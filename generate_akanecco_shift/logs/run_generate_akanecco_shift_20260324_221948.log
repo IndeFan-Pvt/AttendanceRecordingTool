@@ -1,0 +1,17 @@
+[2026/03/24 22:19:48.315] COMMAND: "C:\Users\inde1\Desktop\勤怠作成ツール\exe\generate_akanecco_shift\generate_akanecco_shift.exe" --help
+
+usage: generate_akanecco_shift.exe generate [-h] [--config CONFIG]
+                                            [--target TARGET] [--year YEAR]
+                                            [--month MONTH]
+                                            [--unit-name UNIT_NAME]
+                                            [--days DAYS]
+
+options:
+  -h, --help            show this help message and exit
+  --config CONFIG       設定JSONファイル
+  --target TARGET       書き込み先のExcelファイル
+  --year YEAR           西暦年
+  --month MONTH         月
+  --unit-name UNIT_NAME
+                        ユニット名
+  --days DAYS           作成する日数
