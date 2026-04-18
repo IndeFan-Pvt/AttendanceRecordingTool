@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>employee_id 設計案</title>
+<style>
+:root {
+  --bg: #f4efe8;
+  --paper: #fffdfa;
+  --ink: #24313d;
+  --muted: #677380;
+  --line: #dccfbe;
+  --soft: #f8f2e9;
+  --accent: #8d4b20;
+  --accent-soft: #fff0e4;
+  --info-bg: #eef6ff;
+  --info-fg: #1e4f8f;
+  --warn-bg: #fff6e8;
+  --warn-fg: #8c5800;
+  --ok-bg: #edf8f0;
+  --ok-fg: #166534;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(141, 75, 32, 0.08), transparent 22%),
+    linear-gradient(180deg, #f9f4ed 0%, var(--bg) 100%);
+  font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+}
+
+main {
+  max-width: 1240px;
+  margin: 28px auto;
+  padding: 30px;
+  background: var(--paper);
+  border: 1px solid rgba(141, 75, 32, 0.12);
+  border-radius: 24px;
+  box-shadow: 0 18px 44px rgba(58, 39, 21, 0.10);
+}
+
+h1, h2, h3, p { margin-top: 0; }
+h1 { font-size: 2rem; line-height: 1.2; margin-bottom: 12px; }
+h2 { font-size: 1.3rem; margin-bottom: 14px; }
+h3 { font-size: 1rem; margin-bottom: 10px; }
+p, li, td, th { line-height: 1.7; }
+
+.hero {
+  padding: 24px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff7f0 0%, #fffdfa 100%);
+  border: 1px solid #efddcd;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.lead {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin: 22px 0 28px;
+}
+
+.card {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid #eadfce;
+  background: var(--soft);
+}
+
+.card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.section {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #eee4d8;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.note,
+.warning,
+.success {
+  padding: 16px 18px;
+  border-radius: 14px;
+}
+
+.note {
+  background: var(--info-bg);
+  border: 1px solid #d8e7fb;
+}
+
+.warning {
+  background: var(--warn-bg);
+  border: 1px solid #f2dfb6;
+}
+
+.success {
+  background: var(--ok-bg);
+  border: 1px solid #d2ead8;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+.tag-info { color: var(--info-fg); background: var(--info-bg); }
+.tag-warn { color: var(--warn-fg); background: var(--warn-bg); }
+.tag-ok { color: var(--ok-fg); background: var(--ok-bg); }
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  margin-top: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #efe6da;
+  white-space: nowrap;
+}
+
+tbody tr:nth-child(even) { background: #fffcf8; }
+
+pre {
+  margin: 0;
+  padding: 16px;
+  overflow-x: auto;
+  border-radius: 14px;
+  background: #f6f1e9;
+  border: 1px solid #e3d7c8;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+ul, ol {
+  margin: 8px 0 0 18px;
+  padding-left: 8px;
+}
+
+.source-ref {
+  margin: -4px 0 14px;
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+
+@media (max-width: 900px) {
+  main {
+    margin: 0;
+    padding: 18px;
+    border-radius: 0;
+  }
+
+  h1 { font-size: 1.55rem; }
+}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="eyebrow">設定設計</div>
+    <h1>employee_id 設計案</h1>
+    <p class="lead">akanecco_shift_config.json に employee_id を追加するための具体案です。互換を壊さない移行案を先に定義し、その後の最終形まで見通せる形にしています。</p>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div>追加フィールド</div>
+      <strong>2から3個</strong>
+      <div>employee_id、aliases、必要なら display_name</div>
+    </div>
+    <div class="card">
+      <div>互換方針</div>
+      <strong>name 維持</strong>
+      <div>第1段階では既存 name を残す</div>
+    </div>
+    <div class="card">
+      <div>ID 形式</div>
+      <strong>固定採番</strong>
+      <div>名前由来ではなく再利用しない連番</div>
+    </div>
+    <div class="card">
+      <div>優先対応</div>
+      <strong>読込系</strong>
+      <div>fixed、休日、前月末を先に ID 化</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>1. 採用したい設計原則</h2>
+    <div class="success" style="margin-bottom: 14px;">
+      <ul>
+        <li>ID は名前から自動生成しません。明示的に設定ファイルへ保存する固定値にします</li>
+        <li>一度採番した employee_id は退職後も再利用しません</li>
+        <li>現在は employee_id を内部キー、display_name を表示名、name を互換入力用として併用します</li>
+      </ul>
+    </div>
+    <div class="warning">
+      <p><strong>理由</strong><br>名前由来 ID は旧姓変更や表記揺れのたびに揺れます。今回は名前依存をなくすのが目的なので、ID は意味より安定性を優先します。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>2. 第1段階の JSON 形</h2>
+    <p class="source-ref">現在の実装はこの段階を拡張し、display_name を正式な表示名として追加しています。name は旧設定との互換入力用です。</p>
+    <pre>{
+  "employee_id": "akanecco-001",
+  "display_name": "笹谷 正人",
+  "name": "笹谷 正人",
+  "aliases": ["笹谷正人", "笹谷 正人"],
+  "unit": "南",
+  "employment": "full",
+  "row": 6,
+  "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+  "min_counts": {"夜": 3, "日": 1},
+  "max_counts": {"夜": 4},
+  "min_rest_days": 6,
+  "max_rest_days": 10,
+  "fixed_assignments": {},
+  "previous_tail": []
+}</pre>
+    <div class="note" style="margin-top: 14px;">
+      <p><strong>読み方</strong><br>内部では employee_id を優先し、レポートや検証表示は display_name を使います。Excel 読込では aliases と row を使って employee_id へ解決し、name は旧設定ファイルを読めるよう残しています。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>3. 最終形の JSON 形</h2>
+    <p class="source-ref">次の整理候補は、互換期間が終わった時点で name を設定から外し、display_name に一本化することです。</p>
+    <pre>{
+  "employee_id": "akanecco-001",
+  "display_name": "笹谷 正人",
+  "aliases": ["笹谷正人", "笹谷 正人"],
+  "unit": "南",
+  "employment": "full",
+  "row": 6,
+  "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+  "min_counts": {"夜": 3, "日": 1},
+  "max_counts": {"夜": 4},
+  "min_rest_days": 6,
+  "max_rest_days": 10,
+  "fixed_assignments": {},
+  "previous_tail": []
+}</pre>
+  </section>
+
+  <section class="section">
+    <h2>4. 現在の職員への採番案</h2>
+    <p class="source-ref">採番は意味を持たせず、現在の config 順に固定連番で持つ案です。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>employee_id</th>
+            <th>現在の name</th>
+            <th>employment</th>
+            <th>補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>akanecco-001</td><td>笹谷 正人</td><td>full</td><td>現行 row 6</td></tr>
+          <tr><td>akanecco-002</td><td>川部 春香</td><td>full</td><td>現行 row 8</td></tr>
+          <tr><td>akanecco-003</td><td>都築 良弘</td><td>full</td><td>現行 row 10</td></tr>
+          <tr><td>akanecco-004</td><td>嶋﨑 光子</td><td>full</td><td>現行 row 12</td></tr>
+          <tr><td>akanecco-005</td><td>八重 美貴</td><td>part</td><td>現行 row 14</td></tr>
+          <tr><td>akanecco-006</td><td>稲富茜里</td><td>part</td><td>period_overrides に 稲富 茜里 表記あり</td></tr>
+          <tr><td>akanecco-007</td><td>駒倉 利光</td><td>full</td><td>現行 row 21</td></tr>
+          <tr><td>akanecco-008</td><td>竹内孝寛</td><td>full</td><td>現行 row 23</td></tr>
+          <tr><td>akanecco-009</td><td>岡 虹光</td><td>full</td><td>現行 row 25</td></tr>
+          <tr><td>akanecco-010</td><td>鈴木 美奈</td><td>full</td><td>現行 row 27</td></tr>
+          <tr><td>akanecco-011</td><td>菅野 実里</td><td>full</td><td>誤読候補対策の優先対象</td></tr>
+          <tr><td>akanecco-012</td><td>石井 都子</td><td>part</td><td>現行 row 31</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>5. aliases の持ち方</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>name</th>
+            <th>aliases の例</th>
+            <th>目的</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>稲富茜里</td>
+            <td>稲富茜里, 稲富 茜里</td>
+            <td>base と period_overrides の表記差を吸収する</td>
+          </tr>
+          <tr>
+            <td>竹内孝寛</td>
+            <td>竹内孝寛, 竹内 孝寛</td>
+            <td>空白差分を設定側でも明示する</td>
+          </tr>
+          <tr>
+            <td>菅野 実里</td>
+            <td>菅野実里, 菅野 実里</td>
+            <td>Excel 読込時の候補名寄せを安定させる</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>6. period_overrides でのルール</h2>
+    <div class="warning" style="margin-bottom: 14px;">
+      <p><strong>重要</strong><br>period_overrides 内に職員別設定がある場合、name ではなく employee_id で結び直す方針にすべきです。ここが name のままだと、base に employee_id を足しても月別上書きでまた名前依存が残ります。</p>
+    </div>
+    <pre>{
+  "period_overrides": {
+    "2026-01": {
+      "employees": [
+        {
+          "employee_id": "akanecco-008",
+          "allowed_shifts": ["早", "遅", "日", "休", "特"]
+        }
+      ]
+    }
+  }
+}</pre>
+  </section>
+
+  <section class="section">
+    <h2>7. ロード時の互換ルール</h2>
+    <ol>
+      <li>employee_id があればそれを採用する</li>
+      <li>employee_id がなければ、移行期間だけ normalize(name) から暫定 ID を作る</li>
+      <li>同一 employee_id の重複は即エラーにする</li>
+      <li>aliases の正規化値が他職員と衝突したら警告ではなくエラーにする</li>
+      <li>Excel 読込は aliases 一致を優先し、最後に row 一致をフォールバックにする</li>
+    </ol>
+  </section>
+
+  <section class="section">
+    <h2>8. この設計案で最初にやること</h2>
+    <div class="success">
+      <ol>
+        <li>akanecco_shift_config.json の各 employee に employee_id を追加する</li>
+        <li>表記差がある職員だけ aliases を追加する</li>
+        <li>load_config で employee_id の重複チェックを入れる</li>
+        <li>読込結果の固定勤務、指定休日、previous_tail を employee_id キーへ変換する</li>
+      </ol>
+    </div>
+  </section>
+</main>
+</body>
+</html>

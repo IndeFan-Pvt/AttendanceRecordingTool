@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>現在スクリプトの不足箇所まとめ</title>
+<style>
+:root {
+  --bg: #f3efe9;
+  --paper: #fffdfa;
+  --ink: #24313d;
+  --muted: #66727f;
+  --line: #ddd2c3;
+  --soft: #f7f1e8;
+  --accent: #8f3d18;
+  --accent-soft: #fff1e8;
+  --ok-bg: #edf8f0;
+  --ok-fg: #166534;
+  --partial-bg: #fff7e8;
+  --partial-fg: #9a5b00;
+  --missing-bg: #fff1f2;
+  --missing-fg: #a61b32;
+  --info-bg: #eef6ff;
+  --info-fg: #1d4f91;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(143, 61, 24, 0.08), transparent 24%),
+    linear-gradient(180deg, #f8f3ec 0%, var(--bg) 100%);
+  font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+}
+
+main {
+  max-width: 1220px;
+  margin: 28px auto;
+  padding: 30px;
+  background: var(--paper);
+  border: 1px solid rgba(143, 61, 24, 0.10);
+  border-radius: 24px;
+  box-shadow: 0 18px 44px rgba(58, 39, 21, 0.10);
+}
+
+h1, h2, h3, p { margin-top: 0; }
+h1 { font-size: 2rem; line-height: 1.2; margin-bottom: 12px; }
+h2 { font-size: 1.28rem; margin-bottom: 14px; }
+h3 { font-size: 1rem; margin-bottom: 10px; }
+p, li { line-height: 1.7; }
+
+.hero {
+  padding: 24px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff7f1 0%, #fffdfa 100%);
+  border: 1px solid #f0ddcf;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.lead { color: var(--muted); margin-bottom: 0; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin: 22px 0 28px;
+}
+
+.card {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid #eadfce;
+  background: var(--soft);
+}
+
+.card strong {
+  display: block;
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-top: 6px;
+}
+
+.section {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #eee4d8;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+.ok { color: var(--ok-fg); background: var(--ok-bg); }
+.partial { color: var(--partial-fg); background: var(--partial-bg); }
+.missing { color: var(--missing-fg); background: var(--missing-bg); }
+.info { color: var(--info-fg); background: var(--info-bg); }
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  text-align: left;
+}
+
+th {
+  background: #efe6da;
+  white-space: nowrap;
+}
+
+tbody tr:nth-child(even) { background: #fffcf8; }
+
+ul { margin: 8px 0 0 18px; padding-left: 8px; }
+
+.note {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #f3f8ff;
+  border: 1px solid #d7e6fb;
+}
+
+.warning {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #fff4f5;
+  border: 1px solid #f4cfd7;
+}
+
+.source-ref {
+  margin: -4px 0 14px;
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+
+@media (max-width: 860px) {
+  main {
+    margin: 0;
+    padding: 18px;
+    border-radius: 0;
+  }
+
+  h1 { font-size: 1.55rem; }
+}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="eyebrow">実装ギャップ整理</div>
+    <h1>現在スクリプトの不足箇所まとめ</h1>
+    <p class="lead">シフト作成ルールの検討内容と現在の Python スクリプトを突き合わせて、現状の対応範囲、不足箇所、先に決める仕様、実装タスクの順に整理し直した資料です。対象は主に generate_akanecco_shift.py、generate_akanecco_shift_gui.py、akanecco_shift_config.json です。</p>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div>実装済み</div>
+      <strong>8項目</strong>
+      <div>コア処理で概ね対応済み</div>
+    </div>
+    <div class="card">
+      <div>一部対応</div>
+      <strong>6項目</strong>
+      <div>コアはあるが仕様不足やGUI不足あり</div>
+    </div>
+    <div class="card">
+      <div>未対応</div>
+      <strong>4項目</strong>
+      <div>現在のコードでは直接扱えない</div>
+    </div>
+    <div class="card">
+      <div>重点修正先</div>
+      <strong>3ファイル</strong>
+      <div>本体、GUI、設定JSON</div>
+    </div>
+    <div class="card">
+      <div>実装タスク</div>
+      <strong>9件</strong>
+      <div>高5件、中4件に整理済み</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>1. この資料の見方</h2>
+    <p class="source-ref">根拠: generate_akanecco_shift.py の load_config、build_schedule_model、solve_schedule、validate_schedule と、generate_akanecco_shift_gui.py の入力UI。</p>
+    <div class="note" style="margin-bottom: 16px;">
+      <ul>
+        <li>2 から 5 は、現在のコードがどこまで対応しているかを分類した現状整理です</li>
+        <li>6 は、現場運用に影響が大きく優先して埋める不足を抜き出した要約です</li>
+        <li>7 から 9 は、実装前に決める仕様、実装タスク、着手順を続けて見られる構成にしています</li>
+      </ul>
+    </div>
+    <ul>
+      <li><span class="tag ok">実装済み</span> ルールや機能が現在のコードで明示的に処理されている</li>
+      <li><span class="tag partial">一部対応</span> コア処理はあるが、仕様の厳密さ不足、GUI不足、または解釈依存が残る</li>
+      <li><span class="tag missing">未対応</span> 現在のデータモデルや制約に直接の実装がない</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>2. 実装済みの項目</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>状態</th>
+            <th>根拠</th>
+            <th>補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>南北の早番・遅番配置</td>
+            <td><span class="tag ok">実装済み</span></td>
+            <td>build_schedule_model の required_per_day</td>
+            <td>南北ごとの early と late の人数制約を毎日付与している</td>
+          </tr>
+          <tr>
+            <td>夜勤は南北合計で1人</td>
+            <td><span class="tag ok">実装済み</span></td>
+            <td>build_schedule_model の night_total_per_day</td>
+            <td>1日ごとの夜勤総数制約として実装されている</td>
+          </tr>
+          <tr>
+            <td>遅→早禁止、夜勤翌日の制限</td>
+            <td><span class="tag ok">実装済み</span></td>
+            <td>build_schedule_model の隣接日制約</td>
+            <td>validate_schedule でも再検証される</td>
+          </tr>
+          <tr>
+            <td>最長5連勤、夜勤2連続、連休上限</td>
+            <td><span class="tag ok">実装済み</span></td>
+            <td>add_window_constraint と各 streak 制約</td>
+            <td>work、night、rest、rest+special を別々に判定している</td>
+          </tr>
+          <tr>
+            <td>指定休日前日の夜勤禁止</td>
+            <td><span class="tag ok">実装済み</span></td>
+            <td>EmployeeConfig.specified_holidays と build_schedule_model</td>
+            <td>validate_schedule でも未検証や違反を出せる</td>
+          </tr>
+          <tr>
+            <td>月初への前月末勤務引継ぎ</td>
+            <td><span class="tag ok">実装済み</span></td>
+            <td>previous_tail、read_previous_tail_from_workbook、with_generate_overrides</td>
+            <td>CLI側は前月勤務表を自動探索、GUI側は手動指定も可能</td>
+          </tr>
+          <tr>
+            <td>個別の休数、勤務回数上限</td>
+            <td><span class="tag ok">実装済み</span></td>
+            <td>min_counts、max_counts、min_rest_days、max_rest_days</td>
+            <td>JSONで設定すればコア制約として反映できる</td>
+          </tr>
+          <tr>
+            <td>指定日の日勤人数</td>
+            <td><span class="tag ok">実装済み</span></td>
+            <td>rules.day_requirements</td>
+            <td>日付ごとの min / max 制約として入れられる</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>3. 一部対応だが不足がある項目</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>状態</th>
+            <th>今ある実装</th>
+            <th>不足している点</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>指定勤務日</td>
+            <td><span class="tag partial">一部対応</span></td>
+            <td>fixed_assignments と read_fixed_assignments_from_workbook</td>
+            <td>コアにはあるが、GUIから職員別・日付別に入力する仕組みがない</td>
+          </tr>
+          <tr>
+            <td>指定休日</td>
+            <td><span class="tag partial">一部対応</span></td>
+            <td>specified_holidays を JSON から読める</td>
+            <td>GUIから直接編集できず、運用は設定ファイル依存になる</td>
+          </tr>
+          <tr>
+            <td>夜勤回数の平等化</td>
+            <td><span class="tag partial">一部対応</span></td>
+            <td>fairness_night_spread による差分制約</td>
+            <td>「夜勤回数制限のない職員」だけを明示的に選ぶ仕組みはなく、夜勤可能者全体が対象になる</td>
+          </tr>
+          <tr>
+            <td>土日休みの平等化</td>
+            <td><span class="tag partial">一部対応</span></td>
+            <td>fairness_weekend_spread による差分制約</td>
+            <td>対象は employment == full のみ固定で、個別例外や対象者選択ができない</td>
+          </tr>
+          <tr>
+            <td>夜夜を1回は入れる配慮</td>
+            <td><span class="tag partial">一部対応</span></td>
+            <td>prefer_double_night による目的関数の優遇</td>
+            <td>保証ではなく優遇に留まるため、必ず1回入る仕様にはなっていない</td>
+          </tr>
+          <tr>
+            <td>通常の「日」をどこかに入れる条件</td>
+            <td><span class="tag partial">一部対応</span></td>
+            <td>一部社員に min_counts の「日": 1」を設定可能</td>
+            <td>ルールとして一般化されておらず、対象者定義も validate_schedule 側では曖昧なまま</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>4. 現在のコードで未対応の項目</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>状態</th>
+            <th>不足の根拠</th>
+            <th>必要な拡張</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>人数不足でも途中経過を返す機能</td>
+            <td><span class="tag missing">未対応</span></td>
+            <td>solve_schedule は feasible / optimal でなければ RuntimeError を返すだけ</td>
+            <td>部分解の保持、違反付き出力、GUIでの暫定結果表示が必要</td>
+          </tr>
+          <tr>
+            <td>曜日ごとの勤務可能制限</td>
+            <td><span class="tag missing">未対応</span></td>
+            <td>allowed_shifts は職員単位の固定集合で、曜日別制限を持てない</td>
+            <td>職員ごとの曜日別 allowed_shifts か、日付別禁止制約が必要</td>
+          </tr>
+          <tr>
+            <td>「土日のどちらか休み」の週単位制約</td>
+            <td><span class="tag missing">未対応</span></td>
+            <td>build_schedule_model に週末ペア単位の休み制約がない</td>
+            <td>各土日ペアまたは各週末単位での休み制約モデルが必要</td>
+          </tr>
+          <tr>
+            <td>夜休の明示的なモデル化</td>
+            <td><span class="tag missing">未対応</span></td>
+            <td>夜休は shift_kinds に独立記号がなく、validate_schedule 側で近似判定しているだけ</td>
+            <td>夜休の定義確定、記号追加または派生状態としての一貫した実装が必要</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warning" style="margin-top: 16px;">
+      <h3>重要</h3>
+      <ul>
+        <li>夜休10日ルールは validate_schedule に検出処理があるが、生成時の制約には入っていない</li>
+        <li>曜日限定遅番型の職員制約は、現在のデータモデルでは表現しきれない</li>
+        <li>途中経過出力は、現行ロジックでは失敗時に何も返せない</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>5. GUI側で不足している点</h2>
+    <p class="source-ref">根拠: generate_akanecco_shift_gui.py の ShiftGeneratorApp._build_ui と _run_generate。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>現状</th>
+            <th>不足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>職員別条件の編集</td>
+            <td>GUIでは設定JSONファイルを選ぶだけ</td>
+            <td>allowed_shifts、指定休日、回数上限、固定勤務を画面で編集できない</td>
+          </tr>
+          <tr>
+            <td>指定日条件の編集</td>
+            <td>day_requirements を画面から触れない</td>
+            <td>イベント日の日勤人数指定をGUIから直接設定できない</td>
+          </tr>
+          <tr>
+            <td>制約違反時の再調整補助</td>
+            <td>失敗時はエラーメッセージとログ表示のみ</td>
+            <td>何を緩めればよいかの提案や、未充足条件の分類表示がない</td>
+          </tr>
+          <tr>
+            <td>暫定結果の表示</td>
+            <td>成功時のみ workbook と report を開く</td>
+            <td>失敗時の途中シフトや候補案を見せる仕組みがない</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>6. 優先して埋めるべき不足</h2>
+    <p class="source-ref">未対応項目と一部対応項目のうち、ルール反映への影響が大きいものを先に絞り込んだ一覧です。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>優先度</th>
+            <th>不足項目</th>
+            <th>理由</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>高</td>
+            <td>曜日ごとの勤務可能制限</td>
+            <td>理事長修正版ルールにある曜日限定遅番型を現状のままでは表現できないため</td>
+          </tr>
+          <tr>
+            <td>高</td>
+            <td>夜休の明示的なモデル化</td>
+            <td>夜休10日ルールの生成制約と検証ロジックが一致していないため</td>
+          </tr>
+          <tr>
+            <td>高</td>
+            <td>途中経過出力</td>
+            <td>運用要望に対して、現状は失敗時に何も返せないため</td>
+          </tr>
+          <tr>
+            <td>中</td>
+            <td>GUIでの職員別条件編集</td>
+            <td>コア処理はあっても運用が JSON 直編集前提になっているため</td>
+          </tr>
+          <tr>
+            <td>中</td>
+            <td>「通常の日」を入れる条件の一般化</td>
+            <td>現在は個別設定でしか代替できず、ルールとして明示されていないため</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>7. 実装前に決める仕様</h2>
+    <p class="source-ref">未対応項目を実装可能にするため、先に判断が必要な仕様論点です。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>対象</th>
+            <th>決めること</th>
+            <th>決まっていないと困る理由</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>夜休</td>
+            <td>独立した勤務記号にするか、夜勤翌日の休みから導出するか</td>
+            <td>夜休10日ルールを生成制約へ入れる方法と表示方法が変わるため</td>
+          </tr>
+          <tr>
+            <td>曜日別勤務制限</td>
+            <td>曜日ベースで持つか、日付ベースで禁止日を持つか</td>
+            <td>「金土日のみ遅番可」の設定形式が決まらないとデータモデルを拡張できないため</td>
+          </tr>
+          <tr>
+            <td>土日のどちらか休み</td>
+            <td>各土日ペアで判定するか、週単位で判定するか。夜勤明け休みを含めるか</td>
+            <td>制約モデルと検証ロジックの作り方が変わるため</td>
+          </tr>
+          <tr>
+            <td>途中経過出力</td>
+            <td>暫定シフトを返すのか、未確定セル付きで返すのか、違反一覧だけ出すのか</td>
+            <td>solve_schedule の返り値と GUI の見せ方を先に決める必要があるため</td>
+          </tr>
+          <tr>
+            <td>夜勤平等化</td>
+            <td>対象者、許容差、必須か配慮か</td>
+            <td>現状は夜勤可能者全体が対象で、原文の「制限のない職員」と一致しないため</td>
+          </tr>
+          <tr>
+            <td>土日平等化</td>
+            <td>対象者、夜勤明け休みの扱い、許容差</td>
+            <td>誰の休みを比較するかが曖昧なままだと公平性ルールを固定できないため</td>
+          </tr>
+          <tr>
+            <td>通常の「日」確保</td>
+            <td>対象者、必要回数、他条件と競合したときの優先度</td>
+            <td>ルールとして一般化できていないため</td>
+          </tr>
+          <tr>
+            <td>指定勤務日</td>
+            <td>入力元を JSON、GUI、元勤務表のどれにするか。固定勤務の優先度をどうするか</td>
+            <td>運用方法が決まらないと UI と設定形式を揃えられないため</td>
+          </tr>
+          <tr>
+            <td>指定休日</td>
+            <td>入力元、GUI編集の有無、前月末情報不足時の扱い</td>
+            <td>検証だけでなく運用フローにも影響するため</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>8. 実装タスク一覧</h2>
+    <p class="source-ref">仕様が固まったあとに、そのまま着手できる作業単位へ落とし込んだ一覧です。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>優先度</th>
+            <th>タスク</th>
+            <th>対象ファイル</th>
+            <th>完了条件</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>H1</td>
+            <td><span class="tag missing">高</span></td>
+            <td>曜日別勤務制限を追加する</td>
+            <td>generate_akanecco_shift.py, akanecco_shift_config.json</td>
+            <td>「金土日のみ遅番可」を設定だけで表現できる</td>
+          </tr>
+          <tr>
+            <td>H2</td>
+            <td><span class="tag missing">高</span></td>
+            <td>夜休の定義を実装へ落とす</td>
+            <td>generate_akanecco_shift.py, akanecco_shift_config.json</td>
+            <td>夜休10日ルールが生成時にも検証時にも同じ意味で扱われる</td>
+          </tr>
+          <tr>
+            <td>H3</td>
+            <td><span class="tag missing">高</span></td>
+            <td>週末単位の休み制約を追加する</td>
+            <td>generate_akanecco_shift.py</td>
+            <td>「土日のどちらか休み」が制約として機能する</td>
+          </tr>
+          <tr>
+            <td>H4</td>
+            <td><span class="tag missing">高</span></td>
+            <td>途中経過出力を追加する</td>
+            <td>generate_akanecco_shift.py, generate_akanecco_shift_gui.py</td>
+            <td>不成立でも暫定結果や未充足条件を確認できる</td>
+          </tr>
+          <tr>
+            <td>H5</td>
+            <td><span class="tag missing">高</span></td>
+            <td>対象者付き公平性ルールへ拡張する</td>
+            <td>generate_akanecco_shift.py, akanecco_shift_config.json</td>
+            <td>公平性ルールの対象者を明示指定できる</td>
+          </tr>
+          <tr>
+            <td>M1</td>
+            <td><span class="tag partial">中</span></td>
+            <td>「通常の日」を一般ルール化する</td>
+            <td>generate_akanecco_shift.py, akanecco_shift_config.json</td>
+            <td>対象者と回数を設定から指定できる</td>
+          </tr>
+          <tr>
+            <td>M2</td>
+            <td><span class="tag partial">中</span></td>
+            <td>GUIで職員別条件を編集できるようにする</td>
+            <td>generate_akanecco_shift_gui.py</td>
+            <td>JSON直編集なしで主要条件を変更できる</td>
+          </tr>
+          <tr>
+            <td>M3</td>
+            <td><span class="tag partial">中</span></td>
+            <td>GUIで指定日条件を編集できるようにする</td>
+            <td>generate_akanecco_shift_gui.py</td>
+            <td>特定日の日勤人数指定をGUIで設定できる</td>
+          </tr>
+          <tr>
+            <td>M4</td>
+            <td><span class="tag partial">中</span></td>
+            <td>制約違反時の案内を改善する</td>
+            <td>generate_akanecco_shift.py, generate_akanecco_shift_gui.py</td>
+            <td>再調整に使える失敗案内が出せる</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>9. 着手順</h2>
+    <div class="note">
+      <ul>
+        <li>1. 夜休の定義を決める</li>
+        <li>2. 曜日別勤務制限の表現方法を決める</li>
+        <li>3. 土日のどちらか休みの判定単位を決める</li>
+        <li>4. 公平性ルールの対象者定義を決める</li>
+        <li>5. 途中経過出力の形式を決める</li>
+        <li>6. H1 から H5 のコア実装へ入る</li>
+        <li>7. その後に GUI 入力範囲を広げる</li>
+      </ul>
+    </div>
+    <div class="warning" style="margin-top: 16px;">
+      <h3>この順にする理由</h3>
+      <ul>
+        <li>コア制約の定義が固まらないと、設定JSONもGUIも確定できない</li>
+        <li>特に夜休と曜日制約は、現在のデータモデル拡張の起点になる</li>
+        <li>H1 から H5 は solver と設定モデルに直接影響するため、先に着手する価値が高い</li>
+        <li>途中経過出力は、制約不成立時の扱いを根本から変えるため後回しにしすぎない方がよい</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>10. 要点まとめ</h2>
+    <div class="note">
+      <ul>
+        <li>現在のコードは基本配置と主要な回数制約までは対応済みで、未対応の中心は曜日依存条件、夜休、週末制約、途中経過出力です</li>
+        <li>最初に固めるべきなのは、夜休、曜日制約、週末制約、公平性対象、途中経過出力の仕様です</li>
+        <li>実装は H1 から H5 のコア拡張を先行し、その後に GUI 改善へ進む流れが自然です</li>
+      </ul>
+    </div>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>実装前仕様 確認フォーマット</title>
+<style>
+:root {
+  --bg: #f4efe8;
+  --paper: #fffdfa;
+  --ink: #24313d;
+  --muted: #677380;
+  --line: #dccfbe;
+  --soft: #f8f2e9;
+  --accent: #8d4b20;
+  --accent-soft: #fff0e4;
+  --info-bg: #eef6ff;
+  --info-fg: #1e4f8f;
+  --warn-bg: #fff6e8;
+  --warn-fg: #8c5800;
+  --ok-bg: #edf8f0;
+  --ok-fg: #166534;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(141, 75, 32, 0.08), transparent 22%),
+    linear-gradient(180deg, #f9f4ed 0%, var(--bg) 100%);
+  font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+}
+
+main {
+  max-width: 1240px;
+  margin: 28px auto;
+  padding: 30px;
+  background: var(--paper);
+  border: 1px solid rgba(141, 75, 32, 0.12);
+  border-radius: 24px;
+  box-shadow: 0 18px 44px rgba(58, 39, 21, 0.10);
+}
+
+h1, h2, h3, p { margin-top: 0; }
+h1 { font-size: 2rem; line-height: 1.2; margin-bottom: 12px; }
+h2 { font-size: 1.3rem; margin-bottom: 14px; }
+h3 { font-size: 1rem; margin-bottom: 10px; }
+p, li, td, th { line-height: 1.7; }
+
+.hero {
+  padding: 24px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff7f0 0%, #fffdfa 100%);
+  border: 1px solid #efddcd;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.lead {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 22px 0 28px;
+}
+
+.card {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid #eadfce;
+  background: var(--soft);
+}
+
+.section {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #eee4d8;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.note,
+.warning,
+.success {
+  padding: 16px 18px;
+  border-radius: 14px;
+}
+
+.note {
+  background: var(--info-bg);
+  border: 1px solid #d8e7fb;
+}
+
+.warning {
+  background: var(--warn-bg);
+  border: 1px solid #f2dfb6;
+}
+
+.success {
+  background: var(--ok-bg);
+  border: 1px solid #d2ead8;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+.tag-info { color: var(--info-fg); background: var(--info-bg); }
+.tag-warn { color: var(--warn-fg); background: var(--warn-bg); }
+.tag-ok { color: var(--ok-fg); background: var(--ok-bg); }
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  margin-top: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #efe6da;
+  white-space: nowrap;
+}
+
+tbody tr:nth-child(even) { background: #fffcf8; }
+
+ul, ol {
+  margin: 8px 0 0 18px;
+  padding-left: 8px;
+}
+
+.sheet {
+  margin-top: 18px;
+  padding: 18px;
+  border: 1px solid #e7dbc9;
+  border-radius: 16px;
+  background: #fffdfa;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sheet-title {
+  margin-bottom: 0;
+}
+
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px 14px;
+  margin-top: 14px;
+}
+
+.field {
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 1px dashed #ccbda8;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.decision-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.box {
+  padding: 14px;
+  border: 1px solid #eadfce;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.subtle {
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+
+.impact {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff8ef;
+  border: 1px solid #efdcc2;
+}
+
+.compare-table th:last-child,
+.compare-table td:last-child {
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  main {
+    margin: 0;
+    padding: 18px;
+    border-radius: 0;
+  }
+
+  h1 { font-size: 1.55rem; }
+
+  .decision-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sheet-header {
+    display: block;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  main {
+    margin: 0;
+    max-width: none;
+    box-shadow: none;
+    border: 0;
+  }
+
+  .sheet,
+  .section {
+    break-inside: avoid;
+  }
+}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="eyebrow">有識者確認用</div>
+    <h1>実装前仕様 確認フォーマット</h1>
+    <p class="lead">[現在スクリプトの不足箇所まとめ.html] の「7. 実装前に決める仕様」を、会議やヒアリングでそのまま使える確認フォーマットに整理したものです。できるだけ専門用語を避け、各論点ごとに「勤務表で何が変わるか」「候補」「暫定案」「決定事項」「保留事項」を記録できる形にしています。</p>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div>対象論点</div>
+      <h3 class="sheet-title">9件</h3>
+      <div class="subtle">夜休、曜日ごとの勤務制限、週末の休み方、勤務希望の入れ方など</div>
+    </div>
+    <div class="card">
+      <div>主な利用場面</div>
+      <h3 class="sheet-title">仕様確認会</h3>
+      <div class="subtle">有識者レビュー、運用確認、実装前合意形成</div>
+    </div>
+    <div class="card">
+      <div>記録したい内容</div>
+      <h3 class="sheet-title">決定と保留</h3>
+      <div class="subtle">結論だけでなく、未決事項と次回宿題も残せる構成</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>1. 使い方</h2>
+    <div class="note">
+      <ol>
+        <li>最初に 2 の会議基本情報を記入する</li>
+        <li>次に 3 の論点一覧で、今回決める対象と優先度を確認する</li>
+        <li>4 以降の論点シートを上から順に埋める</li>
+        <li>各シートでは「何を決めるか」「候補」「暫定案」「最終決定」「保留」を分けて記入する</li>
+        <li>最後に未決事項を次回アクションとして整理する</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>2. 会議基本情報</h2>
+    <div class="meta-grid">
+      <div class="field"><span class="field-label">会議名</span></div>
+      <div class="field"><span class="field-label">実施日</span></div>
+      <div class="field"><span class="field-label">参加者</span></div>
+      <div class="field"><span class="field-label">記録担当</span></div>
+      <div class="field"><span class="field-label">対象バージョン</span></div>
+      <div class="field"><span class="field-label">参照資料</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>3. 論点一覧</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>論点</th>
+            <th>決めること</th>
+            <th>勤務表で変わること</th>
+            <th>優先度</th>
+            <th>今回の結論</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>夜休</td>
+            <td>夜勤の次の日を、勤務表で別の種類として扱うかどうか</td>
+            <td>夜勤の次の日の表示と数え方が変わる</td>
+            <td><span class="tag tag-warn">高</span></td>
+            <td>A: 夜勤の次の日は「夜休」として別表示する</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>曜日別勤務制限</td>
+            <td>曜日ごとに入れる勤務を決めるか、日にちごとに決めるか</td>
+            <td>特定の人を「金土日だけ遅番」などにできる</td>
+            <td><span class="tag tag-warn">高</span></td>
+            <td>C: 基本は曜日、例外日は個別上書き</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>土日のどちらか休み</td>
+            <td>土日を1組として見るか、1週間で見るか。夜勤明けを休みに含めるか</td>
+            <td>週末の休みの付き方が変わる</td>
+            <td><span class="tag tag-warn">高</span></td>
+            <td>B: 土日どちらか休み、または夜勤明け扱いなら可</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>途中経過出力</td>
+            <td>完成しないときに、どこまで途中結果を見せるか</td>
+            <td>作れなかった月でも、見直し用の途中案を確認できる</td>
+            <td><span class="tag tag-warn">高</span></td>
+            <td>B: 途中までの勤務表と理由を表示する</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>夜勤平等化</td>
+            <td>誰の夜勤回数を、どの程度そろえるか</td>
+            <td>夜勤回数のばらつき方が変わる</td>
+            <td><span class="tag tag-info">中</span></td>
+            <td>A: 夜勤可能者全員を対象に差は1回まで</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>土日平等化</td>
+            <td>誰の土日休みを、どの程度そろえるか</td>
+            <td>土日の休みの偏り方が変わる</td>
+            <td><span class="tag tag-info">中</span></td>
+            <td>A: 常勤全員を対象に土日休みの差は1回まで</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>通常の「日」確保</td>
+            <td>通常の「日勤」を誰に何回入れるか</td>
+            <td>一部の人に日勤がまったく入らない状態を防ぎやすくなる</td>
+            <td><span class="tag tag-info">中</span></td>
+            <td>A: 対象者全員に月1回以上は通常の日勤を入れる</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>指定勤務日</td>
+            <td>あらかじめ決まっている勤務を、どこで入力するか</td>
+            <td>事前に決まっている勤務の反映方法が変わる</td>
+            <td><span class="tag tag-info">中</span></td>
+            <td>C: 元の勤務表から読み込み、必要時のみ手動上書き</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td>指定休日</td>
+            <td>休み希望や指定休を、どこで入力するか</td>
+            <td>休み希望の入れ方と確認方法が変わる</td>
+            <td><span class="tag tag-info">中</span></td>
+            <td>対象の勤務表に事前に「休」を記入しておく形式</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>4. 論点別シート</h2>
+    <div class="warning">
+      <strong>記入ルール</strong>
+      <ul>
+        <li>「決めること」は曖昧な言い回しのままにせず、勤務表でどう扱うかが分かる書き方にする</li>
+        <li>「決定事項」には、条件、例外、対象者、優先順位まで含める</li>
+        <li>決まらなかった場合は「保留事項」と「次回までの宿題」を必ず残す</li>
+      </ul>
+    </div>
+
+    <article class="sheet">
+      <div class="sheet-header">
+        <h3 class="sheet-title">4-1. 夜休</h3>
+        <span class="tag tag-warn">最優先</span>
+      </div>
+      <p class="subtle">夜勤の次の日を勤務表でどう表すかを決める論点です。</p>
+      <div class="impact"><strong>勤務表で変わること:</strong> 夜勤の次の日を、別の種類の休みとして表示するのか、通常の休みとして扱うのかが決まります。</div>
+      <div class="decision-grid">
+        <div class="box">
+          <strong>決めること</strong>
+          <ul>
+            <li>夜勤の次の日を、勤務表で別記号にするか</li>
+            <li>夜勤の次の日を、通常の休みの一種として扱うか</li>
+            <li>月跨ぎ時の夜休カウントをどう持つか</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>候補</strong>
+          <ul>
+            <li>候補A: 夜勤の次の日は、勤務表に「夜休」として別表示する</li>
+            <li>候補B: 夜勤の次の日は、勤務表上は通常の休みとして扱う</li>
+            <li>候補C: 勤務表には「夜休」と見せるが、内部では通常の休みの一種として数える</li>
+          </ul>
+        </div>
+      </div>
+      <div class="table-wrap compare-table">
+        <table>
+          <thead>
+            <tr>
+              <th>候補</th>
+              <th>メリット</th>
+              <th>デメリット</th>
+              <th>おすすめ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td>勤務表を見たときに夜休が分かりやすい</td>
+              <td>勤務種類が増えるため、整理が少し増える</td>
+              <td><span class="tag tag-warn">有力</span></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td>休みの種類を増やさずに運用できる</td>
+              <td>夜休10日ルールを見た目で確認しにくい</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td>見た目の分かりやすさと内部処理の簡潔さを両立しやすい</td>
+              <td>画面表示と内部の数え方がずれるため説明が必要</td>
+              <td><span class="tag tag-info">次点</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="meta-grid">
+        <div class="field"><span class="field-label">暫定案</span>候補A</div>
+        <div class="field"><span class="field-label">決定事項</span>夜勤の次の日は、勤務表に「夜休」として別表示する。</div>
+        <div class="field"><span class="field-label">例外条件</span></div>
+        <div class="field"><span class="field-label">保留事項</span></div>
+        <div class="field"><span class="field-label">担当者</span></div>
+        <div class="field"><span class="field-label">次回までの宿題</span></div>
+        <div class="field"><span class="field-label">システム側メモ</span></div>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="sheet-header">
+        <h3 class="sheet-title">4-2. 曜日別勤務制限</h3>
+        <span class="tag tag-warn">高優先</span>
+      </div>
+      <p class="subtle">例: 「金土日だけ遅番に入れる」のような条件を、どう管理するかを決める論点です。</p>
+      <div class="impact"><strong>勤務表で変わること:</strong> 特定の人を、決まった曜日だけ特定勤務に入れるようになります。</div>
+      <div class="decision-grid">
+        <div class="box">
+          <strong>決めること</strong>
+          <ul>
+            <li>曜日ごとに決めるか</li>
+            <li>日にちごとに決めるか</li>
+            <li>職員単位か、職員グループ単位でも設定できるようにするか</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>候補</strong>
+          <ul>
+            <li>候補A: 「金土日は遅番可」のように曜日ごとに決める</li>
+            <li>候補B: 「4日、11日、18日は遅番不可」のように日にちごとに決める</li>
+            <li>候補C: 基本は曜日で決め、例外の日だけ個別に上書きする</li>
+          </ul>
+        </div>
+      </div>
+      <div class="table-wrap compare-table">
+        <table>
+          <thead>
+            <tr>
+              <th>候補</th>
+              <th>メリット</th>
+              <th>デメリット</th>
+              <th>おすすめ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td>現場の感覚に近く、説明しやすい</td>
+              <td>例外日が多いと管理しづらい</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td>細かい例外を直接指定しやすい</td>
+              <td>毎月の入力量が増えやすい</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td>基本ルールと例外対応の両方に対応しやすい</td>
+              <td>管理項目が少し増える</td>
+              <td><span class="tag tag-warn">有力</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="meta-grid">
+        <div class="field"><span class="field-label">暫定案</span>候補C</div>
+        <div class="field"><span class="field-label">決定事項</span>基本は曜日ごとに設定し、例外の日だけ個別に上書きする。</div>
+        <div class="field"><span class="field-label">対象職員</span></div>
+        <div class="field"><span class="field-label">保留事項</span></div>
+        <div class="field"><span class="field-label">担当者</span></div>
+        <div class="field"><span class="field-label">次回までの宿題</span></div>
+        <div class="field"><span class="field-label">システム側メモ</span></div>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="sheet-header">
+        <h3 class="sheet-title">4-3. 土日のどちらか休み</h3>
+        <span class="tag tag-warn">高優先</span>
+      </div>
+      <p class="subtle">毎週末に、少なくともどちらか1日は休みになるようにするかを決める論点です。</p>
+      <div class="impact"><strong>勤務表で変わること:</strong> 土日が両方とも勤務になる人を減らせるかどうかが決まります。</div>
+      <div class="decision-grid">
+        <div class="box">
+          <strong>決めること</strong>
+          <ul>
+            <li>各土日ペア単位で判定するか</li>
+            <li>週単位で判定するか</li>
+            <li>夜勤明け休みを「休み」に含めるか</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>候補</strong>
+          <ul>
+            <li>候補A: 土曜か日曜のどちらかが休みならよい</li>
+            <li>候補B: 土曜か日曜のどちらかが休み、または夜勤明け扱いならよい</li>
+            <li>候補C: 土日ではなく、その週のどこかで1日は休みがあればよい</li>
+          </ul>
+        </div>
+      </div>
+      <div class="table-wrap compare-table">
+        <table>
+          <thead>
+            <tr>
+              <th>候補</th>
+              <th>メリット</th>
+              <th>デメリット</th>
+              <th>おすすめ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td>条件が単純で分かりやすい</td>
+              <td>夜勤明けを休みと見たい運用には合わない</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td>現場の体感に近い判定にしやすい</td>
+              <td>夜勤明けを休みとみなすか説明が必要</td>
+              <td><span class="tag tag-warn">有力</span></td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td>週全体で柔軟に組みやすい</td>
+              <td>「土日のどちらか休み」という元の意図から少し離れる</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="meta-grid">
+        <div class="field"><span class="field-label">暫定案</span>候補B</div>
+        <div class="field"><span class="field-label">決定事項</span>土曜か日曜のどちらかが休み、または夜勤明け扱いならよい。</div>
+        <div class="field"><span class="field-label">例外条件</span></div>
+        <div class="field"><span class="field-label">保留事項</span></div>
+        <div class="field"><span class="field-label">担当者</span></div>
+        <div class="field"><span class="field-label">次回までの宿題</span></div>
+        <div class="field"><span class="field-label">システム側メモ</span></div>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="sheet-header">
+        <h3 class="sheet-title">4-4. 途中経過出力</h3>
+        <span class="tag tag-warn">高優先</span>
+      </div>
+      <p class="subtle">自動作成が最後まで完成しなかったとき、何を見せると見直ししやすいかを決める論点です。</p>
+      <div class="impact"><strong>勤務表で変わること:</strong> 作成に失敗しても、途中までの案や不足理由を見ながら手直しできるようになるかが決まります。</div>
+      <div class="decision-grid">
+        <div class="box">
+          <strong>決めること</strong>
+          <ul>
+            <li>何を返せば現場で使えるか</li>
+            <li>未確定セルを許容するか</li>
+            <li>GUI と帳票でどう見せるか</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>候補</strong>
+          <ul>
+            <li>候補A: 作れなかった理由だけを一覧で見せる</li>
+            <li>候補B: 途中まで作れた勤務表と、作れなかった理由を見せる</li>
+            <li>候補C: 未確定のまま残した勤務表を見せる</li>
+          </ul>
+        </div>
+      </div>
+      <div class="table-wrap compare-table">
+        <table>
+          <thead>
+            <tr>
+              <th>候補</th>
+              <th>メリット</th>
+              <th>デメリット</th>
+              <th>おすすめ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td>実装と説明が最も簡単</td>
+              <td>見直しに使える情報が少ない</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td>現場が途中案を見ながら手直ししやすい</td>
+              <td>見せ方の整理が必要</td>
+              <td><span class="tag tag-warn">有力</span></td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td>どこが未確定かを細かく把握できる</td>
+              <td>未確定の扱いが分かりにくくなる恐れがある</td>
+              <td><span class="tag tag-info">次点</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="meta-grid">
+        <div class="field"><span class="field-label">暫定案</span>候補B</div>
+        <div class="field"><span class="field-label">決定事項</span>途中まで作れた勤務表と、作れなかった理由を表示する。</div>
+        <div class="field"><span class="field-label">表示方法</span></div>
+        <div class="field"><span class="field-label">保留事項</span></div>
+        <div class="field"><span class="field-label">担当者</span></div>
+        <div class="field"><span class="field-label">次回までの宿題</span></div>
+        <div class="field"><span class="field-label">システム側メモ</span></div>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="sheet-header">
+        <h3 class="sheet-title">4-5. 夜勤平等化</h3>
+        <span class="tag tag-info">中優先</span>
+      </div>
+      <p class="subtle">夜勤回数を、誰と誰の間で、どの程度そろえるかを決める論点です。</p>
+      <div class="impact"><strong>勤務表で変わること:</strong> 夜勤回数が特定の人へ偏りすぎるのをどこまで防ぐかが決まります。</div>
+      <div class="decision-grid">
+        <div class="box">
+          <strong>決めること</strong>
+          <ul>
+            <li>誰を公平性の対象にするか</li>
+            <li>回数差をどこまで許すか</li>
+            <li>必ず守る条件にするか、できれば守りたい条件にするか</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>候補</strong>
+          <ul>
+            <li>候補A: 夜勤に入れる全員を対象にし、差は 1 回までにする</li>
+            <li>候補B: 一部の対象者だけを指定し、その中で差は 1 回までにする</li>
+            <li>候補C: 原則はそろえるが、完全一致ではなく目安として扱う</li>
+          </ul>
+        </div>
+      </div>
+      <div class="table-wrap compare-table">
+        <table>
+          <thead>
+            <tr>
+              <th>候補</th>
+              <th>メリット</th>
+              <th>デメリット</th>
+              <th>おすすめ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td>分かりやすく公平に見える</td>
+              <td>対象を広げすぎると組みにくくなる</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td>実際に比較したい人だけに絞れる</td>
+              <td>対象者の決め方を先に合意する必要がある</td>
+              <td><span class="tag tag-warn">有力</span></td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td>柔軟で運用しやすい</td>
+              <td>強制力が弱く、偏りが残る場合がある</td>
+              <td><span class="tag tag-info">次点</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="meta-grid">
+        <div class="field"><span class="field-label">対象者の定義</span></div>
+        <div class="field"><span class="field-label">許容差</span>1回まで</div>
+        <div class="field"><span class="field-label">必須か配慮か</span></div>
+        <div class="field"><span class="field-label">決定事項</span>候補Aを採用し、夜勤に入れる全員を対象に差は1回までとする。</div>
+        <div class="field"><span class="field-label">保留事項</span></div>
+        <div class="field"><span class="field-label">担当者</span></div>
+        <div class="field"><span class="field-label">システム側メモ</span></div>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="sheet-header">
+        <h3 class="sheet-title">4-6. 土日平等化</h3>
+        <span class="tag tag-info">中優先</span>
+      </div>
+      <p class="subtle">土日休みを、誰と誰の間で、どの程度そろえるかを決める論点です。</p>
+      <div class="impact"><strong>勤務表で変わること:</strong> 土日に休める回数の偏りを、どこまで小さくするかが決まります。</div>
+      <div class="decision-grid">
+        <div class="box">
+          <strong>決めること</strong>
+          <ul>
+            <li>誰を公平性の対象にするか</li>
+            <li>何を「土日休み」と数えるか</li>
+            <li>回数差をどこまで許すか</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>候補</strong>
+          <ul>
+            <li>候補A: 常勤全員を対象にし、土日休みの差は 1 回までにする</li>
+            <li>候補B: 指定した対象者だけで比べ、夜勤明けは休みに含めない</li>
+            <li>候補C: 指定した対象者だけで比べ、夜勤明けも休みに含める</li>
+          </ul>
+        </div>
+      </div>
+      <div class="table-wrap compare-table">
+        <table>
+          <thead>
+            <tr>
+              <th>候補</th>
+              <th>メリット</th>
+              <th>デメリット</th>
+              <th>おすすめ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td>対象が明確なら運用しやすい</td>
+              <td>対象外の人との不公平感が出ることがある</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td>土日休みの数え方が単純で説明しやすい</td>
+              <td>夜勤明けを休みと見たい運用には合わない</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td>現場感覚に近い公平性にしやすい</td>
+              <td>休みの定義を毎回共有する必要がある</td>
+              <td><span class="tag tag-warn">有力</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="meta-grid">
+        <div class="field"><span class="field-label">対象者の定義</span>常勤全員</div>
+        <div class="field"><span class="field-label">休みの数え方</span></div>
+        <div class="field"><span class="field-label">許容差</span>1回まで</div>
+        <div class="field"><span class="field-label">決定事項</span>候補Aを採用し、常勤全員を対象に土日休みの差は1回までとする。</div>
+        <div class="field"><span class="field-label">保留事項</span></div>
+        <div class="field"><span class="field-label">担当者</span></div>
+        <div class="field"><span class="field-label">システム側メモ</span></div>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="sheet-header">
+        <h3 class="sheet-title">4-7. 通常の「日」確保</h3>
+        <span class="tag tag-info">中優先</span>
+      </div>
+      <p class="subtle">通常の日勤を、誰に何回入れるかを決める論点です。</p>
+      <div class="impact"><strong>勤務表で変わること:</strong> 一部の人に日勤がまったく入らない、または極端に少ない状態を防げるかが決まります。</div>
+      <div class="decision-grid">
+        <div class="box">
+          <strong>決めること</strong>
+          <ul>
+            <li>誰を対象にするか</li>
+            <li>1か月に最低何回入れるか</li>
+            <li>他の条件とぶつかったときにどちらを優先するか</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>候補</strong>
+          <ul>
+            <li>候補A: 対象者全員に、月 1 回以上は通常の日勤を入れる</li>
+            <li>候補B: 対象者を限定し、該当者だけ月 1 回以上入れる</li>
+            <li>候補C: 原則は月 1 回以上だが、他条件と競合した月は努力目標にする</li>
+          </ul>
+        </div>
+      </div>
+      <div class="table-wrap compare-table">
+        <table>
+          <thead>
+            <tr>
+              <th>候補</th>
+              <th>メリット</th>
+              <th>デメリット</th>
+              <th>おすすめ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td>分かりやすく、確認しやすい</td>
+              <td>条件が厳しい月は組みにくくなる</td>
+              <td><span class="tag tag-warn">有力</span></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td>必要な人だけに絞って運用できる</td>
+              <td>対象者管理が増える</td>
+              <td><span class="tag tag-info">次点</span></td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td>柔軟で組みやすい</td>
+              <td>守られない月が出る可能性がある</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="meta-grid">
+        <div class="field"><span class="field-label">対象者</span></div>
+        <div class="field"><span class="field-label">必要回数</span>月1回以上</div>
+        <div class="field"><span class="field-label">他条件と競合した場合の優先度</span></div>
+        <div class="field"><span class="field-label">決定事項</span>候補Aを採用し、対象者全員に月1回以上は通常の日勤を入れる。</div>
+        <div class="field"><span class="field-label">保留事項</span></div>
+        <div class="field"><span class="field-label">担当者</span></div>
+        <div class="field"><span class="field-label">システム側メモ</span></div>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="sheet-header">
+        <h3 class="sheet-title">4-8. 指定勤務日</h3>
+        <span class="tag tag-info">中優先</span>
+      </div>
+      <p class="subtle">あらかじめ決まっている勤務を、どこで入力し、どこまで優先するかを決める論点です。</p>
+      <div class="impact"><strong>勤務表で変わること:</strong> 先に決まっている勤務を、手で直さなくても勤務表へ反映しやすくなるかが決まります。</div>
+      <div class="decision-grid">
+        <div class="box">
+          <strong>決めること</strong>
+          <ul>
+            <li>どこで入力するか</li>
+            <li>固定勤務をどこまで優先するか</li>
+            <li>誰が変更できるようにするか</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>候補</strong>
+          <ul>
+            <li>候補A: 設定ファイルで入力し、固定勤務は最優先で守る</li>
+            <li>候補B: 画面から入力し、固定勤務は原則守るが一部例外を認める</li>
+            <li>候補C: 元の勤務表から読み込み、必要時だけ手動で上書きする</li>
+          </ul>
+        </div>
+      </div>
+      <div class="table-wrap compare-table">
+        <table>
+          <thead>
+            <tr>
+              <th>候補</th>
+              <th>メリット</th>
+              <th>デメリット</th>
+              <th>おすすめ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td>ルールが明確でぶれにくい</td>
+              <td>画面で直感的に修正しにくい</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td>現場で修正しやすい</td>
+              <td>画面作りの手間が増える</td>
+              <td><span class="tag tag-info">次点</span></td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td>既存の勤務表を活かしやすい</td>
+              <td>元データの形式に左右されやすい</td>
+              <td><span class="tag tag-warn">有力</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="meta-grid">
+        <div class="field"><span class="field-label">入力元</span>元の勤務表</div>
+        <div class="field"><span class="field-label">固定勤務の優先度</span></div>
+        <div class="field"><span class="field-label">GUIで編集する範囲</span></div>
+        <div class="field"><span class="field-label">決定事項</span>候補Cを採用し、元の勤務表から読み込み、必要時だけ手動で上書きする。</div>
+        <div class="field"><span class="field-label">保留事項</span></div>
+        <div class="field"><span class="field-label">担当者</span></div>
+        <div class="field"><span class="field-label">システム側メモ</span></div>
+      </div>
+    </article>
+
+    <article class="sheet">
+      <div class="sheet-header">
+        <h3 class="sheet-title">4-9. 指定休日</h3>
+        <span class="tag tag-info">中優先</span>
+      </div>
+      <p class="subtle">休み希望や指定休を、どこで入力し、どう確認するかを決める論点です。</p>
+      <div class="impact"><strong>勤務表で変わること:</strong> 休み希望の入れ漏れや確認漏れを減らせるかが決まります。</div>
+      <div class="decision-grid">
+        <div class="box">
+          <strong>決めること</strong>
+          <ul>
+            <li>どこで入力するか</li>
+            <li>誰が確認・修正できるようにするか</li>
+            <li>前月情報が足りないときにどう扱うか</li>
+          </ul>
+        </div>
+        <div class="box">
+          <strong>候補</strong>
+          <ul>
+            <li>候補A: 設定ファイルで入力し、足りない情報は空欄のまま警告を出す</li>
+            <li>候補B: 画面から入力し、入力漏れがあれば作成前に確認メッセージを出す</li>
+            <li>候補C: 元の勤務表から読み込み、不足分だけ手入力で補う</li>
+          </ul>
+        </div>
+      </div>
+      <div class="table-wrap compare-table">
+        <table>
+          <thead>
+            <tr>
+              <th>候補</th>
+              <th>メリット</th>
+              <th>デメリット</th>
+              <th>おすすめ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td>入力方法が単純で管理しやすい</td>
+              <td>入力漏れに気づきにくい</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td>入力漏れを防ぎやすく、確認しやすい</td>
+              <td>画面整備の手間が増える</td>
+              <td><span class="tag tag-info">次点</span></td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td>既存の勤務表資産を使いやすい</td>
+              <td>元データの確認が必要になる</td>
+              <td><span class="tag tag-warn">有力</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="meta-grid">
+        <div class="field"><span class="field-label">入力元</span>記載対象の勤務表に事前記入した「休」</div>
+        <div class="field"><span class="field-label">GUIで編集する範囲</span>GUIでは入力しない</div>
+        <div class="field"><span class="field-label">情報不足時の扱い</span>対象の勤務表に事前記入された内容をそのまま使う</div>
+        <div class="field"><span class="field-label">決定事項</span>指定休日は、【統一書式】あかねっこ2月_temp.xls に記載しているように、記載対象の勤務表へ事前に「休」を記入しておく形式とする。</div>
+        <div class="field"><span class="field-label">保留事項</span></div>
+        <div class="field"><span class="field-label">担当者</span></div>
+        <div class="field"><span class="field-label">システム側メモ</span></div>
+      </div>
+    </article>
+  </section>
+
+  <section class="section">
+    <h2>5. 最終確認欄</h2>
+    <div class="success">
+      <ul>
+        <li>今回決まった内容が、勤務表上でどう変わるかまで確認したか</li>
+        <li>今回決まった内容を、システム側でどこへ反映するか確認したか</li>
+        <li>保留事項に対して、担当者と期限を置いたか</li>
+        <li>次回までに必要なサンプル勤務表や実例を洗い出したか</li>
+      </ul>
+    </div>
+    <div class="meta-grid" style="margin-top: 14px;">
+      <div class="field"><span class="field-label">今回の決定事項まとめ</span></div>
+      <div class="field"><span class="field-label">未決事項まとめ</span></div>
+      <div class="field"><span class="field-label">次回確認日</span></div>
+      <div class="field"><span class="field-label">次回までの担当分担</span></div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

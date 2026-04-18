@@ -1,0 +1,1026 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>シフト作成ルール 分析まとめ</title>
+<style>
+:root {
+  --bg: #f4efe8;
+  --paper: #fffdfa;
+  --ink: #24313d;
+  --muted: #66727f;
+  --line: #ddd2c3;
+  --soft: #f7f1e8;
+  --accent: #8f3d18;
+  --accent-soft: #fff2e8;
+  --must-bg: #eef7f0;
+  --must-fg: #18603a;
+  --care-bg: #fff8e6;
+  --care-fg: #9a5b00;
+  --func-bg: #eef6ff;
+  --func-fg: #1d4f91;
+  --risk-bg: #fff1f2;
+  --risk-fg: #a61b32;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(143, 61, 24, 0.08), transparent 24%),
+    linear-gradient(180deg, #f8f3ec 0%, var(--bg) 100%);
+  font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+}
+
+main {
+  max-width: 1180px;
+  margin: 28px auto;
+  padding: 30px;
+  background: var(--paper);
+  border: 1px solid rgba(143, 61, 24, 0.10);
+  border-radius: 24px;
+  box-shadow: 0 18px 44px rgba(58, 39, 21, 0.10);
+}
+
+h1, h2, h3, p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+h2 {
+  font-size: 1.28rem;
+  margin-bottom: 14px;
+}
+
+h3 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+p, li {
+  line-height: 1.7;
+}
+
+.hero {
+  padding: 24px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff7f1 0%, #fffdfa 100%);
+  border: 1px solid #f0ddcf;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.lead {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin: 22px 0 28px;
+}
+
+.card {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid #eadfce;
+  background: var(--soft);
+}
+
+.card strong {
+  display: block;
+  font-size: 1.8rem;
+  line-height: 1;
+  margin-top: 6px;
+}
+
+.section {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #eee4d8;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.two-column {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr;
+  gap: 18px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+.must { color: var(--must-fg); background: var(--must-bg); }
+.care { color: var(--care-fg); background: var(--care-bg); }
+.func { color: var(--func-fg); background: var(--func-bg); }
+.risk { color: var(--risk-fg); background: var(--risk-bg); }
+
+.status-strong {
+  color: #166534;
+  background: #edf8f0;
+}
+
+.status-pending {
+  color: #9a3412;
+  background: #fff1e8;
+}
+
+.status-structured {
+  color: #1d4f91;
+  background: #eef6ff;
+}
+
+.difficulty-low {
+  color: #18603a;
+  font-weight: 700;
+}
+
+.difficulty-medium {
+  color: #9a5b00;
+  font-weight: 700;
+}
+
+.difficulty-high {
+  color: #a61b32;
+  font-weight: 700;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  text-align: left;
+}
+
+th {
+  background: #efe6da;
+  white-space: nowrap;
+}
+
+tbody tr:nth-child(even) {
+  background: #fffcf8;
+}
+
+ul {
+  margin: 8px 0 0 18px;
+  padding-left: 8px;
+}
+
+.note {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #f3f8ff;
+  border: 1px solid #d7e6fb;
+}
+
+.warning {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #fff4f5;
+  border: 1px solid #f4cfd7;
+}
+
+.source-ref {
+  margin: -4px 0 14px;
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+
+.list-block + .list-block {
+  margin-top: 16px;
+}
+
+@media (max-width: 860px) {
+  main {
+    margin: 0;
+    padding: 18px;
+    border-radius: 0;
+  }
+
+  .two-column {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 1.55rem;
+  }
+}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="eyebrow">ルール再整理</div>
+    <h1>シフト作成ルール 分析まとめ</h1>
+    <p class="lead">原文の内容を、実際に判断しやすい単位へ整理した資料です。単なる転記ではなく、優先度、判定条件、実装に必要な追加情報、曖昧な点を分けて見えるようにしています。</p>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div>勤務記号</div>
+      <strong>6種類</strong>
+      <div>早・遅・日・夜・休・特</div>
+    </div>
+    <div class="card">
+      <div>必須制約</div>
+      <strong>9項目</strong>
+      <div>違反するとシフト不成立</div>
+    </div>
+    <div class="card">
+      <div>配慮事項</div>
+      <strong>5項目</strong>
+      <div>できれば満たしたい条件</div>
+    </div>
+    <div class="card">
+      <div>追加機能要望</div>
+      <strong>4項目</strong>
+      <div>作成ロジック以外の要件も含む</div>
+    </div>
+    <div class="card">
+      <div>個別制限の型</div>
+      <strong>3種類</strong>
+      <div>職員ごとの勤務可能条件</div>
+    </div>
+  </section>
+
+  <section class="section two-column">
+    <div>
+      <h2>1. まず押さえるべき全体像</h2>
+      <p class="source-ref">対応原文: 1-70行。全体構成を再整理した要約です。</p>
+      <div class="list-block">
+        <h3>このルール群は3層に分かれています</h3>
+        <ul>
+          <li><span class="tag must">必須</span> 人員配置や勤務間隔など、守らないと成立しない条件</li>
+          <li><span class="tag care">配慮</span> 公平性や疲労分散のため、できれば満たしたい条件</li>
+          <li><span class="tag func">機能要望</span> 作成システムに持たせたい入力機能や途中出力の要望</li>
+        </ul>
+      </div>
+      <div class="list-block">
+        <h3>このルールで重要な前提</h3>
+        <ul>
+          <li>月初は前月末の勤務状態を引き継ぐため、単月だけ見て判定できない条件がある</li>
+          <li>指定勤務日、指定休日、個人別の休数上限など、外部入力が必要な条件がある</li>
+          <li>「夜休」は公休扱いだが、連続しすぎる並びは禁止という独自運用がある</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="note">
+        <h3>要点</h3>
+        <ul>
+          <li>最優先は人員配置条件と勤務遷移制限</li>
+          <li>次に連勤、連休、夜勤回数の公平性</li>
+          <li>最後に土日休みや日勤配置などの配慮条件</li>
+        </ul>
+      </div>
+      <div class="warning" style="margin-top: 16px;">
+        <h3>原文の読み取り注意</h3>
+        <ul>
+          <li>項番が重複、欠番しているため番号より中身で整理した方が安全</li>
+          <li>「夜勤明け休み」の表現は通常の休みと区別して管理する必要がある</li>
+          <li>「平等」「なるべく」には許容差の定義が必要</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>2. 勤務記号と基本ルール</h2>
+    <p class="source-ref">対応原文: 1-4行。勤務記号と前提情報を整理しています。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>記号</th>
+            <th>意味</th>
+            <th>補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>早</td>
+            <td>早番</td>
+            <td>各ユニットの南北にそれぞれ1人ずつ必要</td>
+          </tr>
+          <tr>
+            <td>遅</td>
+            <td>遅番</td>
+            <td>各ユニットの南北にそれぞれ1人ずつ必要</td>
+          </tr>
+          <tr>
+            <td>日</td>
+            <td>日勤</td>
+            <td>通常勤務。別途「どこかに入れる」配慮条件あり</td>
+          </tr>
+          <tr>
+            <td>夜</td>
+            <td>夜勤</td>
+            <td>南北合計で1人配置。連続は2回まで</td>
+          </tr>
+          <tr>
+            <td>休</td>
+            <td>休み</td>
+            <td>連休上限や夜勤明け休みの扱いに注意</td>
+          </tr>
+          <tr>
+            <td>特</td>
+            <td>特別有休</td>
+            <td>連休計算では休みと合わせて扱う前提がある</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>3. 必須制約</h2>
+    <p class="source-ref">対応原文: 6-30行。必須としているものを条件単位で再編しています。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>分類</th>
+            <th>内容</th>
+            <th>実務上の意味</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>配置人数</td>
+            <td>各ユニットの南北で、早番と遅番をそれぞれ1人ずつ置く</td>
+            <td>毎日の最低配置条件。欠けると運営できない</td>
+          </tr>
+          <tr>
+            <td>夜勤人数</td>
+            <td>夜勤は南北合計で1人置く</td>
+            <td>夜勤者の必要人数が明確に固定されている</td>
+          </tr>
+          <tr>
+            <td>勤務遷移</td>
+            <td>遅の翌日は早不可</td>
+            <td>遅番後の負担軽減。例として「遅→遅→夜」は可、「遅→早」は不可</td>
+          </tr>
+          <tr>
+            <td>勤務遷移</td>
+            <td>夜の翌日は早・日・遅不可。夜勤は2連続まで</td>
+            <td>夜勤後は実質的に休み、特休、または夜の継続に限定される</td>
+          </tr>
+          <tr>
+            <td>指定休日</td>
+            <td>指定休日の前日に夜勤を入れない</td>
+            <td>休日指定を守るため、前日の候補勤務が制限される</td>
+          </tr>
+          <tr>
+            <td>連勤上限</td>
+            <td>最長5連勤まで</td>
+            <td>前月末から数えて6連勤にならないことも含む</td>
+          </tr>
+          <tr>
+            <td>月跨ぎ引継ぎ</td>
+            <td>月初の勤務は前月末の勤務状況を引き継ぐ</td>
+            <td>月末から月初へまたぐ勤務遷移や連勤数も連続して判定する</td>
+          </tr>
+          <tr>
+            <td>連休上限</td>
+            <td>連休は3連休まで。特を含んで5連休までは可</td>
+            <td>休みの偏りを防ぎつつ、特休連結はある程度許容する</td>
+          </tr>
+          <tr>
+            <td>公平性</td>
+            <td>夜勤回数制限のない職員同士で、夜勤回数差を1回以内にする</td>
+            <td>夜勤負担の公平性を数値で定義している</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>4. 前日勤務ごとの遷移ルール</h2>
+    <p class="source-ref">対応原文: 10-18行。前日勤務と翌日勤務の関係を表に集約しています。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>前日</th>
+            <th>翌日に入れてよい勤務</th>
+            <th>禁止または制限</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>早</td>
+            <td>早、日、遅、夜、休、特</td>
+            <td>明確な禁止なし</td>
+          </tr>
+          <tr>
+            <td>遅</td>
+            <td>日、遅、夜、休、特</td>
+            <td>早は禁止</td>
+          </tr>
+          <tr>
+            <td>日</td>
+            <td>早、日、遅、夜、休、特</td>
+            <td>明確な禁止なし</td>
+          </tr>
+          <tr>
+            <td>夜</td>
+            <td>夜、休、特</td>
+            <td>早、日、遅は禁止。夜は2連続まで</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top: 14px; color: var(--muted);">月初判定では、この遷移ルールを前月末の最終勤務から連続して適用する必要があります。</p>
+  </section>
+
+  <section class="section">
+    <h2>5. できれば守りたい配慮条件</h2>
+    <p class="source-ref">対応原文: 32-44行。配慮しているものをそのまま条件群として整理しています。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>内容</th>
+            <th>意図</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>夜勤の入れ方</td>
+            <td>「夜夜」の2連続夜勤を1回は入れる</td>
+            <td>夜勤明け休みばかりになる並びを避けたい</td>
+          </tr>
+          <tr>
+            <td>連勤の抑制</td>
+            <td>理想は4連勤まで。4連勤の発生は月1回程度が望ましい</td>
+            <td>5連勤は許容しても、できればそこまで伸ばしたくない</td>
+          </tr>
+          <tr>
+            <td>土日休み</td>
+            <td>土日の休み数がなるべく平等になるようにする</td>
+            <td>休日の公平感を保つ</td>
+          </tr>
+          <tr>
+            <td>日勤の確保</td>
+            <td>勤務体制に関係のない「日」1日間をどこかに入れる</td>
+            <td>有給取得候補日として使える余地を残したい</td>
+          </tr>
+          <tr>
+            <td>夜休の偏り防止</td>
+            <td>夜勤明け休みは公休ではあるが、「夜休」の入った休みが10日以上続くのは禁止</td>
+            <td>夜勤後休みだけが長く続く不自然な並びを避ける</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>6. システムに欲しい機能</h2>
+    <p class="source-ref">対応原文: 46-56行。組み込んでもらいたい機能を入力観点で整理しています。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>機能</th>
+            <th>内容</th>
+            <th>必要な入力</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>個別の休数指定</td>
+            <td>職員ごと、月ごとに休み回数を指定したい</td>
+            <td>職員別の目標休数</td>
+          </tr>
+          <tr>
+            <td>勤務種類ごとの上限</td>
+            <td>「早」「日」「遅」「夜」のMAX回数を個別指定したい</td>
+            <td>職員別、勤務種別ごとの上限値</td>
+          </tr>
+          <tr>
+            <td>特定日の手厚い日勤配置</td>
+            <td>指定日は日勤を必ず1～2人入れたい</td>
+            <td>対象日と必要人数</td>
+          </tr>
+          <tr>
+            <td>途中経過の出力</td>
+            <td>人数不足で作成が完全にできない場合でも、途中経過でその時点のシフトを出したい</td>
+            <td>未充足条件の一覧と暫定結果の出力仕様</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>7. 出勤制限のある職員パターン</h2>
+    <p class="source-ref">対応原文: 60-70行。個別事情をパターン化して整理しています。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>パターン</th>
+            <th>条件</th>
+            <th>対象メモ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>早番メイン型</td>
+            <td>早番中心。日勤は可。遅番と夜勤は不可</td>
+            <td>あきひめ1名、あかねっこ1名</td>
+          </tr>
+          <tr>
+            <td>早遅固定型</td>
+            <td>早番と遅番のみ。夜勤なし。遅番回数は未定</td>
+            <td>あきひめ1名</td>
+          </tr>
+          <tr>
+            <td>曜日限定遅番型</td>
+            <td>早、遅、日、夜は可能だが、遅番ができるのは金土日のみ</td>
+            <td>あかねっこ1名。土日のどちらか休み。土日の休みは夜勤明け休みでも可</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top: 14px; color: var(--muted);">曜日限定遅番型については、原文に「シフト作成困難な場合は、お願いし土日出勤してもらうこともあり」とあるため、土日条件に例外許容がある前提で読む必要があります。</p>
+  </section>
+
+  <section class="section two-column">
+    <div>
+      <h2>8. 実装や運用で追加定義が必要な点</h2>
+      <div class="warning">
+        <ul>
+          <li>指定勤務日と指定休日の入力形式が未定義</li>
+          <li>「平等」の許容差は夜勤は1回以内と明記があるが、土日休みは未定義</li>
+          <li>「夜休」の判定方法を勤務記号として持つのか、夜の翌日休みとして導出するのかを決める必要がある</li>
+          <li>「勤務体制に関係のない『日』1日間をどこかに入れる」は対象者全員か、一部職員かが曖昧</li>
+          <li>「日勤を必ず1～2人配置」は日付単位なのかユニット単位なのか補足が必要</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <h2>9. 確認事項一覧</h2>
+      <div class="note">
+        <ul>
+          <li>指定勤務日と指定休日は、誰に対してどの日付をどう入力する想定か</li>
+          <li>土日休みの「なるべく平等」は、何回差まで許容するか</li>
+          <li>「夜休」は独立した勤務記号として管理するのか、それとも夜勤翌日の休みを自動的に夜休扱いにするのか</li>
+          <li>「勤務体制に関係のない『日』1日間をどこかに入れる」は全職員対象か、常勤のみ対象か</li>
+          <li>「指定した日は日勤を必ず1～2人配置」は施設全体での人数か、南北それぞれの人数か</li>
+          <li>個別指定できる休み回数と勤務回数上限は、固定値か月ごとの可変設定か</li>
+          <li>曜日限定遅番型の職員に対する「土日のどちらか休み」は原則ルールか、作成困難時には外してよい準必須ルールか</li>
+          <li>完全解が出ない場合の途中経過出力では、未確定欄、違反欄、代替案のどこまで表示したいか</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>10. 優先順位の考え方</h2>
+      <div class="note">
+        <ul>
+          <li>第1優先: 人数配置、勤務遷移、指定休日、連勤上限</li>
+          <li>第2優先: 連休上限、夜勤回数の公平性、個別勤務制限</li>
+          <li>第3優先: 土日休みの平等、4連勤抑制、日勤配置、夜夜を1回入れる配慮</li>
+          <li>第4優先: 途中経過出力や個別上限入力などの操作機能</li>
+        </ul>
+      </div>
+  </section>
+
+  <section class="section">
+    <h2>11. この資料での整理結果</h2>
+    <p>原文は現場の意図が十分入っている一方で、必須条件、理想条件、将来機能、個別事情が一続きに書かれています。そのため、シフト作成ロジックに落とす際は次の順で扱うと整理しやすくなります。</p>
+    <ul>
+      <li>先に「毎日成立に必要な条件」を機械的に判定する</li>
+      <li>次に「公平性と疲労分散」をスコア化して調整する</li>
+      <li>最後に「入力画面や途中出力」といった機能要望を実装する</li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2>12. 原文と分析版の比較表</h2>
+    <p style="color: var(--muted); margin-bottom: 14px;">色分けの意味: <span class="tag status-strong">強化した点</span> は分析版で判断基準を明確にした項目、<span class="tag status-pending">保留した点</span> は確認が必要な項目、<span class="tag status-structured">整理した点</span> は構成や表現を読みやすく再編した項目です。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>区分</th>
+            <th>原文の書き方</th>
+            <th>分析版での整理</th>
+            <th>差分の意味</th>
+            <th>実装難易度</th>
+            <th>理由</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="tag status-structured">整理した点</span></td>
+            <td>「必須としているもの」「配慮しているもの」「組み込んでもらいたい機能」「出勤制限のある職員について」が連続して並ぶ</td>
+            <td>必須制約、配慮条件、機能要望、個別制限の4区分に明確化</td>
+            <td>何を必ず守るかと、何を後から調整するかを分けて判断できるようにした</td>
+            <td><span class="difficulty-low">低</span></td>
+            <td>文書整理だけで済むため</td>
+          </tr>
+          <tr>
+            <td><span class="tag status-structured">整理した点</span></td>
+            <td>項番が重複し、番号と内容の対応が取りにくい</td>
+            <td>番号に依存せず、内容単位で章立てして再配置</td>
+            <td>誤読を防ぎ、実装時に条件漏れを起こしにくくした</td>
+            <td><span class="difficulty-low">低</span></td>
+            <td>再編集のみで対応可能なため</td>
+          </tr>
+          <tr>
+            <td><span class="tag status-strong">強化した点</span></td>
+            <td>「早の翌日は早・日・遅・夜勤・休・特が可」などが文章で散在</td>
+            <td>前日勤務ごとの遷移ルール表に集約</td>
+            <td>制約プログラムに落とし込みやすい形式へ変換した</td>
+            <td><span class="difficulty-medium">中</span></td>
+            <td>条件表への変換と整合確認が必要なため</td>
+          </tr>
+          <tr>
+            <td><span class="tag status-strong">強化した点</span></td>
+            <td>「夜の翌日は早・日・遅不可。夜は夜夜の2連続まで」</td>
+            <td>夜勤後は夜、休、特のみ許容と明示</td>
+            <td>禁止条件の裏返しとして、許可される候補を明示した</td>
+            <td><span class="difficulty-medium">中</span></td>
+            <td>許可条件への読み替えで誤解を避ける必要があるため</td>
+          </tr>
+          <tr>
+            <td><span class="tag status-strong">強化した点</span></td>
+            <td>「月初の勤務は前月末の勤務状況を引き継ぐ」</td>
+            <td>単月判定では不十分で、月跨ぎ判定が必要な条件として整理</td>
+            <td>運用メモではなく、判定ロジック上の必須入力として位置付けた</td>
+            <td><span class="difficulty-high">高</span></td>
+            <td>前月データ連携と跨ぎ判定が必要なため</td>
+          </tr>
+          <tr>
+            <td><span class="tag status-strong">強化した点</span></td>
+            <td>「夜勤回数制限のない職員の夜勤回数は平等。ばらつきは1回以内」</td>
+            <td>公平性ルールとして独立記載</td>
+            <td>単なる配慮ではなく、数値で判定できる条件として明確化した</td>
+            <td><span class="difficulty-medium">中</span></td>
+            <td>対象者抽出と回数比較が必要なため</td>
+          </tr>
+          <tr>
+            <td><span class="tag status-strong">強化した点</span></td>
+            <td>「連勤は4連勤まで。4連勤の発生は月1回程度が望ましい」</td>
+            <td>必須の5連勤上限とは別に、理想条件として分離</td>
+            <td>絶対条件と理想条件を混同しないようにした</td>
+            <td><span class="difficulty-low">低</span></td>
+            <td>優先度の再分類で済むため</td>
+          </tr>
+          <tr>
+            <td><span class="tag status-pending">保留した点</span></td>
+            <td>「勤務体制に関係のない『日』1日間をどこかに入れる」</td>
+            <td>配慮条件として掲載しつつ、対象範囲が曖昧なため確認事項にも転記</td>
+            <td>現時点で実装確定できない条件を保留扱いにした</td>
+            <td><span class="difficulty-high">高</span></td>
+            <td>対象者と意図の確認が先に必要なため</td>
+          </tr>
+          <tr>
+            <td><span class="tag status-pending">保留した点</span></td>
+            <td>「夜休の入った休みが10日以上続くのは禁止」</td>
+            <td>独自運用として扱い、夜休の定義確認が必要と整理</td>
+            <td>記号定義が不足しているため、先に仕様確認が必要だと示した</td>
+            <td><span class="difficulty-high">高</span></td>
+            <td>夜休の定義が未確定で判定基準を作れないため</td>
+          </tr>
+          <tr>
+            <td><span class="tag status-structured">整理した点</span></td>
+            <td>「休回数の指定」「MAX回数指定」「指定日の日勤人数」「途中経過でも欲しい」が同列に並ぶ</td>
+            <td>すべてシステム機能要望として表化し、必要入力も併記</td>
+            <td>ルール本体とUI・出力要件を切り分けた</td>
+            <td><span class="difficulty-medium">中</span></td>
+            <td>入力仕様と画面仕様の整理が必要なため</td>
+          </tr>
+          <tr>
+            <td><span class="tag status-structured">整理した点</span></td>
+            <td>「早番メイン」「早遅固定」「曜日限定遅番」などの職員事情が文章で列挙される</td>
+            <td>個別制限パターンとして類型化</td>
+            <td>個人名ベースではなく、設定テンプレートとして再利用しやすくした</td>
+            <td><span class="difficulty-medium">中</span></td>
+            <td>パターン化後の設定形式を決める必要があるため</td>
+          </tr>
+          <tr>
+            <td><span class="tag status-pending">保留した点</span></td>
+            <td>「土日のどちらか休み。困難ならお願いし土日出勤してもらうこともあり」</td>
+            <td>例外許容のある条件として整理</td>
+            <td>原文に例外が併記されているため、条件強度の確認が必要だと分かるようにした</td>
+            <td><span class="difficulty-high">高</span></td>
+            <td>例外条件付きで制約強度の設計が必要なため</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>13. 高難易度の要対応一覧</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>難しい理由</th>
+            <th>先に決めること</th>
+            <th>影響範囲</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>月初への前月末勤務引継ぎ</td>
+            <td>前月データを参照しないと連勤数や勤務遷移を正しく判定できない</td>
+            <td>前月末データの持ち方、読み込み元、月跨ぎ時の判定ルール</td>
+            <td>連勤上限、遅→早禁止、夜勤後制限などの必須判定全体</td>
+          </tr>
+          <tr>
+            <td>「勤務体制に関係のない『日』1日間をどこかに入れる」条件</td>
+            <td>対象者と「勤務体制に関係のない『日』」の意味が曖昧</td>
+            <td>対象職員、月内での必要回数、他条件と競合した場合の優先度</td>
+            <td>日勤配置ロジック、評価スコア、配慮条件の判定</td>
+          </tr>
+          <tr>
+            <td>夜休が10日以上続く並びの禁止</td>
+            <td>夜休を独立記号で管理するのか派生状態で扱うのか未定</td>
+            <td>夜休の定義、数え方、通常の休みとの違い、連続判定の単位</td>
+            <td>休み判定、連続休み判定、出力表示の記号体系</td>
+          </tr>
+          <tr>
+            <td>土日のどちらか休みだが例外ありの条件</td>
+            <td>原則と例外が同時に書かれており、制約強度を固定できない</td>
+            <td>原則違反をどこまで許すか、代替条件の有無、例外時の記録方法</td>
+            <td>曜日制約、優先度付き制約、候補解の評価ロジック</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="warning" style="margin-top: 16px;">
+      <h3>先に確認すると進めやすい順</h3>
+      <ul>
+        <li>月跨ぎデータをどう持つか</li>
+        <li>夜休をどう定義するか</li>
+        <li>対象者が曖昧な配慮条件を誰に適用するか</li>
+        <li>例外を含む曜日制約をハード制約にするかソフト制約にするか</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>14. 実装順の提案</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>順番</th>
+            <th>先にやること</th>
+            <th>この順にする理由</th>
+            <th>完了条件</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>月跨ぎデータの仕様を確定する</td>
+            <td>前月末の勤務を扱えないと、連勤数や勤務遷移の必須判定が最初から不安定になるため</td>
+            <td>前月末データの入力形式、保存場所、読み込み方法が決まっている</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>夜休の定義を決める</td>
+            <td>夜休を記号で持つか派生状態で持つかにより、休み判定と表示仕様が変わるため</td>
+            <td>夜休の数え方、表示方法、通常の休みとの違いが文書化されている</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>優先度付き制約の扱い方を決める</td>
+            <td>「原則だが例外あり」の条件をハード制約にするかソフト制約にするかで探索方法が変わるため</td>
+            <td>土日条件や配慮条件の優先度と違反時の扱いが整理されている</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>対象者が曖昧な条件の適用範囲を確定する</td>
+            <td>誰に適用するか未確定のままでは、日勤配置や公平性評価のロジックを固定できないため</td>
+            <td>条件ごとの対象者、必要回数、例外条件が一覧化されている</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>必須制約の判定ロジックを先に固める</td>
+            <td>配慮条件や機能要望は、必須制約を満たす土台の上でしか評価できないため</td>
+            <td>人数配置、勤務遷移、連勤、連休、指定休日の判定が安定して動く</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>配慮条件をスコア方式で追加する</td>
+            <td>理想条件は全てを絶対制約にすると解けなくなるため、重み付けで調整した方が現実的なため</td>
+            <td>土日休み、夜夜、4連勤抑制、通常日勤の評価ルールが定義されている</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>個別上限入力や途中経過出力などの操作機能を足す</td>
+            <td>ロジック仕様が固まる前に画面や出力を作ると、後で修正範囲が広がるため</td>
+            <td>入力項目、保存形式、途中結果の表示内容が確定している</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note" style="margin-top: 16px;">
+      <h3>実装の考え方</h3>
+      <ul>
+        <li>必須制約は「満たさないと不成立」、配慮条件は「満たすほど望ましい」と分けて実装する</li>
+        <li>曖昧点を放置したまま画面や設定項目を増やすと、後で仕様変更が広がりやすい</li>
+        <li>まず判定基盤を固め、その後で評価スコアとUIを重ねる方が手戻りが少ない</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>15. 開発タスク一覧</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>タスク</th>
+            <th>作業内容</th>
+            <th>成果物</th>
+            <th>依存関係</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>T1. 月跨ぎ仕様を定義する</td>
+            <td>前月末勤務の保存方法、入力方法、当月判定への引継ぎルールを決める</td>
+            <td>月跨ぎ仕様メモ、設定項目一覧、サンプルデータ</td>
+            <td>なし</td>
+          </tr>
+          <tr>
+            <td>T2. 夜休の扱いを定義する</td>
+            <td>夜休を独立記号にするか派生状態にするかを決め、数え方と表示方法を決める</td>
+            <td>夜休仕様メモ、判定例、表示例</td>
+            <td>T1 と並行可</td>
+          </tr>
+          <tr>
+            <td>T3. 制約の優先度表を作る</td>
+            <td>必須制約、配慮条件、例外付き条件を分類し、違反時の扱いを決める</td>
+            <td>制約優先度表、ハード制約とソフト制約の一覧</td>
+            <td>T1, T2</td>
+          </tr>
+          <tr>
+            <td>T4. 曖昧な適用対象を確定する</td>
+            <td>通常日勤の対象者、土日条件の対象者、個別条件の適用範囲を整理する</td>
+            <td>対象者一覧、条件別適用表</td>
+            <td>T3</td>
+          </tr>
+          <tr>
+            <td>T5. 必須制約の判定基盤を実装する</td>
+            <td>人数配置、勤務遷移、連勤上限、連休上限、指定休日前夜勤禁止を機械判定できるようにする</td>
+            <td>判定ロジック、テスト用ケース、違反レポート</td>
+            <td>T1, T2, T3, T4</td>
+          </tr>
+          <tr>
+            <td>T6. 配慮条件の評価ロジックを実装する</td>
+            <td>土日休みの平等、夜夜、4連勤抑制、通常日勤確保などをスコア化する</td>
+            <td>評価関数、重み一覧、比較用レポート</td>
+            <td>T5</td>
+          </tr>
+          <tr>
+            <td>T7. 個別条件の設定入力を実装する</td>
+            <td>休数、勤務種別ごとの上限、曜日制限などを職員別に設定できる形へする</td>
+            <td>設定ファイル項目、入力UIまたは設定仕様</td>
+            <td>T4, T5</td>
+          </tr>
+          <tr>
+            <td>T8. 途中経過出力を実装する</td>
+            <td>完全解が出ない場合でも、暫定シフトと未充足条件を出力できるようにする</td>
+            <td>途中経過レポート、未充足条件一覧、暫定出力仕様</td>
+            <td>T5, T6, T7</td>
+          </tr>
+          <tr>
+            <td>T9. 検証用の出力を整える</td>
+            <td>既存の検証HTMLや比較資料と同じ流れで、違反と配慮達成度を見える化する</td>
+            <td>検証HTML、比較表、チェック用サンプル</td>
+            <td>T5, T6, T8</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note" style="margin-top: 16px;">
+      <h3>最小着手単位</h3>
+      <ul>
+        <li>まずは T1 から T4 までを仕様整理タスクとして固める</li>
+        <li>実装着手の最初の山は T5 の必須制約判定基盤</li>
+        <li>利用者が触る設定や出力は、T5 と T6 が安定してから進めるのが安全</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>16. 現在の Python スクリプトとの対応</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>タスク</th>
+            <th>主な修正対象ファイル</th>
+            <th>主に見る関数・クラス</th>
+            <th>見るべき理由</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>T5. 必須制約の判定基盤</td>
+            <td>generate_akanecco_shift.py</td>
+            <td>SchedulerConfig, EmployeeConfig, load_config, build_schedule_model, validate_schedule</td>
+            <td>設定読込、制約追加、検証ロジックがこの1ファイルに集約されているため</td>
+          </tr>
+          <tr>
+            <td>T6. 配慮条件の評価ロジック</td>
+            <td>generate_akanecco_shift.py</td>
+            <td>build_schedule_model, validate_schedule, build_validation_results</td>
+            <td>公平性や夜夜の評価は目的関数と検証レポートの両方を揃えて直す必要があるため</td>
+          </tr>
+          <tr>
+            <td>T7. 個別条件の設定入力</td>
+            <td>generate_akanecco_shift.py, generate_akanecco_shift_gui.py, akanecco_shift_config.json</td>
+            <td>default_config_dict, load_config, ShiftGeneratorApp._build_ui, ShiftGeneratorApp._run_generate</td>
+            <td>設定形式、GUI入力、実行時反映の3か所を揃えないと使えないため</td>
+          </tr>
+          <tr>
+            <td>T8. 途中経過出力</td>
+            <td>generate_akanecco_shift.py, generate_akanecco_shift_gui.py</td>
+            <td>solve_schedule, validate_schedule, write_validation_report, ShiftGeneratorApp._run_generate, ShiftGeneratorApp._on_generate_error</td>
+            <td>解が不完全でも結果を返す処理と、GUIでの見せ方を両方直す必要があるため</td>
+          </tr>
+          <tr>
+            <td>T9. 検証用出力の整備</td>
+            <td>generate_akanecco_shift.py</td>
+            <td>build_validation_results, render_validation_report, write_validation_report</td>
+            <td>HTMLレポートの項目定義と描画処理がこの部分にまとまっているため</td>
+          </tr>
+          <tr>
+            <td>月跨ぎデータの反映</td>
+            <td>generate_akanecco_shift.py, generate_akanecco_shift_gui.py</td>
+            <td>read_previous_tail_from_workbook, resolve_previous_month_source, ShiftGeneratorApp._run_generate</td>
+            <td>前月勤務表の読込と EmployeeConfig.previous_tail への注入処理が既に存在するため</td>
+          </tr>
+          <tr>
+            <td>行ズレに強い読込</td>
+            <td>generate_akanecco_shift.py</td>
+            <td>build_employee_row_map, resolve_employee_row_index, read_previous_tail_from_workbook, read_fixed_assignments_from_workbook</td>
+            <td>職員行のずれを名前ベースで吸収する処理がここにまとまっているため</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note" style="margin-top: 16px;">
+      <h3>実際の着手優先</h3>
+      <ul>
+        <li>最初に見るべき本体は generate_akanecco_shift.py</li>
+        <li>generate_akanecco_shift_gui.py は入力と進行表示の受け口として後追い修正で足りる箇所が多い</li>
+        <li>設定追加がある場合は JSON の雛形、読込、GUI表示の3点セットで更新する</li>
+      </ul>
+    </div>
+  </section>
+</main>
+</body>
+</html>

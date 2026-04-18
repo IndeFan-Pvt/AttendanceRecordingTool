@@ -1,0 +1,188 @@
+{
+  "full_diff_count": 405,
+  "assignment_diff_count": 365,
+  "top_assignment_rows": [
+    {
+      "row": 6,
+      "manual_name": "笹谷　正人",
+      "generated_name": "笹谷　正人",
+      "diff_count": 30
+    },
+    {
+      "row": 12,
+      "manual_name": "嶋﨑　光子",
+      "generated_name": "嶋﨑　光子",
+      "diff_count": 29
+    },
+    {
+      "row": 29,
+      "manual_name": "鈴木　美奈",
+      "generated_name": "鈴木　美奈",
+      "diff_count": 29
+    },
+    {
+      "row": 8,
+      "manual_name": "川部　春香",
+      "generated_name": "川部　春香",
+      "diff_count": 28
+    },
+    {
+      "row": 10,
+      "manual_name": "都築　良弘",
+      "generated_name": "都築　良弘",
+      "diff_count": 28
+    },
+    {
+      "row": 25,
+      "manual_name": "有村　瑞穂",
+      "generated_name": "有村　瑞穂",
+      "diff_count": 28
+    },
+    {
+      "row": 31,
+      "manual_name": "菅野　実里",
+      "generated_name": "菅野　実里",
+      "diff_count": 28
+    },
+    {
+      "row": 23,
+      "manual_name": "竹内　孝寛",
+      "generated_name": "竹内　孝寛",
+      "diff_count": 26
+    },
+    {
+      "row": 27,
+      "manual_name": "岡　虹光",
+      "generated_name": "岡　虹光",
+      "diff_count": 25
+    },
+    {
+      "row": 14,
+      "manual_name": "鈴木　聡子",
+      "generated_name": "鈴木　聡子",
+      "diff_count": 24
+    }
+  ],
+  "first_20_cell_diffs": [
+    {
+      "row": 1,
+      "col": 1,
+      "source": "勤務表　　【R8年　　1月】                             ",
+      "target": "勤務表　　【R8年　1　月】                             "
+    },
+    {
+      "row": 6,
+      "col": 5,
+      "source": "遅",
+      "target": "夜"
+    },
+    {
+      "row": 6,
+      "col": 6,
+      "source": "休",
+      "target": "夜"
+    },
+    {
+      "row": 6,
+      "col": 7,
+      "source": "早",
+      "target": "特"
+    },
+    {
+      "row": 6,
+      "col": 8,
+      "source": "夜",
+      "target": "特"
+    },
+    {
+      "row": 6,
+      "col": 9,
+      "source": "休",
+      "target": "早"
+    },
+    {
+      "row": 6,
+      "col": 10,
+      "source": "遅",
+      "target": "早"
+    },
+    {
+      "row": 6,
+      "col": 11,
+      "source": "休",
+      "target": "特"
+    },
+    {
+      "row": 6,
+      "col": 12,
+      "source": "早",
+      "target": "特"
+    },
+    {
+      "row": 6,
+      "col": 14,
+      "source": "休",
+      "target": "特"
+    },
+    {
+      "row": 6,
+      "col": 15,
+      "source": "遅",
+      "target": "早"
+    },
+    {
+      "row": 6,
+      "col": 16,
+      "source": "遅",
+      "target": "日"
+    },
+    {
+      "row": 6,
+      "col": 17,
+      "source": "夜",
+      "target": "日"
+    },
+    {
+      "row": 6,
+      "col": 18,
+      "source": "休",
+      "target": "日"
+    },
+    {
+      "row": 6,
+      "col": 19,
+      "source": "休",
+      "target": "特"
+    },
+    {
+      "row": 6,
+      "col": 20,
+      "source": "早",
+      "target": "遅"
+    },
+    {
+      "row": 6,
+      "col": 21,
+      "source": "早",
+      "target": "遅"
+    },
+    {
+      "row": 6,
+      "col": 22,
+      "source": "遅",
+      "target": "日"
+    },
+    {
+      "row": 6,
+      "col": 23,
+      "source": "夜",
+      "target": "早"
+    },
+    {
+      "row": 6,
+      "col": 24,
+      "source": "休",
+      "target": "遅"
+    }
+  ]
+}

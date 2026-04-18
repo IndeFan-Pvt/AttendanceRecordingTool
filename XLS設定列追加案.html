@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>XLS 設定列追加案</title>
+  <style>
+    :root {
+      --bg: #f4efe8;
+      --paper: #fffdf9;
+      --ink: #26211c;
+      --muted: #6a6258;
+      --line: #d8ccbd;
+      --accent: #8f3d17;
+      --accent-soft: #fff1e8;
+      --good: #1c6a4b;
+      --good-soft: #e8f5ef;
+      --warn: #946200;
+      --warn-soft: #fff6dc;
+      --shadow: 0 18px 38px rgba(73, 53, 36, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "BIZ UDPGothic", "Yu Gothic UI", sans-serif;
+      color: var(--ink);
+      line-height: 1.7;
+      background:
+        radial-gradient(circle at top right, rgba(143, 61, 23, 0.08), transparent 28%),
+        linear-gradient(180deg, #f9f3ec 0%, var(--bg) 100%);
+    }
+
+    .wrap {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 40px 20px 64px;
+    }
+
+    .hero,
+    .section,
+    .card {
+      background: var(--paper);
+      border: 1px solid #eadfce;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 32px;
+      background: linear-gradient(135deg, #fffaf3 0%, #fff3e9 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -70px -70px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(143, 61, 23, 0.12), transparent 70%);
+    }
+
+    h1, h2, h3 { margin: 0; line-height: 1.3; }
+    h1 { font-size: clamp(30px, 4vw, 44px); }
+    h2 { font-size: 24px; margin-bottom: 14px; }
+    h3 { font-size: 18px; margin-bottom: 10px; }
+    p { margin: 0; }
+
+    .lead {
+      margin-top: 16px;
+      max-width: 940px;
+      color: #463f38;
+      font-size: 16px;
+    }
+
+    .meta {
+      margin-top: 16px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid #eadfce;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .card { padding: 20px; }
+    .label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .card strong {
+      display: block;
+      font-size: 32px;
+      line-height: 1;
+      color: var(--accent);
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 28px;
+    }
+
+    .subtle {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .note {
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: var(--accent-soft);
+      border: 1px solid #efd1c1;
+    }
+
+    .note ul,
+    .cols ul,
+    td ul {
+      margin: 8px 0 0;
+      padding-left: 1.2em;
+    }
+
+    .table-wrap {
+      margin-top: 18px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+      background: #fff;
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 14px 16px;
+      border-bottom: 1px solid #ece2d7;
+      font-size: 14px;
+    }
+
+    th {
+      background: #fbf3ea;
+      color: #5b4b3e;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .good { background: var(--good-soft); color: var(--good); }
+    .warn { background: var(--warn-soft); color: var(--warn); }
+
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .footer {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .cols { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .wrap { padding: 20px 14px 40px; }
+      .hero, .section, .card { padding: 20px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <h1>XLS 設定列追加案</h1>
+      <p class="lead">
+        勤務表 XLS にユーザー記入用の設定列と月次設定セルを追加し、残っている条件付き項目を config 手編集なしで扱えるようにするための具体案です。
+        想定対象は [【統一書式】あかねっこ1月.xls] と同系統の帳票で、AP 列以降の空き領域を使う前提です。
+      </p>
+      <div class="meta">
+        <span class="chip">更新日: 2026-04-18</span>
+        <span class="chip">前提: 1月帳票の AP 以降は空欄確認済み</span>
+        <span class="chip">目的: 条件付き項目の入力運用を XLS 側へ寄せる</span>
+        <span class="chip">推奨初期値: AV2=1 / AW2=1 / AX2=休+特+夜休</span>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <span class="label">列追加向き</span>
+        <strong>3</strong>
+        <p class="subtle">No.9, No.10, No.12 は職員行フラグと数値入力で進めやすい</p>
+      </article>
+      <article class="card">
+        <span class="label">列 + 月次設定向き</span>
+        <strong>2</strong>
+        <p class="subtle">No.11, No.14 は個人値と全体定義の両方が必要</p>
+      </article>
+      <article class="card">
+        <span class="label">日付側入力が必要</span>
+        <strong>1</strong>
+        <p class="subtle">No.13 は日付の意味付けを職員列だけでは表せない</p>
+      </article>
+      <article class="card">
+        <span class="label">読込追加点</span>
+        <strong>2系統</strong>
+        <p class="subtle">職員設定列読込 と 月次共通設定読込 を追加する想定</p>
+      </article>
+    </section>
+
+    <section class="section">
+      <h2>基本方針</h2>
+      <div class="note">
+        <strong>提案する配置</strong>
+        <ul>
+          <li>AP から AU: 職員ごとの設定列</li>
+          <li>AV から BA: 月次共通設定セル</li>
+          <li>必要なら BB 以降: No.13 用の拡張欄</li>
+        </ul>
+      </div>
+      <p class="subtle">
+        1月帳票では AP から AX 付近の上部と職員行が空欄だったため、この領域を設定専用に使う設計は現実的です。
+        既存の勤務記号セルとは別領域なので、日々のシフト入力と干渉しにくい利点があります。
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>職員設定列案</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>列</th>
+              <th>項目名</th>
+              <th>対象ルール</th>
+              <th>入力値</th>
+              <th>意味</th>
+              <th>備考</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>AP</td>
+              <td>夜勤公平化対象</td>
+              <td>No.9</td>
+              <td>○ / 1 / TRUE / 空欄</td>
+              <td>この職員を夜勤回数平等化の比較対象に含める</td>
+              <td>ユーザーがイメージしやすいので、まず最初に入れる価値が高い列です。</td>
+            </tr>
+            <tr>
+              <td>AQ</td>
+              <td>夜夜必須対象</td>
+              <td>No.10</td>
+              <td>○ / 1 / TRUE / 空欄</td>
+              <td>この職員に 夜夜 を最低回数入れる対象とする</td>
+              <td>最低回数を全員共通で 1 回に固定するなら、この列だけでも運用可能です。</td>
+            </tr>
+            <tr>
+              <td>AR</td>
+              <td>夜夜必須回数</td>
+              <td>No.10</td>
+              <td>整数 / 空欄</td>
+              <td>AQ が有効な職員に対する 夜夜 の最低回数</td>
+              <td>空欄時は月次共通値を使う、または 1 回固定にする実装が自然です。</td>
+            </tr>
+            <tr>
+              <td>AS</td>
+              <td>土日休公平化対象</td>
+              <td>No.12</td>
+              <td>○ / 1 / TRUE / 空欄</td>
+              <td>この職員を土日休み平等化の比較対象に含める</td>
+              <td>夜勤公平化対象と似た使い方なので、ユーザー説明もしやすいです。</td>
+            </tr>
+            <tr>
+              <td>AT</td>
+              <td>個別連勤上限</td>
+              <td>No.11</td>
+              <td>整数 / 空欄</td>
+              <td>この職員の hard 連勤上限</td>
+              <td>No.11 の意味を固めたあとに使う列です。未使用なら空欄でよいです。</td>
+            </tr>
+            <tr>
+              <td>AU</td>
+              <td>4連勤許容回数</td>
+              <td>No.11</td>
+              <td>整数 / 空欄</td>
+              <td>この職員に 4 連勤を月何回まで許すか</td>
+              <td>4連勤を soft で扱う方針にする場合に使います。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="footer">
+        職員行の設定は、その職員の行に直接記入する方式を想定します。氏名は既存どおり D 列ベースで照合します。
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>月次共通設定セル案</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>セル候補</th>
+              <th>項目名</th>
+              <th>対象ルール</th>
+              <th>入力値</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>AV2</td>
+              <td>夜勤公平化許容差</td>
+              <td>No.9</td>
+              <td>整数</td>
+              <td>夜勤公平化対象の最大差を指定します。基本は 1 を想定します。</td>
+            </tr>
+            <tr>
+              <td>AW2</td>
+              <td>土日休公平化許容差</td>
+              <td>No.12</td>
+              <td>整数</td>
+              <td>土日休公平化対象の最大差を指定します。</td>
+            </tr>
+            <tr>
+              <td>AX2</td>
+              <td>土日休カウント方式</td>
+              <td>No.12</td>
+              <td>休のみ / 休+夜休 / 休+特+夜休</td>
+              <td>何を土日休みとして数えるかを月単位で固定します。</td>
+            </tr>
+            <tr>
+              <td>AY2</td>
+              <td>夜休連鎖定義</td>
+              <td>No.14</td>
+              <td>夜休セル連続 / 夜勤サイクル連続</td>
+              <td>夜休が 10 日以上続く の意味を固定します。</td>
+            </tr>
+            <tr>
+              <td>AZ2</td>
+              <td>夜休月跨ぎ判定</td>
+              <td>No.14</td>
+              <td>含む / 含まない</td>
+              <td>previous_tail を連鎖判定に含めるか指定します。</td>
+            </tr>
+            <tr>
+              <td>BA2</td>
+              <td>夜休連鎖閾値</td>
+              <td>No.14</td>
+              <td>整数</td>
+              <td>通常は 10 を入れます。将来の別施設流用も見据えた欄です。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">
+        <strong>推奨初期値</strong>
+        <ul>
+          <li>AV2 は 1、AW2 は 1、AX2 は 休+特+夜休 を初期値として入れる運用を推奨します</li>
+          <li>この組み合わせは現行の JSON 既定値と一致するため、XLS 側入力へ寄せても既存挙動を変えません</li>
+          <li>テンプレート反映済みなので、未入力のままでも月次設定欄の意図を把握しやすくなります</li>
+        </ul>
+      </div>
+      <div class="note">
+        <strong>ヘッダ配置案</strong>
+        <ul>
+          <li>AP5 から AU5 に項目名を記載</li>
+          <li>AV1 から BA1 に 月次設定 と見出しを記載</li>
+          <li>AV2 から BA2 に実値、AV3 から BA3 に説明文を置くと運用しやすいです</li>
+          <li>現時点の既定値は AV2=1、AW2=1、AX2=休+特+夜休 です</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>No.13 の扱い</h2>
+      <p class="subtle">
+        通常の日 は職員属性だけでは決まらないため、職員右端列だけでは不足します。実装するなら次の 2 案のどちらかが必要です。
+      </p>
+      <div class="cols">
+        <article class="card">
+          <h3>案A: 日付ヘッダで通常日マーク</h3>
+          <ul>
+            <li>各日付の上部に 通常日 フラグ行を追加する</li>
+            <li>例: 4 行目 日付、5 行目 曜日、6 行目 通常日マーク</li>
+            <li>日勤記号が入っていて、かつ通常日マーク付きの日だけをカウントする</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>案B: 専用勤務記号を作る</h3>
+          <ul>
+            <li>通常の日 用の専用記号を追加する</li>
+            <li>その記号を shift_kinds に追加して別種の日勤として扱う</li>
+            <li>コードは整理しやすいが、現場の記入ルール変更が必要です</li>
+          </ul>
+        </article>
+      </div>
+      <p class="footer">
+        現場負担が少ないのは案A、コードが明確になるのは案Bです。
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>読込仕様案</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>論点</th>
+              <th>提案</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ブール入力の解釈</td>
+              <td>○ / 1 / TRUE / true / yes を有効、空欄を無効として扱う</td>
+            </tr>
+            <tr>
+              <td>数値入力の解釈</td>
+              <td>整数のみ有効。小数や文字列は検証レポートで要注意に出す</td>
+            </tr>
+            <tr>
+              <td>優先順位</td>
+              <td>XLS 入力値 ＞ period_overrides ＞ 基本 config</td>
+            </tr>
+            <tr>
+              <td>未入力時</td>
+              <td>既存 config を使う。XLS 未入力で動かなくしない</td>
+            </tr>
+            <tr>
+              <td>対象行の判定</td>
+              <td>既存の氏名照合ロジックを使い、D 列氏名と aliases で解決する</td>
+            </tr>
+            <tr>
+              <td>異常値の扱い</td>
+              <td>即停止ではなく、まずは validation HTML に警告を出し、必要なら strict 側は既定値へフォールバック</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>実装順案</h2>
+      <div class="cols">
+        <article class="card">
+          <h3>第1段階</h3>
+          <ul>
+            <li>AP 夜勤公平化対象</li>
+            <li>AQ 夜夜必須対象</li>
+            <li>AR 夜夜必須回数</li>
+            <li>AS 土日休公平化対象</li>
+            <li>AV2, AW2, AX2 の月次設定</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>第2段階</h3>
+          <ul>
+            <li>AT 個別連勤上限</li>
+            <li>AU 4連勤許容回数</li>
+            <li>AY2, AZ2, BA2 の夜休連鎖設定</li>
+            <li>No.13 の方式決定後に日付側入力欄を追加</li>
+          </ul>
+        </article>
+      </div>
+      <div class="note">
+        <strong>この案で先に実装しやすい範囲</strong>
+        <ul>
+          <li>No.9 はかなり実装しやすくなります</li>
+          <li>No.10 は対象者指定が明確になります</li>
+          <li>No.12 は対象者指定と月次カウント方式を分離できます</li>
+          <li>No.11 と No.14 は仕様固定後に実装へ進みやすくなります</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

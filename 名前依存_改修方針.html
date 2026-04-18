@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>名前依存の解消方針</title>
+<style>
+:root {
+  --bg: #f4efe8;
+  --paper: #fffdfa;
+  --ink: #24313d;
+  --muted: #677380;
+  --line: #dccfbe;
+  --soft: #f8f2e9;
+  --accent: #8d4b20;
+  --accent-soft: #fff0e4;
+  --info-bg: #eef6ff;
+  --info-fg: #1e4f8f;
+  --warn-bg: #fff6e8;
+  --warn-fg: #8c5800;
+  --ok-bg: #edf8f0;
+  --ok-fg: #166534;
+  --alert-bg: #fff1f2;
+  --alert-fg: #9f1239;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(141, 75, 32, 0.08), transparent 22%),
+    linear-gradient(180deg, #f9f4ed 0%, var(--bg) 100%);
+  font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+}
+
+main {
+  max-width: 1240px;
+  margin: 28px auto;
+  padding: 30px;
+  background: var(--paper);
+  border: 1px solid rgba(141, 75, 32, 0.12);
+  border-radius: 24px;
+  box-shadow: 0 18px 44px rgba(58, 39, 21, 0.10);
+}
+
+h1, h2, h3, p { margin-top: 0; }
+h1 { font-size: 2rem; line-height: 1.2; margin-bottom: 12px; }
+h2 { font-size: 1.3rem; margin-bottom: 14px; }
+h3 { font-size: 1rem; margin-bottom: 10px; }
+p, li, td, th { line-height: 1.7; }
+
+.hero {
+  padding: 24px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #fff7f0 0%, #fffdfa 100%);
+  border: 1px solid #efddcd;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.lead {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin: 22px 0 28px;
+}
+
+.card {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid #eadfce;
+  background: var(--soft);
+}
+
+.card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.section {
+  margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #eee4d8;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.note,
+.warning,
+.success,
+.danger {
+  padding: 16px 18px;
+  border-radius: 14px;
+}
+
+.note {
+  background: var(--info-bg);
+  border: 1px solid #d8e7fb;
+}
+
+.warning {
+  background: var(--warn-bg);
+  border: 1px solid #f2dfb6;
+}
+
+.success {
+  background: var(--ok-bg);
+  border: 1px solid #d2ead8;
+}
+
+.danger {
+  background: var(--alert-bg);
+  border: 1px solid #f3c6d3;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+.tag-info { color: var(--info-fg); background: var(--info-bg); }
+.tag-warn { color: var(--warn-fg); background: var(--warn-bg); }
+.tag-ok { color: var(--ok-fg); background: var(--ok-bg); }
+.tag-alert { color: var(--alert-fg); background: var(--alert-bg); }
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  margin-top: 14px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #efe6da;
+  white-space: nowrap;
+}
+
+tbody tr:nth-child(even) { background: #fffcf8; }
+
+ul, ol {
+  margin: 8px 0 0 18px;
+  padding-left: 8px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.source-ref {
+  margin: -4px 0 14px;
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+
+code {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #f3ede5;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.95em;
+}
+
+@media (max-width: 900px) {
+  main {
+    margin: 0;
+    padding: 18px;
+    border-radius: 0;
+  }
+
+  .columns {
+    grid-template-columns: 1fr;
+  }
+
+  h1 { font-size: 1.55rem; }
+}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div class="eyebrow">設計方針</div>
+    <h1>名前依存の解消方針</h1>
+    <p class="lead">現在のスクリプトは職員名を内部識別子として使っているため、氏名変更、表記ゆれ、同姓同名、Excel 側の誤読に弱い構造です。この資料では、名前を表示用に戻し、内部では固定 ID を使うための改修方針を段階的に整理します。</p>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div>現状</div>
+      <strong>名前主キー</strong>
+      <div>読込、引継ぎ、内部 schedule が名前キー</div>
+    </div>
+    <div class="card">
+      <div>目標</div>
+      <strong>ID 主キー</strong>
+      <div>名前は表示と照合補助に限定</div>
+    </div>
+    <div class="card">
+      <div>移行方針</div>
+      <strong>段階導入</strong>
+      <div>互換を残したまま移行</div>
+    </div>
+    <div class="card">
+      <div>優先度</div>
+      <strong>高</strong>
+      <div>誤マッチ防止と将来保守性に直結</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>1. 現状の問題</h2>
+    <p class="source-ref">現行コードでは Excel 行特定、固定勤務読込、指定休日、前月末引継ぎ、solver 結果の schedule まで名前をキーに使っています。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>箇所</th>
+            <th>現在の識別方法</th>
+            <th>問題</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Excel 行マッチング</td>
+            <td>D列の氏名を正規化して照合</td>
+            <td>表記ゆれや誤読に弱く、同姓同名にも弱いです</td>
+          </tr>
+          <tr>
+            <td>固定勤務、指定休日</td>
+            <td><code>employee.name</code> を辞書キーに結合</td>
+            <td>名前が変わると、過去帳票や target workbook との対応が切れます</td>
+          </tr>
+          <tr>
+            <td>前月末引継ぎ</td>
+            <td><code>previous_tails.get(employee.name)</code></td>
+            <td>氏名変更時に月跨ぎの制約が途切れます</td>
+          </tr>
+          <tr>
+            <td>solver 内部</td>
+            <td><code>decision_vars[employee.name, day, shift]</code></td>
+            <td>内部主キーが表示名と一体化しており、設計上の責務が混ざっています</td>
+          </tr>
+          <tr>
+            <td>出力 schedule</td>
+            <td><code>schedule[employee.name]</code></td>
+            <td>後段の検証とレポートも名前依存になります</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>2. 目標構成</h2>
+    <div class="columns">
+      <div class="success">
+        <h3>内部は employee_id を使う</h3>
+        <p>EmployeeConfig に <code>employee_id</code> を追加し、solver、schedule、fixed_assignments、specified_holidays、previous_tail のキーをすべて ID に揃えます。</p>
+      </div>
+      <div class="note">
+        <h3>名前は表示用と Excel 照合補助に限定する</h3>
+        <p>Excel 側には ID がないため、照合時だけ名前や別名を使います。内部処理に入った後は ID に変換して扱います。</p>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>現状</th>
+            <th>目標</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>職員設定</td>
+            <td>name, row が中心</td>
+            <td>employee_id, display_name, aliases, row</td>
+          </tr>
+          <tr>
+            <td>内部辞書キー</td>
+            <td>name</td>
+            <td>employee_id</td>
+          </tr>
+          <tr>
+            <td>Excel 照合</td>
+            <td>name の正規化一致</td>
+            <td>aliases を含む候補一致、最後に row フォールバック</td>
+          </tr>
+          <tr>
+            <td>レポート表示</td>
+            <td>name</td>
+            <td>display_name</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>3. 推奨データ構造</h2>
+    <div class="note" style="margin-bottom: 14px;">
+      <p><strong>推奨フィールド</strong><br>最低限必要なのは <code>employee_id</code> と <code>display_name</code> です。Excel 名寄せの安全性を上げるなら <code>aliases</code> も持つのがよいです。</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>フィールド</th>
+            <th>用途</th>
+            <th>例</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>employee_id</td>
+            <td>内部主キー。変更しない固定値</td>
+            <td>akanecco-kanno-misato</td>
+          </tr>
+          <tr>
+            <td>display_name</td>
+            <td>GUI、レポート、Excel 出力に使う表示名</td>
+            <td>菅野 実里</td>
+          </tr>
+          <tr>
+            <td>aliases</td>
+            <td>Excel 側の別表記や旧姓対応</td>
+            <td>菅野実里, 菅野 実里</td>
+          </tr>
+          <tr>
+            <td>row</td>
+            <td>最終フォールバックの行番号</td>
+            <td>29</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>4. 段階移行の進め方</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>段階</th>
+            <th>変更内容</th>
+            <th>目的</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>第1段階</td>
+            <td>config に employee_id を追加し、重複チェックを入れる</td>
+            <td>内部キー移行の土台を作る</td>
+          </tr>
+          <tr>
+            <td>第2段階</td>
+            <td>Excel 読込時に 名前から employee_id へ変換する層を作る</td>
+            <td>外部入力と内部処理を分離する</td>
+          </tr>
+          <tr>
+            <td>第3段階</td>
+            <td>fixed_assignments、specified_holidays、previous_tail を ID キー化する</td>
+            <td>月跨ぎと workbook 読込の名前依存を除く</td>
+          </tr>
+          <tr>
+            <td>第4段階</td>
+            <td>solver の decision_vars と schedule を ID キー化する</td>
+            <td>内部主キーを完全に分離する</td>
+          </tr>
+          <tr>
+            <td>第5段階</td>
+            <td>レポートと GUI は display_name に統一する</td>
+            <td>利用者の見え方を変えずに内部設計を置き換える</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>5. 最小安全ライン</h2>
+    <div class="warning" style="margin-bottom: 14px;">
+      <ul>
+        <li>いきなり solver まで変えず、まずは config に employee_id を追加して内部辞書だけ移す方が安全です</li>
+        <li>Excel 側に ID を埋め込めない前提なので、aliases と row フォールバックはしばらく残す必要があります</li>
+        <li>同姓同名の可能性があるなら、名前一致だけで処理を続行せず警告に落とすべきです</li>
+      </ul>
+    </div>
+    <div class="success">
+      <p><strong>実務上の最小構成</strong><br>最初の一歩としては、<code>employee_id</code> 追加、名前と ID の変換表追加、読込結果を ID キーへ変換、レポートだけ display_name 表示に戻す、の4点で十分です。これで名前依存の大半を切れます。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>6. この順で着手するのが妥当</h2>
+    <ol>
+      <li>config に <code>employee_id</code> と <code>display_name</code> を追加する</li>
+      <li>読込直後の固定勤務、指定休日、前月末引継ぎを ID キーへ寄せる</li>
+      <li>solver と schedule を ID キーへ移す</li>
+      <li>GUI と HTML レポートは display_name 表示へ統一する</li>
+      <li>最後に aliases と重複名警告を強化する</li>
+    </ol>
+  </section>
+</main>
+</body>
+</html>
