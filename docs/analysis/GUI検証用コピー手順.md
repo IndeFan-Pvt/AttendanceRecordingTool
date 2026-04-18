@@ -40,7 +40,7 @@ GUI を開いたら、次を指定します。
 1. 記載したい勤怠表
    - _inspect/gui_verify_target.xls
 2. 設定 JSON
-   - exe/generate_akanecco_shift_gui/akanecco_shift_config.json
+   - exe/generate_akanecco_shift_gui/shift_config.json
 3. レポート保存先
    - _inspect/gui_verify_report.html
 4. 必要なら前月勤務表

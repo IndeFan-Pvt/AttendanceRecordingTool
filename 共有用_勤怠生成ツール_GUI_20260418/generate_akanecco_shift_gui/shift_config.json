@@ -1,0 +1,888 @@
+{
+  "year": 2026,
+  "month": 2,
+  "unit_name": "あかねっこ",
+  "target_path": "【白紙】あかねっこ.xls",
+  "manual_source": "元データ/シフト自動作成、特養いちご/シフト自動作成、特養いちご/R7年勤務表/R7.2月/【統一書式】あかねっこ2月.xls",
+  "sheet_index": 1,
+  "shift_kinds": {
+    "": "rest",
+    "早": "early",
+    "遅": "late",
+    "日": "day",
+    "夜": "night",
+    "夜休": "night_rest",
+    "休": "rest",
+    "特": "rest",
+    "5.5": "day",
+    "6.0": "day"
+  },
+  "count_symbols": {
+    "夜": "夜",
+    "早": "早",
+    "遅": "遅",
+    "休": "休"
+  },
+  "rules": {
+    "required_per_day": {
+      "南": {
+        "early": 1,
+        "late": 1
+      },
+      "北": {
+        "early": 1,
+        "late": 1
+      },
+      "night_total": 1
+    },
+    "max_consecutive_work": 5,
+    "max_consecutive_night": 2,
+    "max_consecutive_rest": 5,
+    "max_consecutive_rest_with_special": 5,
+    "preferred_four_day_streak_count": 1,
+    "fairness_night_spread": 1,
+    "fairness_weekend_spread": 1,
+    "require_weekend_pair_rest": true,
+    "prefer_double_night": true,
+    "day_requirements": {}
+  },
+  "employees": [
+    {
+      "employee_id": "akanecco-001",
+      "display_name": "笹谷 正人",
+      "name": "笹谷 正人",
+      "aliases": ["笹谷正人", "笹谷 正人"],
+      "unit": "南",
+      "employment": "full",
+      "night_fairness_target": true,
+      "weekend_fairness_target": true,
+      "unit_shift_balance_target": true,
+      "preferred_four_day_streak_target": true,
+      "require_standard_day": true,
+      "row": 6,
+      "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+      "weekday_allowed_shifts": {
+        "月": ["早", "日", "夜", "休", "特"],
+        "火": ["早", "日", "夜", "休", "特"],
+        "水": ["早", "日", "夜", "休", "特"],
+        "木": ["早", "日", "夜", "休", "特"]
+      },
+      "require_weekend_pair_rest": true,
+      "min_counts": {
+        "夜": 3,
+        "日": 1
+      },
+      "max_counts": {
+        "夜": 4
+      },
+      "min_rest_days": 6,
+      "max_rest_days": 10,
+      "fixed_assignments": {},
+      "previous_tail": []
+    },
+    {
+      "employee_id": "akanecco-002",
+      "display_name": "川部 春香",
+      "name": "川部 春香",
+      "aliases": ["川部春香", "川部 春香"],
+      "unit": "南",
+      "employment": "full",
+      "night_fairness_target": true,
+      "weekend_fairness_target": true,
+      "unit_shift_balance_target": true,
+      "preferred_four_day_streak_target": true,
+      "require_standard_day": true,
+      "row": 8,
+      "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+      "min_counts": {
+        "夜": 3,
+        "日": 1
+      },
+      "max_counts": {
+        "夜": 4
+      },
+      "min_rest_days": 6,
+      "max_rest_days": 10,
+      "fixed_assignments": {},
+      "previous_tail": []
+    },
+    {
+      "employee_id": "akanecco-003",
+      "display_name": "都築 良弘",
+      "name": "都築 良弘",
+      "aliases": ["都築良弘", "都築 良弘"],
+      "unit": "南",
+      "employment": "full",
+      "night_fairness_target": true,
+      "weekend_fairness_target": true,
+      "unit_shift_balance_target": true,
+      "preferred_four_day_streak_target": true,
+      "require_standard_day": true,
+      "row": 10,
+      "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+      "min_counts": {
+        "夜": 3,
+        "日": 1
+      },
+      "max_counts": {
+        "夜": 4
+      },
+      "min_rest_days": 6,
+      "max_rest_days": 10,
+      "fixed_assignments": {
+        "18": "特"
+      },
+      "previous_tail": []
+    },
+    {
+      "employee_id": "akanecco-004",
+      "display_name": "嶋﨑 光子",
+      "name": "嶋﨑 光子",
+      "aliases": ["嶋﨑光子", "嶋﨑 光子"],
+      "unit": "南",
+      "employment": "full",
+      "night_fairness_target": true,
+      "weekend_fairness_target": true,
+      "unit_shift_balance_target": true,
+      "preferred_four_day_streak_target": true,
+      "require_standard_day": true,
+      "row": 12,
+      "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+      "min_counts": {
+        "夜": 3,
+        "日": 1
+      },
+      "max_counts": {
+        "夜": 4
+      },
+      "min_rest_days": 6,
+      "max_rest_days": 10,
+      "fixed_assignments": {},
+      "previous_tail": []
+    },
+    {
+      "employee_id": "akanecco-005",
+      "display_name": "八重 美貴",
+      "name": "八重 美貴",
+      "aliases": ["八重美貴", "八重 美貴"],
+      "unit": "南",
+      "employment": "part",
+      "row": 14,
+      "allowed_shifts": ["", "5.5", "休"],
+      "min_counts": {},
+      "max_counts": {},
+      "min_rest_days": 11,
+      "max_rest_days": 18,
+      "fixed_assignments": {},
+      "previous_tail": []
+    },
+    {
+      "employee_id": "akanecco-006",
+      "display_name": "稲富 茜里",
+      "name": "稲富茜里",
+      "aliases": ["稲富茜里", "稲富 茜里"],
+      "unit": "南",
+      "employment": "part",
+      "row": 16,
+      "allowed_shifts": ["", "6.0", "休"],
+      "min_counts": {},
+      "max_counts": {},
+      "min_rest_days": 11,
+      "max_rest_days": 18,
+      "fixed_assignments": {},
+      "previous_tail": []
+    },
+    {
+      "employee_id": "akanecco-007",
+      "display_name": "駒倉 利光",
+      "name": "駒倉 利光",
+      "aliases": ["駒倉利光", "駒倉 利光"],
+      "unit": "北",
+      "employment": "full",
+      "night_fairness_target": true,
+      "weekend_fairness_target": true,
+      "unit_shift_balance_target": true,
+      "preferred_four_day_streak_target": true,
+      "require_standard_day": true,
+      "row": 21,
+      "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+      "min_counts": {
+        "夜": 3,
+        "日": 1
+      },
+      "max_counts": {
+        "夜": 4
+      },
+      "min_rest_days": 6,
+      "max_rest_days": 10,
+      "fixed_assignments": {},
+      "previous_tail": []
+    },
+    {
+      "employee_id": "akanecco-008",
+      "display_name": "竹内 孝寛",
+      "name": "竹内孝寛",
+      "aliases": ["竹内孝寛", "竹内 孝寛"],
+      "unit": "北",
+      "employment": "full",
+      "night_fairness_target": true,
+      "weekend_fairness_target": true,
+      "unit_shift_balance_target": true,
+      "preferred_four_day_streak_target": true,
+      "require_standard_day": true,
+      "row": 23,
+      "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+      "min_counts": {
+        "日": 1
+      },
+      "max_counts": {
+        "夜": 4
+      },
+      "min_rest_days": 6,
+      "max_rest_days": 10,
+      "fixed_assignments": {},
+      "previous_tail": []
+    },
+    {
+      "employee_id": "akanecco-009",
+      "display_name": "岡 虹光",
+      "name": "岡 虹光",
+      "aliases": ["岡虹光", "岡 虹光"],
+      "unit": "北",
+      "employment": "full",
+      "night_fairness_target": true,
+      "weekend_fairness_target": true,
+      "unit_shift_balance_target": true,
+      "preferred_four_day_streak_target": true,
+      "require_standard_day": true,
+      "row": 25,
+      "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+      "min_counts": {
+        "夜": 3,
+        "日": 1
+      },
+      "max_counts": {
+        "夜": 4
+      },
+      "min_rest_days": 6,
+      "max_rest_days": 10,
+      "fixed_assignments": {},
+      "previous_tail": []
+    },
+    {
+      "employee_id": "akanecco-010",
+      "display_name": "鈴木 美奈",
+      "name": "鈴木 美奈",
+      "aliases": ["鈴木美奈", "鈴木 美奈"],
+      "unit": "北",
+      "employment": "full",
+      "night_fairness_target": true,
+      "weekend_fairness_target": true,
+      "unit_shift_balance_target": true,
+      "preferred_four_day_streak_target": true,
+      "require_standard_day": true,
+      "row": 27,
+      "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+      "min_counts": {
+        "夜": 3,
+        "日": 1
+      },
+      "max_counts": {
+        "夜": 4
+      },
+      "min_rest_days": 6,
+      "max_rest_days": 10,
+      "fixed_assignments": {},
+      "previous_tail": []
+    },
+    {
+      "employee_id": "akanecco-011",
+      "display_name": "菅野 実里",
+      "name": "菅野 実里",
+      "aliases": ["菅野実里", "菅野 実里"],
+      "unit": "北",
+      "employment": "full",
+      "night_fairness_target": true,
+      "weekend_fairness_target": true,
+      "unit_shift_balance_target": true,
+      "preferred_four_day_streak_target": true,
+      "require_standard_day": true,
+      "row": 29,
+      "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+      "min_counts": {
+        "日": 1
+      },
+      "max_counts": {
+        "夜": 4
+      },
+      "min_rest_days": 6,
+      "max_rest_days": 10,
+      "fixed_assignments": {},
+      "previous_tail": []
+    },
+    {
+      "employee_id": "akanecco-012",
+      "display_name": "石井 都子",
+      "name": "石井 都子",
+      "aliases": ["石井都子", "石井 都子"],
+      "unit": "北",
+      "employment": "part",
+      "row": 31,
+      "allowed_shifts": ["", "6.0", "休"],
+      "min_counts": {},
+      "max_counts": {},
+      "min_rest_days": 11,
+      "max_rest_days": 18,
+      "fixed_assignments": {},
+      "previous_tail": []
+    }
+  ],
+  "period_overrides": {
+    "2025-08": {
+      "employees": [
+        {
+          "employee_id": "akanecco-001",
+          "display_name": "笹谷 正人",
+          "name": "笹谷 正人",
+          "aliases": ["笹谷正人", "笹谷 正人"],
+          "unit": "南",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 6,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "weekday_allowed_shifts": {
+            "月": ["早", "日", "夜", "休", "特"],
+            "火": ["早", "日", "夜", "休", "特"],
+            "水": ["早", "日", "夜", "休", "特"],
+            "木": ["早", "日", "夜", "休", "特"]
+          },
+          "require_weekend_pair_rest": true,
+          "min_counts": {
+            "夜": 3,
+            "日": 1
+          },
+          "max_counts": {
+            "夜": 4
+          },
+          "min_rest_days": 6,
+          "max_rest_days": 10,
+          "fixed_assignments": {},
+          "previous_tail": []
+        },
+        {
+          "employee_id": "akanecco-002",
+          "display_name": "川部 春香",
+          "name": "川部 春香",
+          "aliases": ["川部春香", "川部 春香"],
+          "unit": "南",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 8,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_counts": {
+            "夜": 3,
+            "日": 1
+          },
+          "max_counts": {
+            "夜": 4
+          },
+          "min_rest_days": 6,
+          "max_rest_days": 10,
+          "specified_holidays": [4, 5, 7, 8, 16, 17],
+          "fixed_assignments": {},
+          "previous_tail": []
+        },
+        {
+          "employee_id": "akanecco-003",
+          "display_name": "都築 良弘",
+          "name": "都築 良弘",
+          "aliases": ["都築良弘", "都築 良弘"],
+          "unit": "南",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 10,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_counts": {
+            "夜": 3,
+            "日": 1
+          },
+          "max_counts": {
+            "夜": 4
+          },
+          "min_rest_days": 6,
+          "max_rest_days": 10,
+          "specified_holidays": [5, 8, 17],
+          "fixed_assignments": {
+            "18": "特"
+          },
+          "previous_tail": []
+        },
+        {
+          "employee_id": "akanecco-004",
+          "display_name": "嶋﨑 光子",
+          "name": "嶋﨑 光子",
+          "aliases": ["嶋﨑光子", "嶋﨑 光子"],
+          "unit": "南",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 12,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_counts": {
+            "夜": 3,
+            "日": 1
+          },
+          "max_counts": {
+            "夜": 4
+          },
+          "min_rest_days": 6,
+          "max_rest_days": 10,
+          "fixed_assignments": {},
+          "previous_tail": []
+        },
+        {
+          "employee_id": "akanecco-005",
+          "display_name": "八重 美貴",
+          "name": "八重 美貴",
+          "aliases": ["八重美貴", "八重 美貴"],
+          "unit": "南",
+          "employment": "part",
+          "row": 14,
+          "allowed_shifts": ["", "5.5", "休"],
+          "min_counts": {},
+          "max_counts": {},
+          "min_rest_days": 11,
+          "max_rest_days": 18,
+          "fixed_assignments": {},
+          "previous_tail": []
+        },
+        {
+          "employee_id": "akanecco-006",
+          "display_name": "稲富 茜里",
+          "name": "稲富茜里",
+          "aliases": ["稲富茜里", "稲富 茜里"],
+          "unit": "南",
+          "employment": "part",
+          "row": 16,
+          "allowed_shifts": ["", "6.0", "休"],
+          "min_counts": {},
+          "max_counts": {},
+          "min_rest_days": 11,
+          "max_rest_days": 18,
+          "fixed_assignments": {},
+          "previous_tail": []
+        },
+        {
+          "employee_id": "akanecco-007",
+          "display_name": "駒倉 利光",
+          "name": "駒倉 利光",
+          "aliases": ["駒倉利光", "駒倉 利光"],
+          "unit": "北",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 21,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_counts": {
+            "夜": 3,
+            "日": 1
+          },
+          "max_counts": {
+            "夜": 4
+          },
+          "min_rest_days": 6,
+          "max_rest_days": 10,
+          "fixed_assignments": {},
+          "previous_tail": []
+        },
+        {
+          "employee_id": "akanecco-008",
+          "display_name": "竹内 孝寛",
+          "name": "竹内孝寛",
+          "aliases": ["竹内孝寛", "竹内 孝寛"],
+          "unit": "北",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 23,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_counts": {
+            "日": 1
+          },
+          "max_counts": {
+            "夜": 4
+          },
+          "min_rest_days": 6,
+          "max_rest_days": 10,
+          "fixed_assignments": {},
+          "previous_tail": []
+        },
+        {
+          "employee_id": "akanecco-009",
+          "display_name": "岡 虹光",
+          "name": "岡 虹光",
+          "aliases": ["岡虹光", "岡 虹光"],
+          "unit": "北",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 25,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_counts": {
+            "夜": 3,
+            "日": 1
+          },
+          "max_counts": {
+            "夜": 4
+          },
+          "min_rest_days": 6,
+          "max_rest_days": 10,
+          "fixed_assignments": {},
+          "previous_tail": []
+        },
+        {
+          "employee_id": "akanecco-010",
+          "display_name": "鈴木 美奈",
+          "name": "鈴木 美奈",
+          "aliases": ["鈴木美奈", "鈴木 美奈"],
+          "unit": "北",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 27,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_counts": {
+            "夜": 3,
+            "日": 1
+          },
+          "max_counts": {
+            "夜": 4
+          },
+          "min_rest_days": 6,
+          "max_rest_days": 10,
+          "fixed_assignments": {},
+          "previous_tail": []
+        },
+        {
+          "employee_id": "akanecco-011",
+          "display_name": "菅野 実里",
+          "name": "菅野 実里",
+          "aliases": ["菅野実里", "菅野 実里"],
+          "unit": "北",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 29,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_counts": {
+            "日": 1
+          },
+          "max_counts": {
+            "夜": 4
+          },
+          "min_rest_days": 6,
+          "max_rest_days": 10,
+          "fixed_assignments": {},
+          "previous_tail": []
+        },
+        {
+          "employee_id": "akanecco-012",
+          "display_name": "石井 都子",
+          "name": "石井 都子",
+          "aliases": ["石井都子", "石井 都子"],
+          "unit": "北",
+          "employment": "part",
+          "row": 31,
+          "allowed_shifts": ["", "6.0", "休"],
+          "min_counts": {},
+          "max_counts": {},
+          "min_rest_days": 11,
+          "max_rest_days": 18,
+          "fixed_assignments": {},
+          "previous_tail": []
+        }
+      ]
+    },
+    "2026-01": {
+      "target_path": "【統一書式】あかねっこ1月_temp.xls",
+      "manual_source": "元データ/シフト自動作成、特養いちご/シフト自動作成、特養いちご/【白紙】あかねっこ.xls",
+      "shift_kinds": {
+        "3.0": "day"
+      },
+      "rules": {
+        "max_consecutive_rest": 3
+      },
+      "employees": [
+        {
+          "employee_id": "akanecco-001",
+          "display_name": "笹谷 正人",
+          "name": "笹谷 正人",
+          "aliases": ["笹谷正人", "笹谷 正人"],
+          "unit": "南",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 6,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "weekday_allowed_shifts": {
+            "月": ["早", "日", "夜", "休", "特"],
+            "火": ["早", "日", "夜", "休", "特"],
+            "水": ["早", "日", "夜", "休", "特"],
+            "木": ["早", "日", "夜", "休", "特"]
+          },
+          "require_weekend_pair_rest": true,
+          "min_rest_days": 6,
+          "max_rest_days": 12,
+          "max_counts": {"夜": 5}
+        },
+        {
+          "employee_id": "akanecco-002",
+          "display_name": "川部 春香",
+          "name": "川部 春香",
+          "aliases": ["川部春香", "川部 春香"],
+          "unit": "南",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 8,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_rest_days": 6,
+          "max_rest_days": 12,
+          "max_counts": {"夜": 5}
+        },
+        {
+          "employee_id": "akanecco-003",
+          "display_name": "都築 良弘",
+          "name": "都築 良弘",
+          "aliases": ["都築良弘", "都築 良弘"],
+          "unit": "南",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 10,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_rest_days": 6,
+          "max_rest_days": 12,
+          "max_counts": {"夜": 5}
+        },
+        {
+          "employee_id": "akanecco-004",
+          "display_name": "嶋﨑 光子",
+          "name": "嶋﨑 光子",
+          "aliases": ["嶋﨑光子", "嶋﨑 光子"],
+          "unit": "南",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 12,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_rest_days": 6,
+          "max_rest_days": 12,
+          "max_counts": {"夜": 5}
+        },
+        {
+          "employee_id": "akanecco-013",
+          "display_name": "鈴木 聡子",
+          "name": "鈴木 聡子",
+          "aliases": ["鈴木聡子", "鈴木 聡子"],
+          "unit": "南",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 14,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_rest_days": 6,
+          "max_rest_days": 14,
+          "max_counts": {"夜": 4}
+        },
+        {
+          "employee_id": "akanecco-005",
+          "display_name": "八重 美貴",
+          "name": "八重 美貴",
+          "aliases": ["八重美貴", "八重 美貴"],
+          "unit": "南",
+          "employment": "part",
+          "row": 16,
+          "allowed_shifts": ["", "3.0", "5.5", "休"],
+          "min_rest_days": 10,
+          "max_rest_days": 22
+        },
+        {
+          "employee_id": "akanecco-006",
+          "display_name": "稲富 茜里",
+          "name": "稲富 茜里",
+          "aliases": ["稲富茜里", "稲富 茜里"],
+          "unit": "南",
+          "employment": "part",
+          "row": 18,
+          "allowed_shifts": ["", "6.0", "休"],
+          "min_rest_days": 10,
+          "max_rest_days": 22
+        },
+        {
+          "employee_id": "akanecco-007",
+          "display_name": "駒倉 利光",
+          "name": "駒倉 利光",
+          "aliases": ["駒倉利光", "駒倉 利光"],
+          "unit": "北",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 21,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_rest_days": 6,
+          "max_rest_days": 12,
+          "max_counts": {"夜": 5}
+        },
+        {
+          "employee_id": "akanecco-008",
+          "display_name": "竹内 孝寛",
+          "name": "竹内孝寛",
+          "aliases": ["竹内孝寛", "竹内 孝寛"],
+          "unit": "北",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 23,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_rest_days": 6,
+          "max_rest_days": 12,
+          "max_counts": {"夜": 4}
+        },
+        {
+          "employee_id": "akanecco-014",
+          "display_name": "有村 瑞穂",
+          "name": "有村 瑞穂",
+          "aliases": ["有村瑞穂", "有村 瑞穂"],
+          "unit": "北",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 25,
+          "allowed_shifts": ["早", "遅", "日", "休", "特"],
+          "min_rest_days": 6,
+          "max_rest_days": 16
+        },
+        {
+          "employee_id": "akanecco-009",
+          "display_name": "岡 虹光",
+          "name": "岡 虹光",
+          "aliases": ["岡虹光", "岡 虹光"],
+          "unit": "北",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 27,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_rest_days": 6,
+          "max_rest_days": 12,
+          "max_counts": {"夜": 5}
+        },
+        {
+          "employee_id": "akanecco-010",
+          "display_name": "鈴木 美奈",
+          "name": "鈴木 美奈",
+          "aliases": ["鈴木美奈", "鈴木 美奈"],
+          "unit": "北",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 29,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
+          "min_rest_days": 6,
+          "max_rest_days": 12,
+          "max_counts": {"夜": 5}
+        },
+        {
+          "employee_id": "akanecco-011",
+          "display_name": "菅野 実里",
+          "name": "菅野 実里",
+          "aliases": ["菅野実里", "菅野 実里"],
+          "unit": "北",
+          "employment": "full",
+          "night_fairness_target": true,
+          "weekend_fairness_target": true,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": true,
+          "require_standard_day": true,
+          "row": 31,
+          "allowed_shifts": ["早", "遅", "日", "休", "特"],
+          "min_rest_days": 6,
+          "max_rest_days": 16
+        },
+        {
+          "employee_id": "akanecco-012",
+          "display_name": "石井 都子",
+          "name": "石井 都子",
+          "aliases": ["石井都子", "石井 都子"],
+          "unit": "北",
+          "employment": "part",
+          "row": 33,
+          "allowed_shifts": ["", "6.0", "休"],
+          "min_rest_days": 10,
+          "max_rest_days": 22
+        }
+      ]
+    }
+  }
+}

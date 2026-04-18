@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>3分で使う GUI版</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #f3efe7 0%, #efe7db 100%);
+      color: #1f2937;
+      font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+      line-height: 1.75;
+    }
+    main {
+      max-width: 1100px;
+      margin: 32px auto;
+      padding: 0 18px;
+    }
+    section {
+      background: #fffdf9;
+      border: 1px solid #eadfce;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 14px 36px rgba(72, 52, 34, 0.08);
+    }
+    h1, h2, h3 { margin-top: 0; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 22px; }
+    ul, ol { padding-left: 22px; }
+    pre {
+      background: #f6f1ea;
+      border: 1px solid #e4d8c6;
+      border-radius: 12px;
+      padding: 14px;
+      overflow-x: auto;
+    }
+    code, .path {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f4efe8;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <h1>3分で使う GUI版</h1>
+      <p>最短で GUI を使い始めるための手順です。</p>
+    </section>
+
+    <section>
+      <h2>使うもの</h2>
+      <ul>
+        <li><span class="path">generate_akanecco_shift_gui</span> フォルダ</li>
+        <li>記載したい勤怠表の xls または xlsx</li>
+        <li>必要なら前月勤務表</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>事前確認</h2>
+      <ul>
+        <li>Windows PC であること</li>
+        <li>Microsoft Excel が入っていること</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>手順</h2>
+      <h3>1. GUI を起動する</h3>
+      <p><span class="path">generate_akanecco_shift_gui/generate_akanecco_shift_gui.exe</span> を開きます。</p>
+      <h3>2. GUI でファイルを選ぶ</h3>
+      <ol>
+        <li>記載したい勤怠表 (.xls / .xlsx)</li>
+        <li>設定 JSON: <span class="path">generate_akanecco_shift_gui/shift_config.json</span></li>
+        <li>必要なら前月勤務表</li>
+        <li>必要ならレポート保存先</li>
+      </ol>
+      <h3>3. 実行する</h3>
+      <p>「生成実行」を押します。</p>
+    </section>
+
+    <section>
+      <h2>設定 JSON でよく使う職員フラグ</h2>
+      <ul>
+        <li><strong>night_fairness_target</strong>: 夜勤回数の平等化対象にする</li>
+        <li><strong>weekend_fairness_target</strong>: 土日休系回数の平等化対象にする</li>
+        <li><strong>unit_shift_balance_target</strong>: 同じユニット内で早番・遅番回数の偏りを抑える対象にする</li>
+        <li><strong>preferred_four_day_streak_target</strong>: 4連勤が月1回程度に収まるよう配慮する対象にする</li>
+        <li><strong>require_standard_day</strong>: 通常の「日」を月1回以上入れたい対象にする</li>
+      </ul>
+      <pre>{
+  "employee_id": "employee-001",
+  "display_name": "職員A",
+  "unit": "unit-a",
+  "employment": "full",
+  "allowed_shifts": ["早", "遅", "日", "夜", "休"],
+  "night_fairness_target": true,
+  "weekend_fairness_target": true,
+  "unit_shift_balance_target": true,
+  "preferred_four_day_streak_target": true,
+  "require_standard_day": true
+}</pre>
+      <p>対象外にしたい場合は、そのフラグを <span class="path">false</span> にします。</p>
+    </section>
+
+    <section>
+      <h2>勤務表から直接変えられる項目</h2>
+      <ul>
+        <li>夜勤公平化対象</li>
+        <li>夜夜必須対象</li>
+        <li>夜夜必須回数</li>
+        <li>土日休公平化対象</li>
+        <li>個別連勤上限</li>
+        <li>4連勤許容回数</li>
+        <li>早遅平準化対象</li>
+        <li>4連勤配慮対象</li>
+        <li>日勤候補対象</li>
+        <li>休系回数指定</li>
+        <li>早番MAX / 日勤MAX / 遅番MAX / 夜勤MAX</li>
+        <li>勤務可能一覧</li>
+        <li>曜日別勤務制限</li>
+        <li>日付別勤務制限</li>
+        <li>指定日の日勤増員</li>
+      </ul>
+      <p>休系回数指定は、休だけではなく 休・特・夜休 を合計した回数です。</p>
+      <pre>勤務可能一覧: 早/遅/日/夜/休
+曜日別勤務制限: 金=早/遅/日/夜/休; 土=早/遅/日/夜/休; 日=早/遅/日/夜/休
+日付別勤務制限: 5=休; 17=休; 21=早/日</pre>
+      <p>指定日の日勤増員は次のように書きます。</p>
+      <pre>指定日の日勤増員: 5=日:1-2; 17=日:2</pre>
+    </section>
+
+    <section>
+      <h2>月ごとに設定を変えたいとき</h2>
+      <ul>
+        <li>period_overrides のキーは YYYY-MM 形式にします。</li>
+        <li>その月だけ変えたい項目だけを書きます。</li>
+        <li>employees を書く場合は、その月に使う職員一覧を丸ごと書きます。</li>
+      </ul>
+      <p>employees を指定した月は、通常設定の employees 全体ではなく、その月の employees 配列が採用されます。</p>
+    </section>
+
+    <section>
+      <h2>結果を確認する</h2>
+      <ul>
+        <li>完了後に Excel を開く にチェックがあれば、勤怠表が開きます。</li>
+        <li>完了後にレポートを開く にチェックがあれば、検証レポートが開きます。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>うまくいかないとき</h2>
+      <h3>Excel が開かない</h3>
+      <ul>
+        <li>Excel がインストールされているか確認する</li>
+      </ul>
+      <h3>ファイルが見つからない</h3>
+      <ul>
+        <li>対象ファイルの場所を確認する</li>
+        <li>設定 JSON の場所を確認する</li>
+        <li>必要なら前月勤務表を指定する</li>
+      </ul>
+      <h3>生成に失敗する</h3>
+      <ul>
+        <li>実行ログ欄の内容を確認する</li>
+        <li>同月の参照元勤務表があるか確認する</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>一番簡単な使い方</h2>
+      <ol>
+        <li>GUI を起動</li>
+        <li>対象の xls を選択</li>
+        <li>設定 JSON を選択</li>
+        <li>必要なら前月勤務表を選択</li>
+        <li>生成実行</li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>

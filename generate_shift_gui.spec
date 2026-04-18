@@ -8,6 +8,7 @@ from PyInstaller.utils.hooks import collect_submodules
 datas = [
     ('.\\docs\\guides\\3分で使う_GUI版.md', '.'),
 ]
+project_root = Path('.').resolve()
 candidate = Path('.\\shift_config.json')
 if candidate.exists():
     datas.append((str(candidate), '.'))
@@ -21,7 +22,7 @@ for candidate in [
         datas.append((str(candidate), '.'))
         break
 binaries = []
-hiddenimports = ['win32timezone']
+hiddenimports = ['win32timezone', 'generate_shift']
 datas += collect_data_files('ortools')
 binaries += collect_dynamic_libs('ortools')
 hiddenimports += collect_submodules('ortools')
@@ -29,7 +30,7 @@ hiddenimports += collect_submodules('ortools')
 
 a = Analysis(
     ['generate_shift_gui.py'],
-    pathex=[],
+    pathex=[str(project_root)],
     binaries=binaries,
     datas=datas,
     hiddenimports=hiddenimports,

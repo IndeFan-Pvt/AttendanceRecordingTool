@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1660" height="520" viewBox="0 0 1660 520">
+  <defs>
+    <style>
+      .bg { fill: #f7f1e8; }
+      .panel { fill: #fffdf8; stroke: #e5d8c7; stroke-width: 1.5; }
+      .header { fill: #eef3f8; }
+      .sub { fill: #fafcfe; }
+      .rowhead { fill: #f4f7fb; }
+      .text { font-family: "Yu Gothic UI", "Meiryo", sans-serif; font-size: 13px; fill: #23313d; }
+      .small { font-family: "Yu Gothic UI", "Meiryo", sans-serif; font-size: 12px; fill: #526170; }
+      .title { font-family: "Yu Gothic UI", "Meiryo", sans-serif; font-size: 28px; font-weight: 700; fill: #1f2933; }
+      .accent { font-family: "Yu Gothic UI", "Meiryo", sans-serif; font-size: 18px; font-weight: 700; fill: #9a3412; }
+      .highlight { fill: rgba(220, 38, 38, 0.08); stroke: #dc2626; stroke-width: 4; }
+      .focus { fill: rgba(245, 158, 11, 0.10); stroke: #f59e0b; stroke-width: 2.5; }
+      .callout { fill: #fff3f3; stroke: #f3b4b4; stroke-width: 1.5; }
+      .arrow { stroke: #dc2626; stroke-width: 3; fill: none; marker-end: url(#arrowhead2); }
+    </style>
+    <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626" />
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1660" height="520" rx="20" />
+  <text class="title" x="30" y="48">職員ごとの設定はここを見る</text>
+  <text class="small" x="30" y="74">AP から BF に、その人だけの条件を書きます</text>
+
+  <rect class="panel" x="26" y="96" width="1600" height="280" rx="18" />
+
+  <g>
+    <rect class="rowhead" x="46" y="126" width="48" height="44" />
+    <rect class="rowhead" x="46" y="170" width="48" height="52" />
+    <rect class="rowhead" x="46" y="222" width="48" height="52" />
+    <rect class="rowhead" x="46" y="274" width="48" height="52" />
+    <text class="text" x="58" y="154">行</text>
+    <text class="text" x="63" y="201">5</text>
+    <text class="text" x="63" y="253">6</text>
+    <text class="text" x="63" y="305">8</text>
+  </g>
+
+  <g>
+    <rect class="header" x="94" y="126" width="78" height="44" /><text class="text" x="122" y="154">AP</text>
+    <rect class="header" x="172" y="126" width="78" height="44" /><text class="text" x="200" y="154">AQ</text>
+    <rect class="header" x="250" y="126" width="78" height="44" /><text class="text" x="278" y="154">AR</text>
+    <rect class="header" x="328" y="126" width="92" height="44" /><text class="text" x="360" y="154">AS</text>
+    <rect class="header" x="420" y="126" width="92" height="44" /><text class="text" x="452" y="154">AT</text>
+    <rect class="header" x="512" y="126" width="92" height="44" /><text class="text" x="544" y="154">AU</text>
+    <rect class="header" x="604" y="126" width="92" height="44" /><text class="text" x="636" y="154">AV</text>
+    <rect class="header" x="696" y="126" width="92" height="44" /><text class="text" x="728" y="154">AW</text>
+    <rect class="header" x="788" y="126" width="92" height="44" /><text class="text" x="820" y="154">AX</text>
+    <rect class="header" x="880" y="126" width="92" height="44" /><text class="text" x="912" y="154">AY</text>
+    <rect class="header" x="972" y="126" width="78" height="44" /><text class="text" x="998" y="154">AZ</text>
+    <rect class="header" x="1050" y="126" width="78" height="44" /><text class="text" x="1078" y="154">BA</text>
+    <rect class="header" x="1128" y="126" width="78" height="44" /><text class="text" x="1156" y="154">BB</text>
+    <rect class="header" x="1206" y="126" width="78" height="44" /><text class="text" x="1234" y="154">BC</text>
+    <rect class="header" x="1284" y="126" width="122" height="44" /><text class="text" x="1330" y="154">BD</text>
+    <rect class="header" x="1406" y="126" width="122" height="44" /><text class="text" x="1452" y="154">BE</text>
+    <rect class="header" x="1528" y="126" width="78" height="44" /><text class="text" x="1554" y="154">BF</text>
+  </g>
+
+  <g class="small">
+    <text x="100" y="190">夜勤公平化</text><text x="100" y="205">対象</text>
+    <text x="180" y="190">夜夜必須</text><text x="180" y="205">対象</text>
+    <text x="258" y="190">夜夜必須</text><text x="258" y="205">回数</text>
+    <text x="336" y="190">土日休公平化</text><text x="336" y="205">対象</text>
+    <text x="428" y="190">個別連勤</text><text x="428" y="205">上限</text>
+    <text x="520" y="190">4連勤</text><text x="520" y="205">許容回数</text>
+    <text x="612" y="190">早遅平準化</text><text x="612" y="205">対象</text>
+    <text x="704" y="190">4連勤配慮</text><text x="704" y="205">対象</text>
+    <text x="796" y="190">日勤候補</text><text x="796" y="205">対象</text>
+    <text x="888" y="190">休系回数</text><text x="888" y="205">指定</text>
+    <text x="980" y="198">早番MAX</text>
+    <text x="1058" y="198">日勤MAX</text>
+    <text x="1136" y="198">遅番MAX</text>
+    <text x="1214" y="198">夜勤MAX</text>
+    <text x="1292" y="190">曜日別</text><text x="1292" y="205">勤務制限</text>
+    <text x="1414" y="190">日付別</text><text x="1414" y="205">勤務制限</text>
+    <text x="1536" y="190">勤務可能</text><text x="1536" y="205">一覧</text>
+  </g>
+
+  <g>
+    <rect class="sub" x="94" y="222" width="78" height="52" />
+    <rect class="sub" x="172" y="222" width="78" height="52" />
+    <rect class="sub" x="250" y="222" width="78" height="52" />
+    <rect class="sub" x="328" y="222" width="92" height="52" />
+    <rect class="sub" x="420" y="222" width="92" height="52" />
+    <rect class="sub" x="512" y="222" width="92" height="52" />
+    <rect class="sub" x="604" y="222" width="92" height="52" />
+    <rect class="sub" x="696" y="222" width="92" height="52" />
+    <rect class="sub" x="788" y="222" width="92" height="52" />
+    <rect class="sub" x="880" y="222" width="92" height="52" />
+    <rect class="sub" x="972" y="222" width="78" height="52" />
+    <rect class="sub" x="1050" y="222" width="78" height="52" />
+    <rect class="sub" x="1128" y="222" width="78" height="52" />
+    <rect class="sub" x="1206" y="222" width="78" height="52" />
+    <rect class="sub" x="1284" y="222" width="122" height="52" />
+    <rect class="sub" x="1406" y="222" width="122" height="52" />
+    <rect class="sub" x="1528" y="222" width="78" height="52" />
+
+    <rect class="sub" x="94" y="274" width="78" height="52" />
+    <rect class="sub" x="172" y="274" width="78" height="52" />
+    <rect class="sub" x="250" y="274" width="78" height="52" />
+    <rect class="sub" x="328" y="274" width="92" height="52" />
+    <rect class="sub" x="420" y="274" width="92" height="52" />
+    <rect class="sub" x="512" y="274" width="92" height="52" />
+    <rect class="sub" x="604" y="274" width="92" height="52" />
+    <rect class="sub" x="696" y="274" width="92" height="52" />
+    <rect class="sub" x="788" y="274" width="92" height="52" />
+    <rect class="sub" x="880" y="274" width="92" height="52" />
+    <rect class="sub" x="972" y="274" width="78" height="52" />
+    <rect class="sub" x="1050" y="274" width="78" height="52" />
+    <rect class="sub" x="1128" y="274" width="78" height="52" />
+    <rect class="sub" x="1206" y="274" width="78" height="52" />
+    <rect class="sub" x="1284" y="274" width="122" height="52" />
+    <rect class="sub" x="1406" y="274" width="122" height="52" />
+    <rect class="sub" x="1528" y="274" width="78" height="52" />
+
+    <text class="text" x="124" y="254">○</text>
+    <text class="text" x="202" y="254">○</text>
+    <text class="text" x="282" y="254">1</text>
+    <text class="text" x="366" y="254">○</text>
+    <text class="text" x="460" y="254">5</text>
+    <text class="text" x="548" y="254">31</text>
+
+    <text class="text" x="124" y="306">○</text>
+    <text class="text" x="366" y="306">○</text>
+    <text class="text" x="460" y="306">5</text>
+    <text class="text" x="548" y="306">31</text>
+  </g>
+
+  <rect class="highlight" x="94" y="222" width="1512" height="104" rx="12" />
+  <rect class="focus" x="94" y="126" width="78" height="200" rx="10" />
+  <rect class="focus" x="328" y="126" width="92" height="200" rx="10" />
+  <rect class="focus" x="880" y="126" width="92" height="200" rx="10" />
+  <rect class="focus" x="1528" y="126" width="78" height="200" rx="10" />
+
+  <rect class="callout" x="1020" y="384" width="590" height="102" rx="14" />
+  <text class="accent" x="1040" y="414">まずは赤い大きな枠の中だけ書けば大丈夫です</text>
+  <text class="text" x="1040" y="442">6 行目以降に、職員ごとの条件を書きます。</text>
+  <text class="text" x="1040" y="466">黄色の列は、最初によく使う AP、AS、AY、BF です。</text>
+  <path class="arrow" d="M 1030 420 C 920 398, 820 372, 760 326" />
+
+  <rect class="callout" x="30" y="384" width="900" height="102" rx="14" />
+  <text class="accent" x="50" y="414">最初によく使う列</text>
+  <text class="text" x="50" y="442">AP: 夜勤公平化対象 / AS: 土日休公平化対象 / AY: 休系回数指定 / BF: 勤務可能一覧</text>
+  <text class="text" x="50" y="466">全部を埋めなくても、必要な列だけ書けば動きます。</text>
+</svg>

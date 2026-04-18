@@ -28,7 +28,7 @@
 1. 記載したい勤怠表 (.xls / .xlsx)
    - 例: 【統一書式】あかねっこ2月_temp.xls
 2. 設定 JSON
-   - exe 版では exe/generate_akanecco_shift_gui/akanecco_shift_config.json を使います
+   - exe 版では exe/generate_akanecco_shift_gui/shift_config.json を使います
 
 必要なら以下も指定します。
 

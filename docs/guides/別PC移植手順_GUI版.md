@@ -24,7 +24,7 @@
 この中には以下が含まれます。
 
 - generate_akanecco_shift_gui.exe
-- akanecco_shift_config.json
+- shift_config.json
 - _internal
 
 ### 2-2. 勤怠表データ
@@ -46,7 +46,7 @@
 任意の作業フォルダ/
   generate_akanecco_shift_gui/
     generate_akanecco_shift_gui.exe
-    akanecco_shift_config.json
+    shift_config.json
     _internal/
   勤怠データ/
     【統一書式】あかねっこ2月_temp.xls
@@ -75,7 +75,7 @@ GUI が開いたら以下を指定します。
 1. 記載したい勤怠表 (.xls / .xlsx)
    - 例: 【統一書式】あかねっこ2月_temp.xls
 2. 設定 JSON
-  - 例: generate_akanecco_shift_gui/akanecco_shift_config.json
+  - 例: generate_akanecco_shift_gui/shift_config.json
 3. 前月勤務表 (任意)
    - 月初の勤務引継ぎを確実に反映したい場合に指定
    - 例: 【統一書式】あかねっこ1月.xls
@@ -164,7 +164,7 @@ GUI が開いたら以下を指定します。
 
 - generate_akanecco_shift_gui フォルダを丸ごとコピーした
 - generate_akanecco_shift_gui.exe がある
-- akanecco_shift_config.json がある
+- shift_config.json がある
 - _internal フォルダがある
 - 記載対象の temp xls を配置した
 - 必要なら同月参照元 xls を配置した

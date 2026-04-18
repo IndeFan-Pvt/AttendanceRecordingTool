@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>勤怠生成 GUI版 別PC移植手順</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #f4eee5 0%, #efe6da 100%);
+      color: #1f2937;
+      font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+      line-height: 1.75;
+    }
+    main {
+      max-width: 1100px;
+      margin: 32px auto;
+      padding: 0 18px;
+    }
+    section {
+      background: #fffdf9;
+      border: 1px solid #eadfce;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 14px 36px rgba(72, 52, 34, 0.08);
+    }
+    h1, h2, h3 { margin-top: 0; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 22px; }
+    ul, ol { padding-left: 22px; }
+    pre {
+      background: #f6f1ea;
+      border: 1px solid #e4d8c6;
+      border-radius: 12px;
+      padding: 14px;
+      overflow-x: auto;
+    }
+    .path {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f4efe8;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <h1>勤怠生成 GUI版 別PC移植手順</h1>
+      <p>別 PC に GUI 配布物をそのまま持っていくときの手順です。</p>
+    </section>
+
+    <section>
+      <h2>1. 前提</h2>
+      <ul>
+        <li>移植先 PC は Windows であること</li>
+        <li>移植先 PC に Microsoft Excel がインストールされていること</li>
+        <li>Python のインストールは不要</li>
+        <li>使用する実行ファイルは GUI 版とする</li>
+      </ul>
+      <p>対象フォルダは <span class="path">generate_akanecco_shift_gui</span> です。</p>
+    </section>
+
+    <section>
+      <h2>2. 移植するもの</h2>
+      <h3>2-1. アプリ本体</h3>
+      <ul>
+        <li><span class="path">generate_akanecco_shift_gui</span> フォルダを丸ごとコピーします。</li>
+        <li>含まれる主なファイルは <span class="path">generate_akanecco_shift_gui.exe</span>、<span class="path">shift_config.json</span>、<span class="path">_internal</span> です。</li>
+      </ul>
+      <h3>2-2. 勤怠表データ</h3>
+      <ul>
+        <li>記載したい勤怠表</li>
+        <li>必要なら同月の参照元勤務表</li>
+        <li>必要なら前月勤務表</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3. 推奨フォルダ構成</h2>
+      <pre>任意の作業フォルダ/
+  generate_akanecco_shift_gui/
+    generate_akanecco_shift_gui.exe
+    shift_config.json
+    _internal/
+  勤怠データ/
+    【統一書式】あかねっこ_設定項目追加.xls
+    【統一書式】あかねっこ2月.xls
+    【統一書式】あかねっこ1月.xls</pre>
+      <ul>
+        <li>GUI 本体と勤怠データは別フォルダでもかまいません。</li>
+        <li>GUI 上でファイルを選択するため、厳密に同じパス構成でなくても使えます。</li>
+        <li>ただし、同月参照元と前月勤務表は分かりやすい場所に置く方が安全です。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>4. 実行手順</h2>
+      <h3>4-1. GUI の起動</h3>
+      <p><span class="path">generate_akanecco_shift_gui/generate_akanecco_shift_gui.exe</span> を起動します。</p>
+      <h3>4-2. GUI で指定する項目</h3>
+      <ol>
+        <li>記載したい勤怠表 (.xls / .xlsx)</li>
+        <li>設定 JSON: <span class="path">generate_akanecco_shift_gui/shift_config.json</span></li>
+        <li>前月勤務表 (任意)</li>
+        <li>レポート保存先 (任意)</li>
+      </ol>
+      <p>必要に応じて「完了後にレポートを開く」「完了後に Excel を開く」を選択し、最後に「生成実行」を押します。</p>
+    </section>
+
+    <section>
+      <h2>5. 実運用時のおすすめ</h2>
+      <ul>
+        <li>最初はコピーしたテスト用ファイルで 1 回試す</li>
+        <li>本番用ファイルは必ずバックアップを取ってから実行する</li>
+        <li>前月引継ぎを使う月は、前月勤務表を GUI で明示指定する</li>
+        <li>同月の参照元勤務表も一緒に保管しておく</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>6. うまく動かないときの確認項目</h2>
+      <h3>6-1. GUI が起動しない</h3>
+      <ul>
+        <li>Windows か確認する</li>
+        <li>generate_akanecco_shift_gui フォルダを丸ごとコピーしたか確認する</li>
+        <li>_internal フォルダが欠けていないか確認する</li>
+      </ul>
+      <h3>6-2. Excel が開けない、または書き込めない</h3>
+      <ul>
+        <li>Microsoft Excel がインストールされているか確認する</li>
+        <li>対象の xls が別の Excel で開きっぱなしでないか確認する</li>
+        <li>保護ビューで開かれていないか確認する</li>
+      </ul>
+      <h3>6-3. 生成に失敗する</h3>
+      <ul>
+        <li>設定 JSON が正しいか確認する</li>
+        <li>対象ファイルが記載対象側か確認する</li>
+        <li>必要なら前月勤務表を指定する</li>
+        <li>同月の参照元勤務表が存在するか確認する</li>
+      </ul>
+      <h3>6-4. 月初引継ぎが不安</h3>
+      <ul>
+        <li>GUI の「前月勤務表 (任意)」で前月 xls を明示指定する</li>
+        <li>指定後に生成し、レポートの「月初への前月末勤務引継ぎ」を確認する</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>7. 移植時の注意</h2>
+      <ul>
+        <li>Python は不要だが Excel は必要</li>
+        <li>ネットワークドライブ上のファイルは保護ビューになることがある</li>
+        <li>日本語ファイル名を変更すると、運用手順が分かりにくくなることがある</li>
+        <li>設定 JSON の中身を変更する場合は、コピー後のファイルを編集する</li>
+      </ul>
+      <h3>7-1. 設定 JSON の職員フラグについて</h3>
+      <ul>
+        <li>night_fairness_target: 夜勤回数の平等化対象</li>
+        <li>weekend_fairness_target: 土日休系回数の平等化対象</li>
+        <li>unit_shift_balance_target: ユニット内の早番・遅番回数平準化対象</li>
+        <li>preferred_four_day_streak_target: 4連勤を月1回程度に抑える配慮対象</li>
+        <li>require_standard_day: 通常の「日」を月1回以上入れる対象</li>
+      </ul>
+      <p>勤務表側に見出し列を追加している運用なら、夜勤公平化対象、土日休公平化対象、4連勤許容回数、日勤候補対象、休系回数指定、各勤務の MAX 回数、勤務可能一覧、曜日別勤務制限、日付別勤務制限、指定日の日勤増員などは勤務表から直接変更できます。</p>
+      <p>勤務可能一覧は 1 セルに「早/遅/日/夜/休」のように書きます。曜日別勤務制限と日付別勤務制限は、1 セルに「金=早/遅/日/夜/休; 土=早/遅/日/夜/休」「5=休; 17=休」のように書きます。指定日の日勤増員は「5=日:1-2; 17=日:2」のように書きます。</p>
+      <h3>7-2. period_overrides を使うときの注意</h3>
+      <ul>
+        <li>キーは YYYY-MM 形式で書く</li>
+        <li>その月だけ変えたい項目だけを書く</li>
+        <li>employees を書いた月は、その月の employees 配列全体で置き換わる</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>8. 最低限の配布チェックリスト</h2>
+      <ul>
+        <li>generate_akanecco_shift_gui フォルダを丸ごとコピーした</li>
+        <li>generate_akanecco_shift_gui.exe がある</li>
+        <li>shift_config.json がある</li>
+        <li>_internal フォルダがある</li>
+        <li>記載対象の xls を配置した</li>
+        <li>必要なら同月参照元 xls を配置した</li>
+        <li>必要なら前月 xls を配置した</li>
+        <li>Excel インストール済み PC である</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>9. 推奨手順の要約</h2>
+      <ol>
+        <li>generate_akanecco_shift_gui フォルダを別 PC にコピーする</li>
+        <li>勤怠データを別 PC にコピーする</li>
+        <li>exe を起動する</li>
+        <li>GUI で対象 xls、設定 JSON、必要なら前月勤務表を選ぶ</li>
+        <li>生成実行する</li>
+        <li>必要なら生成後に Excel とレポートを確認する</li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>

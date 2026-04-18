@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>共有用フォルダの使い方</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f6f1e8;
+      color: #1f2937;
+      font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+      line-height: 1.7;
+    }
+    main {
+      max-width: 980px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+    section {
+      background: #fffdf9;
+      border: 1px solid #eadfce;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 30px rgba(72, 52, 34, 0.08);
+    }
+    h1, h2 { margin-top: 0; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 22px; }
+    .label {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #fff0e4;
+      color: #9a3412;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+    ul, ol { padding-left: 22px; }
+    code, .path {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f4efe8;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    a { color: #9a3412; }
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <div class="label">共有用</div>
+      <h1>共有用フォルダの使い方</h1>
+      <p>このフォルダをそのまま相手に渡してください。配布物本体、勤怠シート、説明書を 1 つにまとめています。</p>
+    </section>
+
+    <section>
+      <h2>含まれているもの</h2>
+      <ul>
+        <li><span class="path">generate_akanecco_shift_gui</span>: GUI 配布物本体です。</li>
+        <li><span class="path">勤怠データ</span>: 勤怠表ファイルをまとめたフォルダです。現在は <span class="path">【統一書式】あかねっこ_設定項目追加.xls</span> を入れています。</li>
+        <li><span class="path">あかねっこ_設定項目追加_説明書.html</span>: Excel 側の設定欄の見方を説明した資料です。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>相手に案内する内容</h2>
+      <ol>
+        <li><span class="path">generate_akanecco_shift_gui/generate_akanecco_shift_gui.exe</span> を起動します。</li>
+        <li>記載したい勤怠表として <span class="path">勤怠データ/【統一書式】あかねっこ_設定項目追加.xls</span> を選びます。</li>
+        <li>設定 JSON は <span class="path">generate_akanecco_shift_gui/shift_config.json</span> を選びます。</li>
+        <li>必要なら前月勤務表も選びます。</li>
+        <li>Excel 側の設定欄を確認したい場合は <span class="path">あかねっこ_設定項目追加_説明書.html</span> を開きます。</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>同梱している勤怠データ</h2>
+      <ul>
+        <li>記載したい勤怠表: <span class="path">【統一書式】あかねっこ_設定項目追加.xls</span></li>
+        <li>必要なら同月の参照元勤務表を追加してください。例: <span class="path">【統一書式】あかねっこ2月.xls</span></li>
+        <li>必要なら前月勤務表を追加してください。例: <span class="path">【統一書式】あかねっこ1月.xls</span></li>
+      </ul>
+      <p><span class="path">勤怠データ</span> フォルダには、記載したい勤怠表と、必要に応じて同月参照元勤務表・前月勤務表を入れてください。</p>
+      <p>GUI の詳細手順は <a href="generate_akanecco_shift_gui/3分で使う_GUI版.html">3分で使う GUI版</a> と <a href="generate_akanecco_shift_gui/別PC移植手順_GUI版.html">別PC移植手順</a> を参照してください。</p>
+    </section>
+  </main>
+</body>
+</html>

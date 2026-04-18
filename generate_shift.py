@@ -3571,18 +3571,22 @@ def write_validation_report(
     report_path: Path = DEFAULT_REPORT_PATH,
 ) -> Path:
     excluded_rows = {employee.row for employee in config.employees if not should_write_employee_row(employee)}
-    full_diffs = [
-        diff
-        for diff in compare_workbooks(config.manual_source, config.target_path, config.sheet_index)
-        if diff[0] not in excluded_rows
-    ]
-    assignment_rows = collect_assignment_diff_rows(
-        config.manual_source,
-        config.target_path,
-        config.sheet_index,
-        [employee.row for employee in config.employees if should_write_employee_row(employee)],
-        layout=config.workbook_layout,
-    )
+    if config.manual_source.exists():
+        full_diffs = [
+            diff
+            for diff in compare_workbooks(config.manual_source, config.target_path, config.sheet_index)
+            if diff[0] not in excluded_rows
+        ]
+        assignment_rows = collect_assignment_diff_rows(
+            config.manual_source,
+            config.target_path,
+            config.sheet_index,
+            [employee.row for employee in config.employees if should_write_employee_row(employee)],
+            layout=config.workbook_layout,
+        )
+    else:
+        full_diffs = []
+        assignment_rows = []
     report_payload = {
         **validation_summary,
         "results": build_validation_results(config, validation_summary),
@@ -3658,8 +3662,12 @@ def with_generate_overrides(config: SchedulerConfig, args: argparse.Namespace) -
     requested_days = args.days if args.days is not None else detected_days
     days_in_month = normalize_days_in_month(year, month, requested_days, "テンプレートまたは実行引数")
 
-    manual_year, manual_month, _ = detect_template_period(reference_source, config.sheet_index, config.workbook_layout)
     manual_fixed_assignments: dict[str, dict[int, str]] = {}
+    if reference_source.exists():
+        manual_year, manual_month, _ = detect_template_period(reference_source, config.sheet_index, config.workbook_layout)
+    else:
+        manual_year = None
+        manual_month = None
     if manual_year == year and manual_month == month:
         candidate_manual_fixed_assignments = read_fixed_assignments_from_workbook(
             reference_source,
