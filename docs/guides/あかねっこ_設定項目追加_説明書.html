@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>【統一書式】あかねっこ_設定項目追加.xls 説明書</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --paper: #fffdf8;
+      --ink: #1f2933;
+      --muted: #5c6670;
+      --line: #ddd2c2;
+      --head: #f0e6d8;
+      --accent: #9a3412;
+      --accent-soft: #fff2e8;
+      --ok-bg: #edf8f0;
+      --ok-fg: #166534;
+      --note-bg: #eef6ff;
+      --note-fg: #204566;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(154, 52, 18, 0.08), transparent 28%),
+        linear-gradient(180deg, #f8f3eb 0%, var(--bg) 100%);
+      font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+      line-height: 1.7;
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 28px auto 40px;
+      padding: 0 16px;
+    }
+
+    section {
+      background: var(--paper);
+      border: 1px solid #efe5d7;
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 18px 42px rgba(69, 49, 26, 0.08);
+      margin-bottom: 18px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #fff7f0 0%, #fffdf9 100%);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+      color: #212936;
+    }
+
+    h1 {
+      font-size: 32px;
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .card {
+      background: #faf6ef;
+      border: 1px solid #eadfce;
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .card strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+
+    .note {
+      background: var(--note-bg);
+      color: var(--note-fg);
+      border: 1px solid #cfe1f8;
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-top: 14px;
+    }
+
+    .sheet-snapshot {
+      margin-top: 14px;
+      border: 1px solid #d9dfe8;
+      border-radius: 16px;
+      overflow-x: auto;
+      background: #f9fbfe;
+    }
+
+    .sheet-snapshot table {
+      min-width: 720px;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    .sheet-snapshot th {
+      background: #eef3f8;
+      color: #2f4050;
+      font-weight: 700;
+    }
+
+    .sheet-snapshot td.rowhead,
+    .sheet-snapshot th.rowhead {
+      background: #f4f7fb;
+      color: #516273;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .figure-card {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid #eadfce;
+      background: #fffaf3;
+    }
+
+    .figure-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 14px;
+      border: 1px solid #ddcfbb;
+      background: #fff;
+    }
+
+    .figure-card p {
+      margin: 10px 0 0;
+      color: var(--muted);
+    }
+
+    .ok {
+      display: inline-block;
+      background: var(--ok-bg);
+      color: var(--ok-fg);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      margin-top: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: var(--head);
+      white-space: nowrap;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fffbf5;
+    }
+
+    ul, ol {
+      margin: 8px 0 0 22px;
+    }
+
+    li + li {
+      margin-top: 6px;
+    }
+
+    pre {
+      margin: 10px 0 0;
+      padding: 14px 16px;
+      background: #1f2430;
+      color: #f4f7fb;
+      border-radius: 14px;
+      overflow-x: auto;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 720px) {
+      main {
+        margin: 12px auto 28px;
+        padding: 0 10px;
+      }
+
+      section {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">やさしい説明書</div>
+      <h1>【統一書式】あかねっこ_設定項目追加.xls の使い方</h1>
+      <p class="lede">この説明書は、右端の設定欄に何を書けばよいかを、できるだけ専門用語を使わずにまとめたものです。最初は全部覚えなくて大丈夫です。必要なところだけ使えば動きます。</p>
+      <span class="ok">迷ったら空欄で大丈夫</span>
+    </section>
+
+    <section>
+      <h2>最初に覚えること</h2>
+      <div class="grid">
+        <article class="card">
+          <strong>1. 月全体の設定</strong>
+          <p>AV2 から AY2 は、その月全体に効く設定です。</p>
+        </article>
+        <article class="card">
+          <strong>2. 個人の設定</strong>
+          <p>AP から BF は、その人だけに効く設定です。</p>
+        </article>
+        <article class="card">
+          <strong>3. 空欄は変更なし</strong>
+          <p>書かなければ、もともとの設定をそのまま使います。</p>
+        </article>
+        <article class="card">
+          <strong>4. 難しい項目は後回し</strong>
+          <p>まずは AP、AS、AY、BF だけでも十分使えます。</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>実際の画面イメージ</h2>
+      <p>実ファイルの設定欄を、そのまま読める形にした表です。どのセルに何が入っているかを workbook と見比べながら確認できます。</p>
+
+      <h3>月全体の設定の場所</h3>
+      <div class="figure-card">
+        <img src="assets/akanecco-settings-monthly-annotated.svg" alt="月全体の設定位置の注釈図">
+        <p>赤枠が、月全体の設定を実際に入力する行です。AV2 から AY2 を見れば、その月の共通条件を確認できます。</p>
+      </div>
+      <div class="sheet-snapshot">
+        <table>
+          <thead>
+            <tr>
+              <th class="rowhead">行/列</th>
+              <th>AV</th>
+              <th>AW</th>
+              <th>AX</th>
+              <th>AY</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="rowhead">1</td>
+              <td>月次設定</td>
+              <td>土日休公平化差</td>
+              <td>休日数カウント</td>
+              <td>指定日人数条件</td>
+            </tr>
+            <tr>
+              <td class="rowhead">2</td>
+              <td>1</td>
+              <td>1</td>
+              <td>休+特+夜休</td>
+              <td>8=日:2; 21=日:1-2</td>
+            </tr>
+            <tr>
+              <td class="rowhead">3</td>
+              <td>夜勤公平化許容差</td>
+              <td>土日休公平化許容差</td>
+              <td>土日休カウント方式</td>
+              <td>夜休連鎖定義</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">2 行目が実際に入力する値です。今のファイルでは AY2 に 8=日:2; 21=日:1-2 が入っています。</div>
+
+      <h3>個人ごとの設定の場所</h3>
+      <div class="figure-card">
+        <img src="assets/akanecco-settings-employee-annotated.svg" alt="個人ごとの設定位置の注釈図">
+        <p>赤枠が、職員ごとの条件を書く場所です。黄色の列は、最初によく使う AP、AS、AY、BF を示しています。</p>
+      </div>
+      <div class="sheet-snapshot">
+        <table>
+          <thead>
+            <tr>
+              <th class="rowhead">行/列</th>
+              <th>AP</th>
+              <th>AQ</th>
+              <th>AR</th>
+              <th>AS</th>
+              <th>AT</th>
+              <th>AU</th>
+              <th>AV</th>
+              <th>AW</th>
+              <th>AX</th>
+              <th>AY</th>
+              <th>AZ</th>
+              <th>BA</th>
+              <th>BB</th>
+              <th>BC</th>
+              <th>BD</th>
+              <th>BE</th>
+              <th>BF</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="rowhead">5</td>
+              <td>夜勤公平化対象</td>
+              <td>夜夜必須対象</td>
+              <td>夜夜必須回数</td>
+              <td>土日休公平化対象</td>
+              <td>個別連勤上限</td>
+              <td>4連勤許容回数</td>
+              <td>早遅平準化対象</td>
+              <td>4連勤配慮対象</td>
+              <td>日勤候補対象</td>
+              <td>休系回数指定</td>
+              <td>早番MAX</td>
+              <td>日勤MAX</td>
+              <td>遅番MAX</td>
+              <td>夜勤MAX</td>
+              <td>曜日別勤務制限</td>
+              <td>日付別勤務制限</td>
+              <td>勤務可能一覧</td>
+            </tr>
+            <tr>
+              <td class="rowhead">6</td>
+              <td>○</td>
+              <td>○</td>
+              <td>1</td>
+              <td>○</td>
+              <td>5</td>
+              <td>31</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td class="rowhead">7</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td class="rowhead">8</td>
+              <td>○</td>
+              <td></td>
+              <td></td>
+              <td>○</td>
+              <td>5</td>
+              <td>31</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note">5 行目が項目名です。6 行目以降に職員ごとの条件を書きます。○ が入っている項目だけ対象になります。</div>
+    </section>
+
+    <section>
+      <h2>まずはここだけ使えば十分</h2>
+      <ol>
+        <li>AP 夜勤公平化対象</li>
+        <li>AS 土日休公平化対象</li>
+        <li>AY 休系回数指定</li>
+        <li>BF 勤務可能一覧</li>
+      </ol>
+      <div class="note">最初の運用では、この 4 つだけ触るのがおすすめです。細かい制限は、必要になってから追加で入れれば十分です。</div>
+    </section>
+
+    <section>
+      <h2>月全体の設定</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>セル</th>
+              <th>項目</th>
+              <th>何を書くか</th>
+              <th>おすすめ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>AV2</td>
+              <td>夜勤公平化許容差</td>
+              <td>整数</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>AW2</td>
+              <td>土日休公平化許容差</td>
+              <td>整数</td>
+              <td>1</td>
+            </tr>
+            <tr>
+              <td>AX2</td>
+              <td>土日休カウント方式</td>
+              <td>休のみ / 休+夜休 / 休+特+夜休</td>
+              <td>休+特+夜休</td>
+            </tr>
+            <tr>
+              <td>AY2</td>
+              <td>日別人数指定</td>
+              <td>例: 8=日:2; 21=日:1-2</td>
+              <td>空欄</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>AV2 夜勤公平化許容差</h3>
+      <p>夜勤回数の差をどこまで許すかです。1 なら、対象者どうしの差を 1 回までに近づけます。</p>
+      <pre>1</pre>
+
+      <h3>AW2 土日休公平化許容差</h3>
+      <p>土日休み回数の差をどこまで許すかです。こちらも、迷ったら 1 のままで大丈夫です。</p>
+      <pre>1</pre>
+
+      <h3>AX2 土日休カウント方式</h3>
+      <p>土日休みとして何を数えるかを決めます。迷ったら次を入れてください。</p>
+      <pre>休+特+夜休</pre>
+
+      <h3>AY2 日別人数指定</h3>
+      <p>イベント日などで、その日だけ日勤を増やしたいときに使います。</p>
+      <pre>8=日:2; 21=日:1-2</pre>
+      <p>意味は「8日は日勤を 2 人」「21日は日勤を 1 から 2 人」です。</p>
+    </section>
+
+    <section>
+      <h2>個人ごとの設定</h2>
+      <p>職員の行の右端に書きます。空欄なら、その人の設定は変わりません。</p>
+
+      <h3>○ を入れる項目</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>列</th>
+              <th>項目</th>
+              <th>意味</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>AP</td><td>夜勤公平化対象</td><td>この人を夜勤回数の平等化対象にする</td></tr>
+            <tr><td>AQ</td><td>夜夜必須対象</td><td>この人に「夜夜」を入れる対象にする</td></tr>
+            <tr><td>AS</td><td>土日休公平化対象</td><td>この人を土日休み平等化の対象にする</td></tr>
+            <tr><td>AV</td><td>早遅平準化対象</td><td>ユニット内で早番・遅番の偏りを抑える</td></tr>
+            <tr><td>AW</td><td>4連勤配慮対象</td><td>4連勤をなるべく少なくしたい対象</td></tr>
+            <tr><td>AX</td><td>日勤候補対象</td><td>通常の日勤を入れられる人として扱う</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>入力は <strong>○</strong> で有効、空欄または × で無効です。</p>
+      <pre>○</pre>
+
+      <h3>数字を入れる項目</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>列</th>
+              <th>項目</th>
+              <th>意味</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>AR</td><td>夜夜必須回数</td><td>「夜夜」を最低何回入れたいか</td></tr>
+            <tr><td>AT</td><td>個別連勤上限</td><td>その人だけ連勤上限を変える</td></tr>
+            <tr><td>AU</td><td>4連勤許容回数</td><td>4連勤を何回まで許すか</td></tr>
+            <tr><td>AY</td><td>休系回数指定</td><td>休・特・夜休の合計回数</td></tr>
+            <tr><td>AZ</td><td>早番MAX</td><td>早番の上限回数</td></tr>
+            <tr><td>BA</td><td>日勤MAX</td><td>日勤の上限回数</td></tr>
+            <tr><td>BB</td><td>遅番MAX</td><td>遅番の上限回数</td></tr>
+            <tr><td>BC</td><td>夜勤MAX</td><td>夜勤の上限回数</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>数字は整数だけです。空欄なら変更しません。</p>
+      <pre>5</pre>
+    </section>
+
+    <section>
+      <h2>勤務の種類をしぼる設定</h2>
+
+      <h3>BF 勤務可能一覧</h3>
+      <p>その人がその月に入ってよい勤務を並べます。</p>
+      <pre>早/遅/日/休</pre>
+      <p>この例なら、夜勤には入りません。</p>
+      <div class="note">使える記号の例は、早、遅、日、夜、夜休、休、特、空欄、3.0、5.5、6.0 です。夜 を入れた場合は、夜休は自動で扱われます。</div>
+    </section>
+
+    <section>
+      <h2>曜日や日付でしばる設定</h2>
+
+      <h3>BD 曜日別勤務制限</h3>
+      <p>曜日ごとに、その日に入ってよい勤務だけを書きます。</p>
+      <pre>月=早/日/休; 火=早/日/休; 水=早/日/休; 木=早/日/休</pre>
+      <p>この例なら、月火水木は早番・日勤・休みだけです。</p>
+
+      <h3>BE 日付別勤務制限</h3>
+      <p>特定の日だけ条件を付けたいときに使います。</p>
+      <pre>5=休; 17=休; 21=早/日</pre>
+      <p>この例なら、5日と17日は休みだけ、21日は早番か日勤だけです。</p>
+    </section>
+
+    <section>
+      <h2>指定勤務日について</h2>
+      <p>右端の設定欄とは別に、日ごとの勤務マスへ直接 早 や 休 を入れた場合は、その内容が指定勤務として優先されます。</p>
+      <ul>
+        <li>研修の日はその日のマスに 日 を入れる</li>
+        <li>委員会の日はその日のマスに 早 を入れる</li>
+        <li>必ず休みにしたい日はその日のマスに 休 を入れる</li>
+      </ul>
+      <div class="note">委員会日は、今の運用では「その日を早番の指定勤務にする」と考えてください。</div>
+    </section>
+
+    <section>
+      <h2>よくある例</h2>
+      <h3>夜勤に入れたくない</h3>
+      <pre>早/遅/日/休</pre>
+
+      <h3>この人だけ休みを 10 回にしたい</h3>
+      <pre>10</pre>
+
+      <h3>土日休みの回数を平等にしたい</h3>
+      <p>対象者の AS に ○ を入れて、AW2 は 1 にします。</p>
+      <pre>○</pre>
+      <pre>1</pre>
+
+      <h3>8日は日勤を 2 人にしたい</h3>
+      <pre>8=日:2</pre>
+
+      <h3>5日だけ休みにしたい</h3>
+      <pre>5=休</pre>
+    </section>
+
+    <section>
+      <h2>迷ったときの順番</h2>
+      <ol>
+        <li>まず空欄のまま使う</li>
+        <li>BF の勤務可能一覧だけ入れる</li>
+        <li>必要な人だけ AP や AS に ○ を入れる</li>
+        <li>それでも足りなければ AY や MAX 列を入れる</li>
+        <li>最後に BD や BE の細かい制限を使う</li>
+      </ol>
+      <div class="note">最初から全部埋める必要はありません。少しずつ増やす方が安全です。</div>
+    </section>
+  </main>
+</body>
+</html>

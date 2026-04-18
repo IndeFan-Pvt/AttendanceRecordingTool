@@ -1,0 +1,179 @@
+{
+  "year": 2026,
+  "month": 1,
+  "unit_name": "__UNIT_NAME_REQUIRED__",
+  "target_path": "__TARGET_WORKBOOK_REQUIRED__.xls",
+  "manual_source": "__MANUAL_SOURCE_REQUIRED__.xls",
+  "sheet_index": 1,
+  "workbook_layout": {
+    "title_cell": {"row_index": 0, "column_index": 0},
+    "unit_name_cell": {"row_index": 1, "column_index": 2},
+    "name_column_index": 3,
+    "first_day_column_index": 4,
+    "day_header_row_index": 3,
+    "weekday_header_row_index": 4,
+    "count_columns": {"night": 35, "early": 36, "late": 37, "rest": 38},
+    "employee_setting_header_row_index": 4,
+    "employee_setting_columns": {
+      "night_fairness_target": {"column_index": 41, "header_label": "夜勤公平化対象"},
+      "required_double_night_target": {"column_index": 42, "header_label": "夜夜必須対象"},
+      "required_double_night_min_count": {"column_index": 43, "header_label": "夜夜必須回数"},
+      "weekend_fairness_target": {"column_index": 44, "header_label": "土日休公平化対象"},
+      "max_consecutive_work_limit": {"column_index": 45, "header_label": "個別連勤上限"},
+      "max_four_day_streak_count": {"column_index": 46, "header_label": "4連勤許容回数"},
+      "unit_shift_balance_target": {"column_index": 47, "header_label": "早遅平準化対象"},
+      "preferred_four_day_streak_target": {"column_index": 48, "header_label": "4連勤配慮対象"},
+      "require_standard_day": {"column_index": 49, "header_label": "日勤候補対象"},
+      "exact_rest_days": {"column_index": 50, "header_label": "休系回数指定"},
+      "max_count_early": {"column_index": 51, "header_label": "早番MAX"},
+      "max_count_day": {"column_index": 52, "header_label": "日勤MAX"},
+      "max_count_late": {"column_index": 53, "header_label": "遅番MAX"},
+      "max_count_night": {"column_index": 54, "header_label": "夜勤MAX"},
+      "weekday_allowed_shifts": {"column_index": 55, "header_label": "曜日別勤務制限"},
+      "date_allowed_shift_overrides": {"column_index": 56, "header_label": "日付別勤務制限"},
+      "allowed_shifts": {"column_index": 57, "header_label": "勤務可能一覧"}
+    },
+    "monthly_setting_header_cell": {"row_index": 0, "column_index": 47},
+    "monthly_setting_cells": {
+      "fairness_night_spread": {"row_index": 1, "column_index": 47},
+      "fairness_weekend_spread": {"row_index": 1, "column_index": 48},
+      "weekend_rest_count_mode": {"row_index": 1, "column_index": 49},
+      "day_requirements": {"row_index": 1, "column_index": 50}
+    }
+  },
+  "shift_kinds": {
+    "": "rest",
+    "早": "early",
+    "遅": "late",
+    "日": "day",
+    "夜": "night",
+    "夜休": "night_rest",
+    "休": "rest"
+  },
+  "count_symbols": {},
+  "rules": {
+    "required_per_day": {
+      "unit-a": {"early": 1, "late": 1},
+      "unit-b": {"early": 1, "late": 1},
+      "night_total": 1
+    },
+    "max_consecutive_work": 5,
+    "max_consecutive_night": 2,
+    "max_consecutive_rest": 5,
+    "max_consecutive_rest_with_special": 5,
+    "preferred_four_day_streak_count": 1,
+    "fairness_night_spread": 1,
+    "fairness_weekend_spread": 1,
+    "require_weekend_pair_rest": true,
+    "prefer_double_night": true,
+    "day_requirements": {}
+  },
+  "employees": [
+    {
+      "employee_id": "employee-001",
+      "display_name": "職員A",
+      "aliases": ["職員A"],
+      "unit": "unit-a",
+      "employment": "full",
+      "row": 6,
+      "allowed_shifts": ["早", "遅", "日", "夜", "休"],
+      "require_weekend_pair_rest": true,
+      "night_fairness_target": true,
+      "weekend_fairness_target": true,
+      "unit_shift_balance_target": true,
+      "preferred_four_day_streak_target": true,
+      "require_standard_day": true,
+      "min_counts": {
+        "夜": 3,
+        "日": 1
+      },
+      "max_counts": {
+        "夜": 4
+      },
+      "min_rest_days": 6,
+      "max_rest_days": 10,
+      "fixed_assignments": {},
+      "previous_tail": []
+    },
+    {
+      "employee_id": "employee-002",
+      "display_name": "職員B",
+      "aliases": ["職員B"],
+      "unit": "unit-b",
+      "employment": "part",
+      "row": 8,
+      "allowed_shifts": ["", "日", "休"],
+      "require_weekend_pair_rest": false,
+      "night_fairness_target": false,
+      "weekend_fairness_target": false,
+      "unit_shift_balance_target": false,
+      "preferred_four_day_streak_target": false,
+      "require_standard_day": false,
+      "min_counts": {},
+      "max_counts": {},
+      "min_rest_days": 10,
+      "max_rest_days": 18,
+      "fixed_assignments": {},
+      "previous_tail": []
+    }
+  ],
+  "period_overrides": {
+    "2026-02": {
+      "rules": {
+        "max_consecutive_rest": 3
+      },
+      "employees": [
+        {
+          "employee_id": "employee-001",
+          "display_name": "職員A",
+          "aliases": ["職員A"],
+          "unit": "unit-a",
+          "employment": "full",
+          "row": 6,
+          "allowed_shifts": ["早", "遅", "日", "夜", "休"],
+          "require_weekend_pair_rest": true,
+          "night_fairness_target": true,
+          "weekend_fairness_target": false,
+          "unit_shift_balance_target": true,
+          "preferred_four_day_streak_target": false,
+          "require_standard_day": true,
+          "min_counts": {
+            "夜": 3,
+            "日": 1
+          },
+          "max_counts": {
+            "夜": 4
+          },
+          "min_rest_days": 6,
+          "max_rest_days": 10,
+          "fixed_assignments": {
+            "3": "休",
+            "17": "休"
+          },
+          "previous_tail": []
+        },
+        {
+          "employee_id": "employee-002",
+          "display_name": "職員B",
+          "aliases": ["職員B"],
+          "unit": "unit-b",
+          "employment": "part",
+          "row": 8,
+          "allowed_shifts": ["", "日", "休"],
+          "require_weekend_pair_rest": false,
+          "night_fairness_target": false,
+          "weekend_fairness_target": false,
+          "unit_shift_balance_target": false,
+          "preferred_four_day_streak_target": false,
+          "require_standard_day": false,
+          "min_counts": {},
+          "max_counts": {},
+          "min_rest_days": 10,
+          "max_rest_days": 18,
+          "fixed_assignments": {},
+          "previous_tail": []
+        }
+      ]
+    }
+  }
+}

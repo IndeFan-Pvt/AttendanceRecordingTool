@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>docs/reference 対応状況 2026-04-18</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --panel: #fffdf8;
+      --line: #d9ccb8;
+      --text: #2f261d;
+      --muted: #6b6156;
+      --accent: #8a4f2d;
+      --ok: #1f6b45;
+      --ok-soft: #e9f6ef;
+      --warn: #9b6a00;
+      --warn-soft: #fff5dd;
+      --ng: #9d2f2f;
+      --ng-soft: #fdecec;
+      --shadow: 0 16px 40px rgba(77, 55, 29, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Yu Gothic UI", "Hiragino Sans", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(196, 162, 122, 0.25), transparent 30%),
+        linear-gradient(180deg, #faf5ec 0%, var(--bg) 100%);
+      line-height: 1.7;
+    }
+
+    main {
+      width: min(1240px, calc(100vw - 32px));
+      margin: 32px auto 56px;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    h1, h2 {
+      margin: 0;
+      line-height: 1.25;
+    }
+
+    h1 {
+      font-size: clamp(30px, 5vw, 46px);
+      letter-spacing: 0.02em;
+    }
+
+    h2 {
+      font-size: 24px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .lede {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 920px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: #fffcf6;
+    }
+
+    .card strong {
+      display: block;
+      font-size: 34px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .card span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-top: 16px;
+    }
+
+    .ok {
+      background: var(--ok-soft);
+      color: var(--ok);
+    }
+
+    .partial {
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    .ng {
+      background: var(--ng-soft);
+      color: var(--ng);
+    }
+
+    .note {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-left: 4px solid #c38c42;
+      border-radius: 12px;
+      background: #faf2e3;
+      color: var(--muted);
+    }
+
+    .list {
+      margin-top: 12px;
+      padding-left: 20px;
+    }
+
+    .list li + li {
+      margin-top: 8px;
+    }
+
+    .table-wrap {
+      margin-top: 16px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1020px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 14px 16px;
+      border-bottom: 1px solid #ece2d3;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f7efe1;
+      color: var(--accent);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    a {
+      color: #7b3f22;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .priority-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .priority-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      background: #fffaf3;
+    }
+
+    .priority-label {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+
+    .priority-high {
+      background: var(--ng-soft);
+      color: var(--ng);
+    }
+
+    .priority-mid {
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    .priority-low {
+      background: #efe9ff;
+      color: #5a3e9c;
+    }
+
+    .priority-card h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      line-height: 1.4;
+      color: var(--accent);
+    }
+
+    .priority-card p {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .priority-card ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    .priority-card li + li {
+      margin-top: 6px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        width: calc(100vw - 20px);
+        margin: 10px auto 32px;
+      }
+
+      section {
+        padding: 20px;
+        border-radius: 18px;
+      }
+
+      table, thead, tbody, tr, th, td {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        border-bottom: 1px solid #ece2d3;
+      }
+
+      td {
+        border-bottom: none;
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+
+      td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <h1>docs/reference 対応状況</h1>
+      <p class="lede">2026-04-18 時点の監査結果です。対象は docs/reference のテキスト要件と理事長修正 xlsx を基準に、現行実装と照合したものです。</p>
+      <div class="tag ok">docs/reference 全体対応済み</div>
+      <div class="summary">
+        <div class="card">
+          <strong>22</strong>
+          <span>確認した要件・運用項目</span>
+        </div>
+        <div class="card">
+          <strong>22</strong>
+          <span>実装済み</span>
+        </div>
+        <div class="card">
+          <strong>0</strong>
+          <span>部分対応</span>
+        </div>
+        <div class="card">
+          <strong>0</strong>
+          <span>未解決の原本差分</span>
+        </div>
+      </div>
+      <div class="note">
+        docs/reference のテキスト要件と、原本シートに残っていた委員会担当日の早番固定まで含めて、現行仕様へ反映済みです。
+      </div>
+    </section>
+
+    <section>
+      <h2>判定前提</h2>
+      <ul class="list">
+        <li>現行要件の主判定対象は <a href="シフト作成ルール.txt">シフト作成ルール.txt</a> です。</li>
+        <li><a href="%E3%82%B7%E3%83%95%E3%83%88%E4%BD%9C%E6%88%90%EF%BC%88%E3%83%AB%E3%83%BC%E3%83%AB%E3%81%A8%E9%85%8D%E6%85%AE%EF%BC%89%E7%90%86%E4%BA%8B%E9%95%B7%E4%BF%AE%E6%AD%A3.xlsx">シフト作成（ルールと配慮）理事長修正.xlsx</a> の修整シートはテキスト要件と概ね整合しています。</li>
+        <li>同 xlsx の原本シートに残っていた委員会担当日の早番固定は、指定勤務日の運用として現行仕様へ取り込みました。</li>
+      </ul>
+      <p class="small">元の監査メモは <a href="対応状況_20260418.md">対応状況_20260418.md</a> にも残しています。</p>
+    </section>
+
+    <section>
+      <h2>対応表</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>項目</th>
+              <th>要件</th>
+              <th>判定</th>
+              <th>根拠</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="項目">①</td>
+              <td data-label="要件">各ユニットで早番1人・遅番1人</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">要件は <a href="シフト作成ルール.txt">シフト作成ルール.txt</a>。制約追加は generate_shift.py L1895-L1899、基本設定は shift_config.json L19-L28。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">②</td>
+              <td data-label="要件">南北合計で夜勤1人</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">要件は <a href="シフト作成ルール.txt">シフト作成ルール.txt</a>。制約追加は generate_shift.py L1900。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">③</td>
+              <td data-label="要件">遅の翌日は早不可</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">要件は <a href="シフト作成ルール.txt">シフト作成ルール.txt</a>。制約追加は generate_shift.py L1948-L1952。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">④</td>
+              <td data-label="要件">夜の翌日は夜または夜休のみ、夜夜は2連続まで</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">夜勤後遷移は generate_shift.py L1953-L1956、夜夜上限は generate_shift.py L2012-L2014。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⑤</td>
+              <td data-label="要件">指定休日前日に夜勤不可</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">月内の前日制約は strict model で維持しています。月初1日の指定休日は、前月末情報が無いまま未検証で通さず、generate 実行前に previous_tail 不足を明示エラーにしています。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⑥</td>
+              <td data-label="要件">最長5連勤まで</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">制約追加は generate_shift.py L1979-L1981。基本設定は shift_config.json L30。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">❼</td>
+              <td data-label="要件">月初は前月末勤務を引き継ぐ</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">前月末読込は generate_shift.py L3633-L3645。制約反映は generate_shift.py L1937-L1946。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⑧</td>
+              <td data-label="要件">連休は3連休まで、特含みで5連休まで可</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">制約追加は generate_shift.py L1997-L2005。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">❾</td>
+              <td data-label="要件">夜勤回数の公平化、ばらつき1回以内</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">制約追加は generate_shift.py L2056-L2066。基本設定は shift_config.json L34。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⑩</td>
+              <td data-label="要件">夜夜を1回は入れる配慮</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">対象カウントと最低回数は generate_shift.py L1965-L1977。既定配慮は shift_config.json L45。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⓫</td>
+              <td data-label="要件">4連勤まで、月1回程度が望ましい</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">4連勤窓制御は generate_shift.py L1982-L1996。既定目標は shift_config.json L33。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⓬</td>
+              <td data-label="要件">土日の休みをなるべく平等化</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">土日休公平化は generate_shift.py L2041-L2054。基本設定は shift_config.json L35。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⓭</td>
+              <td data-label="要件">勤務体制に関係ない通常の日を月1回入れる</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">employee_requires_standard_day は通常の日勤記号を allowed_shifts に持つ職員を対象にし、strict / relaxed の両方で月1回以上の通常日勤を要求しています。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⓮</td>
+              <td data-label="要件">夜休を含む休みが10日以上続くのは禁止</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">検証ロジックに加え、strict model に夜休連鎖 9 回上限を追加し、relaxed model にも同等の超過ペナルティを入れています。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⓯</td>
+              <td data-label="要件">休回数の個別指定</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">設定読込は generate_shift.py L774-L783、制約追加は generate_shift.py L2032-L2038。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⓰</td>
+              <td data-label="要件">早・日・遅・夜の MAX 回数を個別指定</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">制約追加は generate_shift.py L2015-L2020。Workbook 側の MAX 列は generate_shift.py L85-L88。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⓱</td>
+              <td data-label="要件">指定日の日勤を1から2人にする</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">月次設定読込は generate_shift.py L862-L864、制約追加は generate_shift.py L1902-L1909。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">⓲</td>
+              <td data-label="要件">完全に作れない場合も途中経過を出す</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">緩和モデル構築は generate_shift.py L2110、切替は generate_shift.py L2325-L2343。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">原本補足</td>
+              <td data-label="要件">委員会の担当職員は委員会日に早番で出勤する</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">原本シート要約の旧要件は _inspect/rules_xlsx_summary.txt にあります。現行仕様では指定勤務日として扱い、委員会日は早番の fixed assignment で反映します。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">制限職員A</td>
+              <td data-label="要件">早番メイン、日勤可、夜勤と遅番不可</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">allowed_shifts で表現でき、日別制約との併用も generate_shift.py L1105-L1110 で対応しています。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">制限職員B</td>
+              <td data-label="要件">早番と遅番固定、夜勤なし</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">allowed_shifts と個別 max/min 制約で表現できます。</td>
+            </tr>
+            <tr>
+              <td data-label="項目">制限職員C</td>
+              <td data-label="要件">遅番は金土日のみ、土日のどちらか休み</td>
+              <td data-label="判定"><span class="status ok">実装済み</span></td>
+              <td data-label="根拠">曜日制限は維持しつつ、土日どちらか休みは strict model でも soft 配慮として扱い、例外運用を許容できる形にしています。validation でも必須違反ではなく配慮未達として報告します。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>現時点の主な不足</h2>
+      <ol class="list">
+        <li>docs/reference のテキスト要件と原本シート由来の委員会ルールに対する不足はありません。</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>原本シート差分の取り込み</h2>
+      <p>原本シート要約に残っていた「委員会の担当職員は早番で出勤する」は、<a href="../../_inspect/rules_xlsx_summary.txt">_inspect/rules_xlsx_summary.txt</a> の記載をもとに、現行仕様では委員会日を指定勤務日の早番として扱う方針で取り込みました。</p>
+      <div class="note">実装上は fixed assignment の仕組みで表現します。元勤務表や設定ファイルで委員会日を早番指定すれば、そのまま最優先で反映されます。</div>
+    </section>
+
+    <section>
+      <h2>未対応項目の優先順位</h2>
+      <p class="lede">実装順を決めるための整理です。運用への影響、仕様の明確さ、修正コストの順で並べています。</p>
+      <div class="priority-grid">
+        <article class="priority-card">
+          <div class="priority-label ok">対応済み</div>
+          <h3>夜休10日以上連続禁止を生成制約へ反映</h3>
+          <p>strict model に夜休連鎖上限を追加し、relaxed model にも超過ペナルティを入れました。検証止まりだった状態は解消済みです。</p>
+          <ul>
+            <li>対象要件: ⓮ 夜休を含む休みが10日以上続くのは禁止</li>
+            <li>対応: strict model と relaxed model の両方へ反映</li>
+            <li>状態: 2026-04-18 対応済み</li>
+          </ul>
+        </article>
+
+        <article class="priority-card">
+          <div class="priority-label ok">対応済み</div>
+          <h3>月初1日の指定休日を未検証にしない</h3>
+          <p>day 1 に指定休日があるのに previous_tail が無いケースは、generate 実行前に明示エラーで止めるようにしました。</p>
+          <ul>
+            <li>対象要件: ⑤ 指定休日前日に夜勤不可</li>
+            <li>対応: previous_tail 不足を生成前チェックで検出</li>
+            <li>状態: 2026-04-18 対応済み</li>
+          </ul>
+        </article>
+
+        <article class="priority-card">
+          <div class="priority-label ok">対応済み</div>
+          <h3>通常の日勤1回要件を allowed_shifts 基準へ統一</h3>
+          <p>通常の日勤記号を持つ職員全員を対象に切り替え、docs/reference の文面に寄せました。旧フラグ列は互換維持のため残しています。</p>
+          <ul>
+            <li>対象要件: ⓭ 勤務体制に関係ない通常の日を月1回入れる</li>
+            <li>対応: primary day を allowed_shifts に持つ職員全員を対象化</li>
+            <li>状態: 2026-04-18 対応済み</li>
+          </ul>
+        </article>
+
+        <article class="priority-card">
+          <div class="priority-label ok">対応済み</div>
+          <h3>原本シートの委員会ルールを現行仕様へ統合</h3>
+          <p>委員会担当日の早番固定は、現行仕様では指定勤務日の早番として扱う方針に統一しました。専用制約は増やさず、既存の fixed assignment 機構へ統合しています。</p>
+          <ul>
+            <li>対象差分: 委員会担当者は早番で出勤する</li>
+            <li>対応: 指定勤務日（委員会日を含む）の運用として取り込み</li>
+            <li>状態: 2026-04-18 対応済み</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

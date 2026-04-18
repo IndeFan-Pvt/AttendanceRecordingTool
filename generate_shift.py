@@ -26,8 +26,22 @@ configure_stdio()
 
 
 BASE_DIR = Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent
-DEFAULT_CONFIG_PATH = BASE_DIR / "akanecco_shift_config.json"
-DEFAULT_REPORT_PATH = BASE_DIR / "akanecco_generated_validation.html"
+DEFAULT_CONFIG_CANDIDATE_FILENAMES = ("shift_config.json",)
+
+
+def resolve_default_config_path(base_dir: Path) -> Path:
+    for file_name in DEFAULT_CONFIG_CANDIDATE_FILENAMES:
+        candidate = base_dir / file_name
+        if candidate.exists():
+            return candidate
+    return base_dir / DEFAULT_CONFIG_CANDIDATE_FILENAMES[0]
+
+
+DEFAULT_CONFIG_PATH = resolve_default_config_path(BASE_DIR)
+DEFAULT_REPORT_PATH = BASE_DIR / "reports" / "generated_validation.html"
+DEFAULT_UNIT_NAME_PLACEHOLDER = "__UNIT_NAME_REQUIRED__"
+DEFAULT_TARGET_PATH_PLACEHOLDER = "__TARGET_WORKBOOK_REQUIRED__.xls"
+DEFAULT_MANUAL_SOURCE_PLACEHOLDER = "__MANUAL_SOURCE_REQUIRED__.xls"
 DEFAULT_SHIFT_KINDS = {
     "": "rest",
     "早": "early",
@@ -36,26 +50,54 @@ DEFAULT_SHIFT_KINDS = {
     "夜": "night",
     "夜休": "night_rest",
     "休": "rest",
-    "特": "rest",
-    "5.5": "day",
-    "6.0": "day",
 }
-DEFAULT_COUNT_SYMBOLS = {"夜": "夜", "早": "早", "遅": "遅", "休": "休"}
+DEFAULT_COUNT_SYMBOL_LABEL_KINDS = {"夜": "night", "早": "early", "遅": "late", "休": "rest"}
+WORKBOOK_COUNT_COLUMN_KEY_ALIASES = {
+    "night": "night",
+    "夜": "night",
+    "early": "early",
+    "早": "early",
+    "late": "late",
+    "遅": "late",
+    "rest": "rest",
+    "休": "rest",
+}
 JAPANESE_WEEKDAYS = ["月", "火", "水", "木", "金", "土", "日"]
-XLS_EMPLOYEE_SETTING_HEADER_ROW_INDEX = 4
-XLS_EMPLOYEE_SETTING_COLUMNS = {
-    "night_fairness_target": (41, "夜勤公平化対象"),
-    "required_double_night_target": (42, "夜夜必須対象"),
-    "required_double_night_min_count": (43, "夜夜必須回数"),
-    "weekend_fairness_target": (44, "土日休公平化対象"),
-    "max_consecutive_work_limit": (45, "個別連勤上限"),
-    "max_four_day_streak_count": (46, "4連勤許容回数"),
-}
-XLS_MONTHLY_SETTING_HEADER_CELL = (0, 47)
-XLS_MONTHLY_SETTING_CELLS = {
-    "fairness_night_spread": (1, 47),
-    "fairness_weekend_spread": (1, 48),
-    "weekend_rest_count_mode": (1, 49),
+DEFAULT_WORKBOOK_LAYOUT = {
+    "title_cell": {"row_index": 0, "column_index": 0},
+    "unit_name_cell": {"row_index": 1, "column_index": 2},
+    "name_column_index": 3,
+    "first_day_column_index": 4,
+    "day_header_row_index": 3,
+    "weekday_header_row_index": 4,
+    "count_columns": {"night": 35, "early": 36, "late": 37, "rest": 38},
+    "employee_setting_header_row_index": 4,
+    "employee_setting_columns": {
+        "night_fairness_target": {"column_index": 41, "header_label": "夜勤公平化対象"},
+        "required_double_night_target": {"column_index": 42, "header_label": "夜夜必須対象"},
+        "required_double_night_min_count": {"column_index": 43, "header_label": "夜夜必須回数"},
+        "weekend_fairness_target": {"column_index": 44, "header_label": "土日休公平化対象"},
+        "max_consecutive_work_limit": {"column_index": 45, "header_label": "個別連勤上限"},
+        "max_four_day_streak_count": {"column_index": 46, "header_label": "4連勤許容回数"},
+        "unit_shift_balance_target": {"column_index": 47, "header_label": "早遅平準化対象"},
+        "preferred_four_day_streak_target": {"column_index": 48, "header_label": "4連勤配慮対象"},
+        "require_standard_day": {"column_index": 49, "header_label": "日勤候補対象"},
+        "exact_rest_days": {"column_index": 50, "header_label": "休系回数指定"},
+        "max_count_early": {"column_index": 51, "header_label": "早番MAX"},
+        "max_count_day": {"column_index": 52, "header_label": "日勤MAX"},
+        "max_count_late": {"column_index": 53, "header_label": "遅番MAX"},
+        "max_count_night": {"column_index": 54, "header_label": "夜勤MAX"},
+        "weekday_allowed_shifts": {"column_index": 55, "header_label": "曜日別勤務制限"},
+        "date_allowed_shift_overrides": {"column_index": 56, "header_label": "日付別勤務制限"},
+        "allowed_shifts": {"column_index": 57, "header_label": "勤務可能一覧"},
+    },
+    "monthly_setting_header_cell": {"row_index": 0, "column_index": 47},
+    "monthly_setting_cells": {
+        "fairness_night_spread": {"row_index": 1, "column_index": 47},
+        "fairness_weekend_spread": {"row_index": 1, "column_index": 48},
+        "weekend_rest_count_mode": {"row_index": 1, "column_index": 49},
+        "day_requirements": {"row_index": 1, "column_index": 50},
+    },
 }
 TRUE_MARKERS = {"○", "〇", "1", "true", "yes", "y", "on"}
 FALSE_MARKERS = {"×", "✕", "x", "0", "false", "no", "n", "off"}
@@ -87,6 +129,9 @@ class EmployeeConfig:
     night_fairness_target: bool = False
     required_double_night_min_count: int | None = None
     weekend_fairness_target: bool = False
+    unit_shift_balance_target: bool = False
+    preferred_four_day_streak_target: bool = False
+    require_standard_day: bool = False
     min_counts: dict[str, int] = field(default_factory=dict)
     max_counts: dict[str, int] = field(default_factory=dict)
     max_consecutive_work_limit: int | None = None
@@ -105,6 +150,7 @@ class SchedulerConfig:
     target_path: Path
     manual_source: Path
     sheet_index: int
+    workbook_layout: dict[str, object]
     year: int
     month: int
     days_in_month: int
@@ -119,6 +165,7 @@ class SchedulerConfig:
     max_consecutive_night: int
     max_consecutive_rest: int
     max_consecutive_rest_with_special: int
+    preferred_four_day_streak_count: int | None
     fairness_night_spread: int | None
     fairness_weekend_spread: int | None
     weekend_rest_count_mode: str
@@ -137,168 +184,71 @@ class ScheduleSolveResult:
 def default_config_dict() -> dict[str, object]:
     return {
         "year": 2026,
-        "month": 2,
-        "unit_name": "あかねっこ",
-        "target_path": "【白紙】あかねっこ.xls",
-        "manual_source": "元データ/シフト自動作成、特養いちご/シフト自動作成、特養いちご/R7年勤務表/R7.2月/【統一書式】あかねっこ2月.xls",
+        "month": 1,
+        "unit_name": DEFAULT_UNIT_NAME_PLACEHOLDER,
+        "target_path": DEFAULT_TARGET_PATH_PLACEHOLDER,
+        "manual_source": DEFAULT_MANUAL_SOURCE_PLACEHOLDER,
         "sheet_index": 1,
+        "workbook_layout": DEFAULT_WORKBOOK_LAYOUT,
         "shift_kinds": DEFAULT_SHIFT_KINDS,
-        "count_symbols": DEFAULT_COUNT_SYMBOLS,
+        "count_symbols": {},
         "rules": {
             "required_per_day": {
-                "南": {"early": 1, "late": 1},
-                "北": {"early": 1, "late": 1},
                 "night_total": 1,
             },
             "max_consecutive_work": 5,
             "max_consecutive_night": 2,
             "max_consecutive_rest": 3,
             "max_consecutive_rest_with_special": 5,
+            "preferred_four_day_streak_count": 1,
             "fairness_night_spread": 1,
             "fairness_weekend_spread": 1,
             "require_weekend_pair_rest": True,
             "prefer_double_night": True,
             "day_requirements": {},
         },
-        "employees": [
-            {
-                "name": "笹谷 正人",
-                "unit": "南",
-                "employment": "full",
-                "row": 6,
-                "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
-                "min_counts": {"夜": 3, "日": 1},
-                "max_counts": {"夜": 4},
-                "min_rest_days": 6,
-                "max_rest_days": 10,
-            },
-            {
-                "name": "川部 春香",
-                "unit": "南",
-                "employment": "full",
-                "row": 8,
-                "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
-                "min_counts": {"夜": 3, "日": 1},
-                "max_counts": {"夜": 4},
-                "min_rest_days": 6,
-                "max_rest_days": 10,
-            },
-            {
-                "name": "都築 良弘",
-                "unit": "南",
-                "employment": "full",
-                "row": 10,
-                "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
-                "min_counts": {"夜": 3, "日": 1},
-                "max_counts": {"夜": 4},
-                "min_rest_days": 6,
-                "max_rest_days": 10,
-            },
-            {
-                "name": "嶋﨑 光子",
-                "unit": "南",
-                "employment": "full",
-                "row": 12,
-                "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
-                "min_counts": {"夜": 3, "日": 1},
-                "max_counts": {"夜": 4},
-                "min_rest_days": 6,
-                "max_rest_days": 10,
-            },
-            {
-                "name": "八重 美貴",
-                "unit": "南",
-                "employment": "part",
-                "row": 14,
-                "allowed_shifts": ["", "5.5", "休"],
-                "min_rest_days": 11,
-                "max_rest_days": 18,
-            },
-            {
-                "name": "稲富茜里",
-                "unit": "南",
-                "employment": "part",
-                "row": 16,
-                "allowed_shifts": ["", "6.0", "休"],
-                "min_rest_days": 11,
-                "max_rest_days": 18,
-            },
-            {
-                "name": "駒倉 利光",
-                "unit": "北",
-                "employment": "full",
-                "row": 21,
-                "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
-                "min_counts": {"夜": 3, "日": 1},
-                "max_counts": {"夜": 4},
-                "min_rest_days": 6,
-                "max_rest_days": 10,
-            },
-            {
-                "name": "竹内孝寛",
-                "unit": "北",
-                "employment": "full",
-                "row": 23,
-                "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
-                "min_counts": {"夜": 3, "日": 1},
-                "max_counts": {"夜": 4},
-                "min_rest_days": 6,
-                "max_rest_days": 10,
-            },
-            {
-                "name": "岡 虹光",
-                "unit": "北",
-                "employment": "full",
-                "row": 25,
-                "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
-                "min_counts": {"夜": 3, "日": 1},
-                "max_counts": {"夜": 4},
-                "min_rest_days": 6,
-                "max_rest_days": 10,
-            },
-            {
-                "name": "鈴木 美奈",
-                "unit": "北",
-                "employment": "full",
-                "row": 27,
-                "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
-                "min_counts": {"夜": 3, "日": 1},
-                "max_counts": {"夜": 4},
-                "min_rest_days": 6,
-                "max_rest_days": 10,
-            },
-            {
-                "name": "菅野 実里",
-                "unit": "北",
-                "employment": "full",
-                "row": 29,
-                "allowed_shifts": ["早", "遅", "日", "夜", "休", "特"],
-                "min_counts": {"夜": 3, "日": 1},
-                "max_counts": {"夜": 4},
-                "min_rest_days": 6,
-                "max_rest_days": 10,
-            },
-            {
-                "name": "石井 都子",
-                "unit": "北",
-                "employment": "part",
-                "row": 31,
-                "allowed_shifts": ["", "6.0", "休"],
-                "min_rest_days": 11,
-                "max_rest_days": 18,
-            },
-        ],
+        "employees": [],
     }
 
 
 def normalize_cell_text(value: object) -> str:
     if value is None:
         return ""
-    return str(value).replace("　", " ").strip()
+    if isinstance(value, float):
+        if value.is_integer():
+            return str(int(value))
+        return str(value)
+    return str(value).strip()
 
 
 def normalize_employee_name(value: object) -> str:
     return re.sub(r"\s+", "", normalize_cell_text(value))
+
+
+def validate_loaded_config(raw: dict[str, object], config_path: Path) -> None:
+    missing_fields: list[str] = []
+    if normalize_cell_text(raw.get("unit_name")) in ("", DEFAULT_UNIT_NAME_PLACEHOLDER):
+        missing_fields.append("unit_name")
+    if normalize_cell_text(raw.get("target_path")) in ("", DEFAULT_TARGET_PATH_PLACEHOLDER):
+        missing_fields.append("target_path")
+    if normalize_cell_text(raw.get("manual_source")) in ("", DEFAULT_MANUAL_SOURCE_PLACEHOLDER):
+        missing_fields.append("manual_source")
+
+    rules = raw.get("rules")
+    if not isinstance(rules, dict):
+        missing_fields.append("rules")
+
+    employees = raw.get("employees")
+    if not isinstance(employees, list) or not employees:
+        missing_fields.append("employees")
+
+    if missing_fields:
+        joined = ", ".join(missing_fields)
+        raise ValueError(
+            f"設定ファイルに必須項目が不足しています: {joined}"
+            f"\n対象設定: {config_path.resolve()}"
+            "\n施設ごとの unit_name / target_path / manual_source / rules / employees を JSON に定義してください。"
+        )
 
 
 def fallback_employee_id(display_name: str, employee_index: int) -> str:
@@ -400,6 +350,80 @@ def sheet_cell_text(worksheet, row_index: int, column_index: int) -> str:
     return normalize_cell_text(worksheet.cell_value(row_index, column_index))
 
 
+def workbook_layout_cell(layout: dict[str, object], key: str) -> tuple[int, int]:
+    raw_cell = layout[key]
+    if not isinstance(raw_cell, dict):
+        raise ValueError(f"workbook_layout.{key} はオブジェクトで指定してください。")
+    return int(raw_cell["row_index"]), int(raw_cell["column_index"])
+
+
+def workbook_layout_name_column_index(layout: dict[str, object]) -> int:
+    return int(layout["name_column_index"])
+
+
+def workbook_layout_first_day_column_index(layout: dict[str, object]) -> int:
+    return int(layout["first_day_column_index"])
+
+
+def workbook_layout_day_header_row_index(layout: dict[str, object]) -> int:
+    return int(layout["day_header_row_index"])
+
+
+def workbook_layout_weekday_header_row_index(layout: dict[str, object]) -> int:
+    return int(layout["weekday_header_row_index"])
+
+
+def workbook_layout_count_columns(layout: dict[str, object]) -> dict[str, int]:
+    raw_columns = layout["count_columns"]
+    if not isinstance(raw_columns, dict):
+        raise ValueError("workbook_layout.count_columns はオブジェクトで指定してください。")
+    normalized_columns: dict[str, int] = {}
+    for label, column_index in raw_columns.items():
+        normalized_label = WORKBOOK_COUNT_COLUMN_KEY_ALIASES.get(str(label))
+        if normalized_label is None:
+            raise ValueError(
+                "workbook_layout.count_columns のキーは night/early/late/rest または 夜/早/遅/休 で指定してください。"
+            )
+        normalized_columns[normalized_label] = int(column_index)
+    return normalized_columns
+
+
+def workbook_layout_employee_setting_header_row_index(layout: dict[str, object]) -> int:
+    return int(layout["employee_setting_header_row_index"])
+
+
+def workbook_layout_employee_setting_columns(layout: dict[str, object]) -> dict[str, tuple[int, str]]:
+    raw_columns = layout["employee_setting_columns"]
+    if not isinstance(raw_columns, dict):
+        raise ValueError("workbook_layout.employee_setting_columns はオブジェクトで指定してください。")
+    return {
+        str(field_name): (int(values["column_index"]), str(values["header_label"]))
+        for field_name, values in raw_columns.items()
+    }
+
+
+def workbook_layout_monthly_setting_header_cell(layout: dict[str, object]) -> tuple[int, int]:
+    return workbook_layout_cell(layout, "monthly_setting_header_cell")
+
+
+def workbook_layout_monthly_setting_cells(layout: dict[str, object]) -> dict[str, tuple[int, int]]:
+    raw_cells = layout["monthly_setting_cells"]
+    if not isinstance(raw_cells, dict):
+        raise ValueError("workbook_layout.monthly_setting_cells はオブジェクトで指定してください。")
+    return {
+        str(field_name): (int(values["row_index"]), int(values["column_index"]))
+        for field_name, values in raw_cells.items()
+    }
+
+
+def workbook_day_column_index(day: int, layout: dict[str, object]) -> int:
+    return workbook_layout_first_day_column_index(layout) + day - 1
+
+
+def worksheet_name_text(worksheet, row_index: int, layout: dict[str, object]) -> str:
+    return normalize_employee_name(worksheet.cell_value(row_index, workbook_layout_name_column_index(layout)))
+
+
 def parse_workbook_bool(value: object, label: str) -> bool:
     text = normalize_cell_text(value)
     if not text:
@@ -425,6 +449,139 @@ def parse_workbook_optional_int(value: object, label: str) -> int | None:
     return parsed
 
 
+def normalize_workbook_shift_token(token: object) -> str:
+    text = normalize_cell_text(token)
+    lowered = text.lower()
+    if text in {"空欄", "（空欄）"} or lowered in {"blank", "empty"}:
+        return ""
+    return text
+
+
+def parse_workbook_allowed_shift_list(
+    value: object,
+    shift_kinds: dict[str, str],
+    employee_name: str,
+    rule_label: str,
+    allow_night_rest: bool,
+) -> tuple[str, ...]:
+    text = normalize_cell_text(value)
+    tokens = [normalize_workbook_shift_token(token) for token in re.split(r"[\/／,、\s]+", text) if normalize_cell_text(token)]
+    if not tokens:
+        raise ValueError(f"{employee_name} の {rule_label} は勤務記号を 1 つ以上指定してください。")
+    return normalize_allowed_shift_rule(tokens, shift_kinds, employee_name, rule_label, allow_night_rest)
+
+
+def parse_workbook_employee_allowed_shifts(
+    value: object,
+    shift_kinds: dict[str, str],
+    employee_name: str,
+    rule_label: str,
+) -> tuple[str, ...] | None:
+    text = normalize_cell_text(value)
+    if not text:
+        return None
+    tokens = [normalize_workbook_shift_token(token) for token in re.split(r"[\/／,、\s]+", text) if normalize_cell_text(token)]
+    if not tokens:
+        return None
+    return normalize_employee_allowed_shifts(tokens, shift_kinds, employee_name, rule_label)
+
+
+def parse_workbook_shift_rule_map(
+    value: object,
+    key_parser,
+    shift_kinds: dict[str, str],
+    employee_name: str,
+    rule_label: str,
+    allow_night_rest: bool,
+) -> dict[int, tuple[str, ...]]:
+    text = normalize_cell_text(value)
+    if not text:
+        return {}
+
+    parsed_rules: dict[int, tuple[str, ...]] = {}
+    entries = [entry.strip() for entry in re.split(r"[;\r\n|]+", text) if entry.strip()]
+    for entry in entries:
+        match = re.fullmatch(r"(.+?)(?:=|:|＝|：)(.+)", entry)
+        if match is None:
+            raise ValueError(
+                f"{employee_name} の {rule_label} は 'キー=勤務/勤務' 形式で指定してください。入力値: {entry}"
+            )
+        raw_key = match.group(1).strip()
+        raw_shifts = match.group(2).strip()
+        parsed_key = key_parser(raw_key)
+        parsed_rules[parsed_key] = parse_workbook_allowed_shift_list(
+            raw_shifts,
+            shift_kinds,
+            employee_name,
+            f"{rule_label}[{raw_key}]",
+            allow_night_rest,
+        )
+    return parsed_rules
+
+
+def parse_workbook_day_key(value: object, days_in_month: int) -> int:
+    parsed_day = parse_excel_day_number(value)
+    if parsed_day is None:
+        raise ValueError(f"日付指定が不正です: {value}")
+    if not 1 <= parsed_day <= days_in_month:
+        raise ValueError(f"日付指定は 1 以上 {days_in_month} 以下で指定してください: {value}")
+    return parsed_day
+
+
+def parse_workbook_count_range(value: object, label: str) -> tuple[int, int]:
+    text = normalize_cell_text(value)
+    match = re.fullmatch(r"(\d+)(?:\s*[-~〜]\s*(\d+))?", text)
+    if match is None:
+        raise ValueError(f"{label} は '1' または '1-2' 形式で指定してください。入力値: {text}")
+    minimum = int(match.group(1))
+    maximum = int(match.group(2) or match.group(1))
+    if minimum < 0 or maximum < 0 or minimum > maximum:
+        raise ValueError(f"{label} の人数範囲が不正です。入力値: {text}")
+    return minimum, maximum
+
+
+def parse_workbook_day_requirements(
+    value: object,
+    shift_kinds: dict[str, str],
+    days_in_month: int,
+) -> dict[int, dict[str, dict[str, int]]]:
+    text = normalize_cell_text(value)
+    if not text:
+        return {}
+
+    requirements: dict[int, dict[str, dict[str, int]]] = {}
+    entries = [entry.strip() for entry in re.split(r"[;\r\n|]+", text) if entry.strip()]
+    for entry in entries:
+        day_match = re.fullmatch(r"(.+?)(?:=|:|＝|：)(.+)", entry)
+        if day_match is None:
+            raise ValueError(
+                f"日別人数指定は '日付=勤務:人数' 形式で指定してください。入力値: {entry}"
+            )
+        day = parse_workbook_day_key(day_match.group(1).strip(), days_in_month)
+        clauses = [clause.strip() for clause in re.split(r"[,、]+", day_match.group(2).strip()) if clause.strip()]
+        if not clauses:
+            raise ValueError(f"日別人数指定の {day} 日には勤務と人数を 1 つ以上指定してください。")
+
+        requirement = {"min": {}, "max": {}}
+        for clause in clauses:
+            clause_match = re.fullmatch(r"(.+?)(?:=|:|＝|：)(.+)", clause)
+            if clause_match is None:
+                raise ValueError(
+                    f"日別人数指定の {day} 日は '勤務:人数' 形式で指定してください。入力値: {clause}"
+                )
+            shift_symbol = normalize_workbook_shift_token(clause_match.group(1).strip())
+            if shift_symbol not in shift_kinds:
+                raise ValueError(f"日別人数指定の {day} 日に未定義の勤務記号があります: {shift_symbol}")
+            minimum, maximum = parse_workbook_count_range(
+                clause_match.group(2).strip(),
+                f"日別人数指定 {day}日 / {display_symbol(shift_symbol)}",
+            )
+            requirement["min"][shift_symbol] = minimum
+            requirement["max"][shift_symbol] = maximum
+        requirements[day] = requirement
+    return requirements
+
+
 def normalize_weekend_rest_count_mode(value: object) -> str:
     text = normalize_cell_text(value)
     if not text:
@@ -439,10 +596,11 @@ def normalize_weekend_rest_count_mode(value: object) -> str:
 
 def weekend_rest_symbols_for_mode(shift_kinds: dict[str, str], mode: str) -> tuple[str, ...]:
     night_rest_symbols = tuple(symbol_names_by_kind(shift_kinds, "night_rest"))
+    primary_rest = primary_rest_symbol(shift_kinds)
     if mode == "rest_only":
-        return (("休",) if "休" in shift_kinds else tuple())
+        return ((primary_rest,) if primary_rest else tuple())
     if mode == "rest_and_night_rest":
-        base = ("休",) if "休" in shift_kinds else tuple()
+        base = (primary_rest,) if primary_rest else tuple()
         return tuple(dict.fromkeys((*base, *night_rest_symbols)))
     if mode == "rest_special_night_rest":
         rest_symbols = tuple(symbol_names_by_kind(shift_kinds, "rest"))
@@ -452,6 +610,20 @@ def weekend_rest_symbols_for_mode(shift_kinds: dict[str, str], mode: str) -> tup
 
 def employee_max_consecutive_work(employee: EmployeeConfig, config: SchedulerConfig) -> int:
     return employee.max_consecutive_work_limit if employee.max_consecutive_work_limit is not None else config.max_consecutive_work
+
+
+def employee_requires_standard_day(employee: EmployeeConfig, primary_day: str | None) -> bool:
+    return bool(primary_day is not None and primary_day in employee.allowed_shifts)
+
+
+def employee_preferred_four_day_streak_count(employee: EmployeeConfig, config: SchedulerConfig) -> int | None:
+    if employee.max_four_day_streak_count is not None:
+        return None
+    if config.preferred_four_day_streak_count is None:
+        return None
+    if not employee.preferred_four_day_streak_target:
+        return None
+    return config.preferred_four_day_streak_count
 
 
 def count_consecutive_work_windows(shifts: list[str], work_symbols: set[str], window_size: int) -> int:
@@ -465,48 +637,70 @@ def count_consecutive_work_windows(shifts: list[str], work_symbols: set[str], wi
 
 
 def selected_night_fairness_employee_ids(config: SchedulerConfig, night_symbols: list[str]) -> list[str]:
-    explicit_targets = [
+    return [
         employee.employee_id
         for employee in config.employees
         if employee.night_fairness_target and any(shift in night_symbols for shift in employee.allowed_shifts)
     ]
-    if explicit_targets:
-        return explicit_targets
-    return [
-        employee.employee_id
-        for employee in config.employees
-        if any(shift in night_symbols for shift in employee.allowed_shifts)
-    ]
 
 
 def selected_weekend_fairness_employee_ids(config: SchedulerConfig) -> list[str]:
-    explicit_targets = [employee.employee_id for employee in config.employees if employee.weekend_fairness_target]
-    if explicit_targets:
-        return explicit_targets
-    return [employee.employee_id for employee in config.employees if employee.employment == "full"]
+    return [employee.employee_id for employee in config.employees if employee.weekend_fairness_target]
+
+
+def selected_unit_shift_balance_employee_ids(config: SchedulerConfig, unit: str) -> list[str]:
+    return [
+        employee.employee_id
+        for employee in config.employees
+        if employee.unit == unit and employee.unit_shift_balance_target
+    ]
 
 
 def read_workbook_employee_settings(
     workbook_path: Path,
     sheet_index: int,
     employees: tuple[EmployeeConfig, ...],
+    shift_kinds: dict[str, str],
+    days_in_month: int,
+    layout: dict[str, object] | None = None,
 ) -> dict[str, dict[str, object]]:
     worksheet = xlrd.open_workbook(str(workbook_path)).sheet_by_index(sheet_index - 1)
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
     active_columns = {
         field_name: column_index
-        for field_name, (column_index, header_label) in XLS_EMPLOYEE_SETTING_COLUMNS.items()
-        if sheet_cell_text(worksheet, XLS_EMPLOYEE_SETTING_HEADER_ROW_INDEX, column_index) == header_label
+        for field_name, (column_index, header_label) in workbook_layout_employee_setting_columns(resolved_layout).items()
+        if sheet_cell_text(worksheet, workbook_layout_employee_setting_header_row_index(resolved_layout), column_index) == header_label
     }
     if not active_columns:
         return {}
 
-    row_map = build_employee_row_map(worksheet)
+    max_count_columns = (
+        ("max_count_early", first_symbol_by_kind(shift_kinds, "early"), "早番MAX"),
+        ("max_count_day", primary_day_symbol(shift_kinds), "日勤MAX"),
+        ("max_count_late", first_symbol_by_kind(shift_kinds, "late"), "遅番MAX"),
+        ("max_count_night", first_symbol_by_kind(shift_kinds, "night"), "夜勤MAX"),
+    )
+
+    row_map = build_employee_row_map(worksheet, resolved_layout)
     results: dict[str, dict[str, object]] = {}
     for employee in employees:
-        row_index = resolve_employee_row_index(worksheet, employee, row_map)
+        row_index = resolve_employee_row_index(worksheet, employee, row_map, resolved_layout)
         if row_index is None:
             continue
+        workbook_allowed_shifts = employee.allowed_shifts
         current: dict[str, object] = {}
+        if "allowed_shifts" in active_columns:
+            column_index = active_columns["allowed_shifts"]
+            parsed_allowed_shifts = parse_workbook_employee_allowed_shifts(
+                worksheet.cell_value(row_index, column_index),
+                shift_kinds,
+                employee.display_name,
+                "勤務可能一覧",
+            )
+            if parsed_allowed_shifts is not None:
+                workbook_allowed_shifts = parsed_allowed_shifts
+                current["allowed_shifts"] = parsed_allowed_shifts
+        allow_night_rest = first_symbol_by_kind(shift_kinds, "night_rest") in workbook_allowed_shifts
         if "night_fairness_target" in active_columns:
             column_index = active_columns["night_fairness_target"]
             current["night_fairness_target"] = parse_workbook_bool(
@@ -559,39 +753,115 @@ def read_workbook_employee_settings(
                 if max_four_day_streak_count < 0:
                     raise ValueError(f"{employee.display_name} の 4連勤許容回数 は 0 以上で指定してください。")
                 current["max_four_day_streak_count"] = max_four_day_streak_count
+        if "unit_shift_balance_target" in active_columns:
+            column_index = active_columns["unit_shift_balance_target"]
+            current["unit_shift_balance_target"] = parse_workbook_bool(
+                worksheet.cell_value(row_index, column_index),
+                f"{employee.display_name} / 早遅平準化対象",
+            )
+        if "preferred_four_day_streak_target" in active_columns:
+            column_index = active_columns["preferred_four_day_streak_target"]
+            current["preferred_four_day_streak_target"] = parse_workbook_bool(
+                worksheet.cell_value(row_index, column_index),
+                f"{employee.display_name} / 4連勤配慮対象",
+            )
+        if "require_standard_day" in active_columns:
+            column_index = active_columns["require_standard_day"]
+            current["require_standard_day"] = parse_workbook_bool(
+                worksheet.cell_value(row_index, column_index),
+                f"{employee.display_name} / 日勤候補対象",
+            )
+        if "exact_rest_days" in active_columns:
+            column_index = active_columns["exact_rest_days"]
+            exact_rest_days = parse_workbook_optional_int(
+                worksheet.cell_value(row_index, column_index),
+                f"{employee.display_name} / 休系回数指定",
+            )
+            if exact_rest_days is not None:
+                if exact_rest_days < 0 or exact_rest_days > days_in_month:
+                    raise ValueError(f"{employee.display_name} の 休系回数指定 は 0 以上 {days_in_month} 以下で指定してください。")
+                current["exact_rest_days"] = exact_rest_days
+        workbook_max_counts: dict[str, int] = {}
+        for field_name, shift_symbol, label in max_count_columns:
+            if shift_symbol is None or field_name not in active_columns:
+                continue
+            column_index = active_columns[field_name]
+            max_count = parse_workbook_optional_int(
+                worksheet.cell_value(row_index, column_index),
+                f"{employee.display_name} / {label}",
+            )
+            if max_count is None:
+                continue
+            if max_count < 0:
+                raise ValueError(f"{employee.display_name} の {label} は 0 以上で指定してください。")
+            workbook_max_counts[shift_symbol] = max_count
+        if workbook_max_counts:
+            current["max_counts"] = workbook_max_counts
+        if "weekday_allowed_shifts" in active_columns:
+            column_index = active_columns["weekday_allowed_shifts"]
+            current["weekday_allowed_shifts"] = parse_workbook_shift_rule_map(
+                worksheet.cell_value(row_index, column_index),
+                parse_weekday_key,
+                shift_kinds,
+                employee.display_name,
+                "曜日別勤務制限",
+                allow_night_rest=allow_night_rest,
+            )
+        if "date_allowed_shift_overrides" in active_columns:
+            column_index = active_columns["date_allowed_shift_overrides"]
+            current["date_allowed_shift_overrides"] = parse_workbook_shift_rule_map(
+                worksheet.cell_value(row_index, column_index),
+                lambda raw_day: parse_workbook_day_key(raw_day, days_in_month),
+                shift_kinds,
+                employee.display_name,
+                "日付別勤務制限",
+                allow_night_rest=allow_night_rest,
+            )
         if current:
             results[employee.employee_id] = current
     return results
 
 
-def read_workbook_monthly_settings(workbook_path: Path, sheet_index: int) -> dict[str, object]:
+def read_workbook_monthly_settings(
+    workbook_path: Path,
+    sheet_index: int,
+    shift_kinds: dict[str, str],
+    days_in_month: int,
+    layout: dict[str, object] | None = None,
+) -> dict[str, object]:
     worksheet = xlrd.open_workbook(str(workbook_path)).sheet_by_index(sheet_index - 1)
-    header_text = sheet_cell_text(worksheet, *XLS_MONTHLY_SETTING_HEADER_CELL)
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
+    monthly_setting_cells = workbook_layout_monthly_setting_cells(resolved_layout)
+    header_text = sheet_cell_text(worksheet, *workbook_layout_monthly_setting_header_cell(resolved_layout))
     has_monthly_settings = header_text == "月次設定" or any(
         sheet_cell_text(worksheet, row_index, column_index)
-        for row_index, column_index in XLS_MONTHLY_SETTING_CELLS.values()
+        for row_index, column_index in monthly_setting_cells.values()
     )
     if not has_monthly_settings:
         return {}
 
     overrides: dict[str, object] = {}
     fairness_night_spread = parse_workbook_optional_int(
-        worksheet.cell_value(*XLS_MONTHLY_SETTING_CELLS["fairness_night_spread"]),
+        worksheet.cell_value(*monthly_setting_cells["fairness_night_spread"]),
         "AV2 / 夜勤公平化許容差",
     )
     if fairness_night_spread is not None:
         overrides["fairness_night_spread"] = fairness_night_spread
 
     fairness_weekend_spread = parse_workbook_optional_int(
-        worksheet.cell_value(*XLS_MONTHLY_SETTING_CELLS["fairness_weekend_spread"]),
+        worksheet.cell_value(*monthly_setting_cells["fairness_weekend_spread"]),
         "AW2 / 土日休公平化許容差",
     )
     if fairness_weekend_spread is not None:
         overrides["fairness_weekend_spread"] = fairness_weekend_spread
 
-    weekend_rest_count_mode = sheet_cell_text(worksheet, *XLS_MONTHLY_SETTING_CELLS["weekend_rest_count_mode"])
+    weekend_rest_count_mode = sheet_cell_text(worksheet, *monthly_setting_cells["weekend_rest_count_mode"])
     if weekend_rest_count_mode:
         overrides["weekend_rest_count_mode"] = normalize_weekend_rest_count_mode(weekend_rest_count_mode)
+
+    day_requirements = sheet_cell_text(worksheet, *monthly_setting_cells["day_requirements"])
+    if day_requirements:
+        overrides["day_requirements"] = parse_workbook_day_requirements(day_requirements, shift_kinds, days_in_month)
     return overrides
 
 
@@ -630,8 +900,75 @@ def first_symbol_by_kind(shift_kinds: dict[str, str], kind: str) -> str | None:
     return symbols[0] if symbols else None
 
 
+def primary_day_symbol(shift_kinds: dict[str, str]) -> str | None:
+    day_symbols = symbol_names_by_kind(shift_kinds, "day")
+    if "日" in day_symbols:
+        return "日"
+    return day_symbols[0] if day_symbols else None
+
+
+def primary_rest_symbol(shift_kinds: dict[str, str]) -> str | None:
+    rest_symbols = symbol_names_by_kind(shift_kinds, "rest")
+    if "休" in rest_symbols:
+        return "休"
+    return rest_symbols[0] if rest_symbols else None
+
+
+def special_rest_symbols(shift_kinds: dict[str, str]) -> tuple[str, ...]:
+    primary_symbol = primary_rest_symbol(shift_kinds)
+    return tuple(symbol for symbol in symbol_names_by_kind(shift_kinds, "rest") if symbol and symbol != primary_symbol)
+
+
+def normalize_count_symbols(raw_count_symbols: object, shift_kinds: dict[str, str]) -> dict[str, str]:
+    generated: dict[str, str] = {}
+    for label, kind in DEFAULT_COUNT_SYMBOL_LABEL_KINDS.items():
+        symbol = primary_rest_symbol(shift_kinds) if kind == "rest" else first_symbol_by_kind(shift_kinds, kind)
+        if symbol is not None:
+            generated[label] = symbol
+
+    if raw_count_symbols is None:
+        return generated
+    if not isinstance(raw_count_symbols, dict):
+        raise ValueError("count_symbols は JSON オブジェクトで指定してください。")
+    return {**generated, **{str(key): str(value) for key, value in raw_count_symbols.items()}}
+
+
+def rest_label_text(shift_kinds: dict[str, str], include_special: bool = False) -> str:
+    primary_rest = primary_rest_symbol(shift_kinds)
+    if include_special:
+        labels = [symbol for symbol in (primary_rest, *special_rest_symbols(shift_kinds)) if symbol]
+    else:
+        labels = [primary_rest] if primary_rest else []
+    return "/".join(display_symbol(symbol) for symbol in labels) if labels else "休系記号"
+
+
+def special_rest_label_text(shift_kinds: dict[str, str]) -> str:
+    labels = "/".join(display_symbol(symbol) for symbol in special_rest_symbols(shift_kinds))
+    return f"追加休系記号（{labels}）" if labels else "追加休系記号"
+
+
+def night_rest_label_text(shift_kinds: dict[str, str]) -> str:
+    labels = "/".join(display_symbol(symbol) for symbol in symbol_names_by_kind(shift_kinds, "night_rest"))
+    return labels or "夜勤明け休み"
+
+
+def rest_like_label_text(shift_kinds: dict[str, str]) -> str:
+    labels = [
+        symbol
+        for symbol in [primary_rest_symbol(shift_kinds), *symbol_names_by_kind(shift_kinds, "night_rest")]
+        if symbol
+    ]
+    return "/".join(display_symbol(symbol) for symbol in labels) if labels else "休系記号"
+
+
+def weekend_rest_label_text(shift_kinds: dict[str, str], mode: str) -> str:
+    labels = "/".join(display_symbol(symbol) for symbol in weekend_rest_symbols_for_mode(shift_kinds, mode) if symbol)
+    return labels or "週末休系記号"
+
+
 def standard_day_symbols(shift_kinds: dict[str, str]) -> list[str]:
-    return ["日"] if shift_kinds.get("日") == "day" else []
+    primary_day = primary_day_symbol(shift_kinds)
+    return [primary_day] if primary_day is not None else []
 
 
 def normalize_night_rest_sequence(
@@ -641,6 +978,7 @@ def normalize_night_rest_sequence(
 ) -> list[str]:
     night_symbols = set(symbol_names_by_kind(shift_kinds, "night"))
     night_rest_symbol = first_symbol_by_kind(shift_kinds, "night_rest")
+    rest_symbol = primary_rest_symbol(shift_kinds)
     if not night_symbols or night_rest_symbol is None:
         return list(sequence)
 
@@ -648,7 +986,7 @@ def normalize_night_rest_sequence(
     prior_shift = previous_shift
     for shift in sequence:
         current_shift = shift
-        if current_shift == "休" and prior_shift in night_symbols:
+        if rest_symbol is not None and current_shift == rest_symbol and prior_shift in night_symbols:
             current_shift = night_rest_symbol
         normalized.append(current_shift)
         prior_shift = current_shift
@@ -663,6 +1001,7 @@ def normalize_night_rest_assignments(
 ) -> dict[int, str]:
     night_symbols = set(symbol_names_by_kind(shift_kinds, "night"))
     night_rest_symbol = first_symbol_by_kind(shift_kinds, "night_rest")
+    rest_symbol = primary_rest_symbol(shift_kinds)
     if not night_symbols or night_rest_symbol is None:
         return dict(assignments)
 
@@ -673,11 +1012,44 @@ def normalize_night_rest_assignments(
             prior_shift = None
             continue
         current_shift = normalized[day]
-        if current_shift == "休" and prior_shift in night_symbols:
+        if rest_symbol is not None and current_shift == rest_symbol and prior_shift in night_symbols:
             current_shift = night_rest_symbol
             normalized[day] = current_shift
         prior_shift = current_shift
     return normalized
+
+
+def night_rest_chain_carry_count(
+    sequence: list[str] | tuple[str, ...],
+    shift_kinds: dict[str, str],
+    previous_shift: str | None = None,
+) -> int:
+    night_symbols = set(symbol_names_by_kind(shift_kinds, "night"))
+    night_rest_symbols = set(symbol_names_by_kind(shift_kinds, "night_rest"))
+    rest_like_symbols = set(symbol_names_by_kind(shift_kinds, "rest")) | night_rest_symbols
+    if not night_symbols or not night_rest_symbols:
+        return 0
+
+    streak = 0
+    prior_shift = previous_shift
+    for shift in sequence:
+        if shift in night_rest_symbols:
+            if prior_shift in night_symbols:
+                streak += 1
+            else:
+                streak = 0
+        elif shift in rest_like_symbols:
+            streak = 0
+        prior_shift = shift
+    return streak
+
+
+def missing_previous_tail_for_day1_holidays(employees: tuple[EmployeeConfig, ...] | list[EmployeeConfig]) -> list[str]:
+    missing: list[str] = []
+    for employee in employees:
+        if 1 in employee.specified_holidays and not employee.previous_tail:
+            missing.append(employee.display_name)
+    return missing
 
 
 def parse_weekday_key(value: object) -> int:
@@ -729,7 +1101,35 @@ def normalize_allowed_shift_rule(
         normalized.append(shift)
 
     night_rest_symbol = first_symbol_by_kind(shift_kinds, "night_rest")
-    if allow_night_rest and night_rest_symbol and "休" in normalized and night_rest_symbol not in normalized:
+    rest_symbol = primary_rest_symbol(shift_kinds)
+    if allow_night_rest and night_rest_symbol and rest_symbol and rest_symbol in normalized and night_rest_symbol not in normalized:
+        normalized.append(night_rest_symbol)
+    return tuple(normalized)
+
+
+def normalize_employee_allowed_shifts(
+    shifts: object,
+    shift_kinds: dict[str, str],
+    employee_name: str,
+    rule_label: str,
+) -> tuple[str, ...]:
+    if not isinstance(shifts, list):
+        raise ValueError(f"{employee_name} の {rule_label} は配列で指定してください。")
+
+    normalized: list[str] = []
+    seen: set[str] = set()
+    night_symbols = set(symbol_names_by_kind(shift_kinds, "night"))
+    night_rest_symbol = first_symbol_by_kind(shift_kinds, "night_rest")
+    for raw_shift in shifts:
+        shift = normalize_workbook_shift_token(raw_shift)
+        if shift not in shift_kinds:
+            raise ValueError(f"{employee_name} の {rule_label} に未定義の勤務記号があります: {shift}")
+        if shift in seen:
+            continue
+        normalized.append(shift)
+        seen.add(shift)
+
+    if night_rest_symbol and any(shift in night_symbols for shift in normalized) and night_rest_symbol not in seen:
         normalized.append(night_rest_symbol)
     return tuple(normalized)
 
@@ -782,19 +1182,24 @@ def open_workbook(excel, path: Path):
         raise
 
 
-def detect_template_period(template_path: Path, sheet_index: int = 1) -> tuple[int | None, int | None, int | None]:
+def detect_template_period(
+    template_path: Path,
+    sheet_index: int = 1,
+    layout: dict[str, object] | None = None,
+) -> tuple[int | None, int | None, int | None]:
     worksheet = xlrd.open_workbook(str(template_path)).sheet_by_index(sheet_index - 1)
-    title_text = ""
-    if worksheet.nrows >= 1 and worksheet.ncols >= 1:
-        title_text = normalize_cell_text(worksheet.cell_value(0, 0))
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
+    title_row_index, title_column_index = workbook_layout_cell(resolved_layout, "title_cell")
+    title_text = sheet_cell_text(worksheet, title_row_index, title_column_index)
     match = re.search(r"R\s*(\d+)\s*年\s*(\d+)\s*月", title_text)
     detected_year = 2018 + int(match.group(1)) if match else None
     detected_month = int(match.group(2)) if match else None
 
     day_numbers: list[int] = []
-    row_index = 3
+    row_index = workbook_layout_day_header_row_index(resolved_layout)
+    first_day_column_index = workbook_layout_first_day_column_index(resolved_layout)
     max_detectable_day = calendar.monthrange(detected_year, detected_month)[1] if detected_year and detected_month else 31
-    for column_index in range(4, 35):
+    for column_index in range(first_day_column_index, first_day_column_index + 31):
         if row_index < worksheet.nrows and column_index < worksheet.ncols:
             day_number = parse_excel_day_number(worksheet.cell_value(row_index, column_index))
             if day_number is not None and 1 <= day_number <= max_detectable_day:
@@ -822,18 +1227,26 @@ def normalize_days_in_month(year: int, month: int, requested_days: int | None, s
     return normalized_days
 
 
-def build_employee_row_map(worksheet) -> dict[str, int]:
+def build_employee_row_map(worksheet, layout: dict[str, object] | None = None) -> dict[str, int]:
     row_map: dict[str, int] = {}
-    if worksheet.ncols < 4:
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
+    name_column_index = workbook_layout_name_column_index(resolved_layout)
+    if worksheet.ncols <= name_column_index:
         return row_map
     for row_index in range(worksheet.nrows):
-        normalized_name = normalize_employee_name(worksheet.cell_value(row_index, 3))
+        normalized_name = worksheet_name_text(worksheet, row_index, resolved_layout)
         if normalized_name and normalized_name != normalize_employee_name("名前") and normalized_name not in row_map:
             row_map[normalized_name] = row_index
     return row_map
 
 
-def resolve_employee_row_index(worksheet, employee: EmployeeConfig, row_map: dict[str, int]) -> int | None:
+def resolve_employee_row_index(
+    worksheet,
+    employee: EmployeeConfig,
+    row_map: dict[str, int],
+    layout: dict[str, object] | None = None,
+) -> int | None:
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
     normalized_aliases: list[str] = []
     for alias in (employee.aliases or (employee.display_name,)):
         normalized_alias = normalize_employee_name(alias)
@@ -847,7 +1260,7 @@ def resolve_employee_row_index(worksheet, employee: EmployeeConfig, row_map: dic
 
     fallback_index = employee.row - 1
     if 0 <= fallback_index < worksheet.nrows:
-        fallback_name = normalize_employee_name(worksheet.cell_value(fallback_index, 3))
+        fallback_name = worksheet_name_text(worksheet, fallback_index, resolved_layout)
         if fallback_name in normalized_aliases:
             return fallback_index
     return None
@@ -859,19 +1272,21 @@ def read_fixed_assignments_from_workbook(
     employees: tuple[EmployeeConfig, ...],
     shift_kinds: dict[str, str],
     days_in_month: int,
+    layout: dict[str, object] | None = None,
 ) -> dict[str, dict[int, str]]:
     worksheet = xlrd.open_workbook(str(workbook_path)).sheet_by_index(sheet_index - 1)
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
     results: dict[str, dict[int, str]] = {}
     valid_symbols = set(shift_kinds)
-    row_map = build_employee_row_map(worksheet)
+    row_map = build_employee_row_map(worksheet, resolved_layout)
     for employee in employees:
         fixed: dict[int, str] = {}
-        row_index = resolve_employee_row_index(worksheet, employee, row_map)
+        row_index = resolve_employee_row_index(worksheet, employee, row_map, resolved_layout)
         if row_index is None:
             results[employee.employee_id] = fixed
             continue
         for day in range(1, days_in_month + 1):
-            column_index = day + 3
+            column_index = workbook_day_column_index(day, resolved_layout)
             if row_index < worksheet.nrows and column_index < worksheet.ncols:
                 symbol = normalize_cell_text(worksheet.cell_value(row_index, column_index))
                 if symbol in valid_symbols:
@@ -895,30 +1310,32 @@ def is_completed_schedule_like_fixed_assignments(
     return fully_filled_count * 5 >= employee_count * 4 and total_assignment_count * 5 >= coverage_threshold
 
 
-def read_specified_holidays_from_workbook(
+def read_specified_holiday_assignments_from_workbook(
     workbook_path: Path,
     sheet_index: int,
     employees: tuple[EmployeeConfig, ...],
     days_in_month: int,
-    holiday_symbol: str = "休",
-) -> dict[str, tuple[int, ...]]:
+    holiday_symbols: tuple[str, ...],
+    layout: dict[str, object] | None = None,
+) -> dict[str, dict[int, str]]:
     worksheet = xlrd.open_workbook(str(workbook_path)).sheet_by_index(sheet_index - 1)
-    results: dict[str, tuple[int, ...]] = {}
-    row_map = build_employee_row_map(worksheet)
-    normalized_holiday_symbol = normalize_cell_text(holiday_symbol)
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
+    results: dict[str, dict[int, str]] = {}
+    row_map = build_employee_row_map(worksheet, resolved_layout)
+    normalized_holiday_symbols = {normalize_cell_text(symbol) for symbol in holiday_symbols if normalize_cell_text(symbol)}
     for employee in employees:
-        holidays: list[int] = []
-        row_index = resolve_employee_row_index(worksheet, employee, row_map)
+        holiday_assignments: dict[int, str] = {}
+        row_index = resolve_employee_row_index(worksheet, employee, row_map, resolved_layout)
         if row_index is None:
-            results[employee.employee_id] = ()
+            results[employee.employee_id] = {}
             continue
         for day in range(1, days_in_month + 1):
-            column_index = day + 3
+            column_index = workbook_day_column_index(day, resolved_layout)
             if row_index < worksheet.nrows and column_index < worksheet.ncols:
                 symbol = normalize_cell_text(worksheet.cell_value(row_index, column_index))
-                if symbol == normalized_holiday_symbol:
-                    holidays.append(day)
-        results[employee.employee_id] = tuple(holidays)
+                if symbol in normalized_holiday_symbols:
+                    holiday_assignments[day] = symbol
+        results[employee.employee_id] = holiday_assignments
     return results
 
 
@@ -928,24 +1345,26 @@ def read_previous_tail_from_workbook(
     employees: tuple[EmployeeConfig, ...],
     shift_kinds: dict[str, str],
     tail_length: int,
+    layout: dict[str, object] | None = None,
 ) -> dict[str, tuple[str, ...]]:
     worksheet = xlrd.open_workbook(str(workbook_path)).sheet_by_index(sheet_index - 1)
-    _, _, detected_days = detect_template_period(workbook_path, sheet_index)
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
+    _, _, detected_days = detect_template_period(workbook_path, sheet_index, resolved_layout)
     if detected_days is None or detected_days <= 0:
         return {}
 
     valid_symbols = set(shift_kinds)
-    row_map = build_employee_row_map(worksheet)
+    row_map = build_employee_row_map(worksheet, resolved_layout)
     tail_by_employee: dict[str, tuple[str, ...]] = {}
     start_day = max(1, detected_days - tail_length + 1)
     for employee in employees:
-        row_index = resolve_employee_row_index(worksheet, employee, row_map)
+        row_index = resolve_employee_row_index(worksheet, employee, row_map, resolved_layout)
         if row_index is None:
             continue
 
         tail: list[str] = []
         for day in range(start_day, detected_days + 1):
-            column_index = day + 3
+            column_index = workbook_day_column_index(day, resolved_layout)
             if row_index < worksheet.nrows and column_index < worksheet.ncols:
                 symbol = normalize_cell_text(worksheet.cell_value(row_index, column_index))
                 tail.append(symbol if symbol in valid_symbols else "")
@@ -967,14 +1386,40 @@ def resolve_reference_source(target_path: Path, fallback_source: Path) -> Path:
         preferred_names.insert(0, non_temp_name)
     fallback_names = [fallback_source.name]
 
-    search_roots: list[Path] = []
+    direct_search_roots: list[Path] = []
     for candidate_root in [target_path.parent, *target_path.parents]:
         resolved_root = candidate_root.resolve()
-        if resolved_root not in search_roots:
-            search_roots.append(resolved_root)
+        if resolved_root not in direct_search_roots:
+            direct_search_roots.append(resolved_root)
+
+    recursive_search_roots: list[Path] = []
+    common_root_candidates = []
+    try:
+        common_root_candidates.append(Path(target_path.parent).resolve())
+        common_root_candidates.append(Path(fallback_source.parent).resolve())
+        common_path = Path(target_path.parent)
+        fallback_parent = Path(fallback_source.parent)
+        target_parts = common_path.resolve().parts
+        fallback_parts = fallback_parent.resolve().parts
+        common_parts: list[str] = []
+        for target_part, fallback_part in zip(target_parts, fallback_parts):
+            if target_part != fallback_part:
+                break
+            common_parts.append(target_part)
+        if common_parts:
+            common_root_candidates.append(Path(*common_parts))
+    except Exception:
+        pass
+
+    for candidate_root in common_root_candidates:
+        resolved_root = candidate_root.resolve()
+        if len(resolved_root.parts) <= 2:
+            continue
+        if resolved_root not in recursive_search_roots:
+            recursive_search_roots.append(resolved_root)
 
     for candidate_name in preferred_names:
-        for search_root in search_roots:
+        for search_root in direct_search_roots:
             direct_candidate = (search_root / candidate_name).resolve()
             if direct_candidate == resolved_target_path:
                 continue
@@ -982,7 +1427,7 @@ def resolve_reference_source(target_path: Path, fallback_source: Path) -> Path:
                 return direct_candidate
 
     for candidate_name in preferred_names:
-        for search_root in search_roots:
+        for search_root in recursive_search_roots:
             try:
                 for candidate_path in search_root.rglob(candidate_name):
                     if is_ignored_search_path(candidate_path):
@@ -995,7 +1440,7 @@ def resolve_reference_source(target_path: Path, fallback_source: Path) -> Path:
                 continue
 
     for candidate_name in fallback_names:
-        for search_root in search_roots:
+        for search_root in direct_search_roots:
             direct_candidate = (search_root / candidate_name).resolve()
             if direct_candidate == resolved_target_path:
                 continue
@@ -1003,7 +1448,7 @@ def resolve_reference_source(target_path: Path, fallback_source: Path) -> Path:
                 return direct_candidate
 
     for candidate_name in fallback_names:
-        for search_root in search_roots:
+        for search_root in recursive_search_roots:
             try:
                 for candidate_path in search_root.rglob(candidate_name):
                     if is_ignored_search_path(candidate_path):
@@ -1056,7 +1501,15 @@ def is_ignored_search_path(candidate_path: Path) -> bool:
     return any(part in normalized_parts for part in ("old", "exe", "dist", "build"))
 
 
-def resolve_previous_month_source(base_dir: Path, target_path: Path, reference_source: Path, year: int, month: int) -> Path | None:
+def resolve_previous_month_source(
+    base_dir: Path,
+    target_path: Path,
+    reference_source: Path,
+    year: int,
+    month: int,
+    layout: dict[str, object] | None = None,
+) -> Path | None:
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
     previous_year = year - 1 if month == 1 else year
     previous_month = 12 if month == 1 else month - 1
 
@@ -1074,7 +1527,7 @@ def resolve_previous_month_source(base_dir: Path, target_path: Path, reference_s
                 continue
             seen_paths.add(candidate_path)
             if candidate_path.exists():
-                detected_year, detected_month, _ = detect_template_period(candidate_path)
+                detected_year, detected_month, _ = detect_template_period(candidate_path, layout=resolved_layout)
                 if detected_year == previous_year and detected_month == previous_month:
                     return candidate_path
 
@@ -1094,7 +1547,7 @@ def resolve_previous_month_source(base_dir: Path, target_path: Path, reference_s
                     if resolved_path in seen_paths:
                         continue
                     seen_paths.add(resolved_path)
-                    detected_year, detected_month, _ = detect_template_period(resolved_path)
+                    detected_year, detected_month, _ = detect_template_period(resolved_path, layout=resolved_layout)
                     if detected_year == previous_year and detected_month == previous_month:
                         return resolved_path
         except OSError:
@@ -1113,7 +1566,7 @@ def resolve_previous_month_source(base_dir: Path, target_path: Path, reference_s
         if candidate_path.name.endswith("_temp.xls"):
             continue
         try:
-            detected_year, detected_month, _ = detect_template_period(candidate_path)
+            detected_year, detected_month, _ = detect_template_period(candidate_path, layout=resolved_layout)
         except Exception:
             continue
         if detected_year == previous_year and detected_month == previous_month:
@@ -1129,14 +1582,20 @@ def resolve_previous_month_source(base_dir: Path, target_path: Path, reference_s
     return None
 
 
-def read_title_from_workbook(workbook_path: Path, sheet_index: int) -> str | None:
+def read_title_from_workbook(
+    workbook_path: Path,
+    sheet_index: int,
+    layout: dict[str, object] | None = None,
+) -> str | None:
     try:
         worksheet = xlrd.open_workbook(str(workbook_path)).sheet_by_index(sheet_index - 1)
     except Exception:
         return None
-    if worksheet.nrows < 1 or worksheet.ncols < 1:
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
+    row_index, column_index = workbook_layout_cell(resolved_layout, "title_cell")
+    if worksheet.nrows <= row_index or worksheet.ncols <= column_index:
         return None
-    value = worksheet.cell_value(0, 0)
+    value = worksheet.cell_value(row_index, column_index)
     return None if value is None else str(value)
 
 
@@ -1161,17 +1620,20 @@ def collect_assignment_diff_rows_xlrd(
     sheet_index: int,
     employee_rows: list[int],
     max_days: int = 31,
+    layout: dict[str, object] | None = None,
 ) -> list[dict[str, object]]:
     source_sheet = xlrd.open_workbook(str(source_path)).sheet_by_index(sheet_index - 1)
     target_sheet = xlrd.open_workbook(str(target_path)).sheet_by_index(sheet_index - 1)
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
+    name_column_index = workbook_layout_name_column_index(resolved_layout)
     results: list[dict[str, object]] = []
     for row in employee_rows:
         row_index = row - 1
-        source_name = normalize_cell_text(source_sheet.cell_value(row_index, 3)) if row_index < source_sheet.nrows and 3 < source_sheet.ncols else ""
-        target_name = normalize_cell_text(target_sheet.cell_value(row_index, 3)) if row_index < target_sheet.nrows and 3 < target_sheet.ncols else ""
+        source_name = normalize_cell_text(source_sheet.cell_value(row_index, name_column_index)) if row_index < source_sheet.nrows and name_column_index < source_sheet.ncols else ""
+        target_name = normalize_cell_text(target_sheet.cell_value(row_index, name_column_index)) if row_index < target_sheet.nrows and name_column_index < target_sheet.ncols else ""
         diffs: list[dict[str, object]] = []
         for day in range(1, max_days + 1):
-            column_index = day + 3
+            column_index = workbook_day_column_index(day, resolved_layout)
             source_value = normalize_cell_text(source_sheet.cell_value(row_index, column_index)) if row_index < source_sheet.nrows and column_index < source_sheet.ncols else ""
             target_value = normalize_cell_text(target_sheet.cell_value(row_index, column_index)) if row_index < target_sheet.nrows and column_index < target_sheet.ncols else ""
             if source_value != target_value:
@@ -1208,6 +1670,30 @@ def merge_config_values(base: object, override: object) -> object:
             merged[key] = merge_config_values(merged.get(key), value)
         return merged
     return override
+
+
+def normalize_workbook_layout(raw_layout: object) -> dict[str, object]:
+    if raw_layout is None:
+        raw_layout = {}
+    if not isinstance(raw_layout, dict):
+        raise ValueError("workbook_layout は JSON オブジェクトで指定してください。")
+
+    layout = merge_config_values(DEFAULT_WORKBOOK_LAYOUT, raw_layout)
+    if not isinstance(layout, dict):
+        raise ValueError("workbook_layout の解釈に失敗しました。")
+
+    workbook_layout_cell(layout, "title_cell")
+    workbook_layout_cell(layout, "unit_name_cell")
+    workbook_layout_monthly_setting_header_cell(layout)
+    workbook_layout_monthly_setting_cells(layout)
+    workbook_layout_employee_setting_columns(layout)
+    workbook_layout_count_columns(layout)
+    workbook_layout_name_column_index(layout)
+    workbook_layout_first_day_column_index(layout)
+    workbook_layout_day_header_row_index(layout)
+    workbook_layout_weekday_header_row_index(layout)
+    workbook_layout_employee_setting_header_row_index(layout)
+    return layout
 
 
 def load_raw_config(config_path: Path, visited: set[Path] | None = None) -> dict[str, object]:
@@ -1257,15 +1743,21 @@ def load_config(config_path: Path, year: int | None = None, month: int | None = 
     raw = apply_period_overrides(raw, effective_year, effective_month)
     raw["year"] = effective_year
     raw["month"] = effective_month
+    validate_loaded_config(raw, config_path)
 
     year = int(raw["year"])
     month = int(raw["month"])
     days_in_month = normalize_days_in_month(year, month, raw.get("days_in_month"), "設定ファイル")
+    workbook_layout = normalize_workbook_layout(raw.get("workbook_layout"))
     shift_kinds = {str(key): str(value) for key, value in raw.get("shift_kinds", DEFAULT_SHIFT_KINDS).items()}
     if "夜休" not in shift_kinds:
         shift_kinds["夜休"] = "night_rest"
-    count_symbols = {str(key): str(value) for key, value in raw.get("count_symbols", DEFAULT_COUNT_SYMBOLS).items()}
+    count_symbols = normalize_count_symbols(raw.get("count_symbols"), shift_kinds)
+    primary_day = primary_day_symbol(shift_kinds)
     rules = raw["rules"]
+    preferred_four_day_streak_count = rules.get("preferred_four_day_streak_count")
+    if preferred_four_day_streak_count is not None and int(preferred_four_day_streak_count) < 0:
+        raise ValueError("rules.preferred_four_day_streak_count は 0 以上で指定してください。")
     night_symbols = set(symbol_names_by_kind(shift_kinds, "night"))
     night_rest_symbol = first_symbol_by_kind(shift_kinds, "night_rest")
 
@@ -1276,12 +1768,9 @@ def load_config(config_path: Path, year: int | None = None, month: int | None = 
             raise ValueError("employees[].display_name または employees[].name を指定してください。")
         employee_id = normalize_cell_text(employee_raw.get("employee_id")) or fallback_employee_id(display_name, len(employees))
         aliases = normalize_employee_aliases(employee_raw, display_name, employee_id)
-        allowed_shifts = [str(shift) for shift in employee_raw["allowed_shifts"]]
-        if night_rest_symbol and any(shift in night_symbols for shift in allowed_shifts) and night_rest_symbol not in allowed_shifts:
-            allowed_shifts.append(night_rest_symbol)
+        allowed_shifts = list(normalize_employee_allowed_shifts(employee_raw["allowed_shifts"], shift_kinds, display_name, "allowed_shifts"))
         min_counts = {str(key): int(value) for key, value in employee_raw.get("min_counts", {}).items()}
-        if str(employee_raw.get("employment", "")) == "full" and "日" in allowed_shifts and int(min_counts.get("日", 0)) < 1:
-            min_counts["日"] = 1
+        require_standard_day = bool(employee_raw.get("require_standard_day", False))
         allow_night_rest = night_rest_symbol in allowed_shifts
         weekday_allowed_shifts = {
             parse_weekday_key(weekday): normalize_allowed_shift_rule(
@@ -1334,6 +1823,9 @@ def load_config(config_path: Path, year: int | None = None, month: int | None = 
                     else int(employee_raw["required_double_night_min_count"])
                 ),
                 weekend_fairness_target=bool(employee_raw.get("weekend_fairness_target", False)),
+                unit_shift_balance_target=bool(employee_raw.get("unit_shift_balance_target", False)),
+                preferred_four_day_streak_target=bool(employee_raw.get("preferred_four_day_streak_target", False)),
+                require_standard_day=require_standard_day,
                 min_counts=min_counts,
                 max_counts={str(key): int(value) for key, value in employee_raw.get("max_counts", {}).items()},
                 max_consecutive_work_limit=(
@@ -1370,6 +1862,7 @@ def load_config(config_path: Path, year: int | None = None, month: int | None = 
         target_path=resolve_path(base_dir, raw["target_path"]),
         manual_source=resolve_path(base_dir, raw["manual_source"]),
         sheet_index=int(raw.get("sheet_index", 1)),
+        workbook_layout=workbook_layout,
         year=year,
         month=month,
         days_in_month=days_in_month,
@@ -1380,7 +1873,7 @@ def load_config(config_path: Path, year: int | None = None, month: int | None = 
         required_per_day={
             str(key): {str(inner_key): int(inner_value) for inner_key, inner_value in value.items()}
             for key, value in rules["required_per_day"].items()
-            if key in {"南", "北"}
+            if key != "night_total"
         },
         night_total_per_day=int(rules["required_per_day"].get("night_total", 1)),
         day_requirements=day_requirements,
@@ -1388,6 +1881,7 @@ def load_config(config_path: Path, year: int | None = None, month: int | None = 
         max_consecutive_night=int(rules.get("max_consecutive_night", 2)),
         max_consecutive_rest=int(rules.get("max_consecutive_rest", 3)),
         max_consecutive_rest_with_special=int(rules.get("max_consecutive_rest_with_special", 5)),
+        preferred_four_day_streak_count=(None if preferred_four_day_streak_count is None else int(preferred_four_day_streak_count)),
         fairness_night_spread=(None if rules.get("fairness_night_spread") is None else int(rules["fairness_night_spread"])),
         fairness_weekend_spread=(None if rules.get("fairness_weekend_spread") is None else int(rules["fairness_weekend_spread"])),
         weekend_rest_count_mode=normalize_weekend_rest_count_mode(rules.get("weekend_rest_count_mode", "rest_special_night_rest")),
@@ -1412,9 +1906,12 @@ def build_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpModel, dic
     night_symbols = symbol_names_by_kind(config.shift_kinds, "night")
     night_rest_symbols = symbol_names_by_kind(config.shift_kinds, "night_rest")
     rest_symbols = symbol_names_by_kind(config.shift_kinds, "rest")
+    standard_day_shift_symbols = standard_day_symbols(config.shift_kinds)
+    primary_day = primary_day_symbol(config.shift_kinds)
     rest_like_symbols = rest_symbols + night_rest_symbols
     work_symbols = [symbol for symbol in shift_order if symbol not in rest_like_symbols]
-    regular_rest_limit_symbols = (["休"] if "休" in shift_order else []) + night_rest_symbols
+    primary_rest = primary_rest_symbol(config.shift_kinds)
+    regular_rest_limit_symbols = ([primary_rest] if primary_rest else []) + night_rest_symbols
     weekend_pairs = weekend_pair_day_indexes(config.year, config.month, config.days_in_month)
 
     for employee in config.employees:
@@ -1449,17 +1946,21 @@ def build_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpModel, dic
     pair_vars_by_employee: dict[str, list[cp_model.IntVar]] = {}
     night_eligible_ids = selected_night_fairness_employee_ids(config, night_symbols)
     weekend_rest_symbols = weekend_rest_symbols_for_mode(config.shift_kinds, config.weekend_rest_count_mode)
+    non_night_rest_reset_symbols = tuple(symbol for symbol in rest_like_symbols if symbol not in night_rest_symbols)
+    objective_terms: list[object] = []
     for employee in config.employees:
         employee_id = employee.employee_id
         pair_vars_by_employee[employee_id] = []
 
         if config.require_weekend_pair_rest and employee.require_weekend_pair_rest:
             for saturday_day, sunday_day in weekend_pairs:
-                model.Add(
-                    sum(decision_vars[employee_id, saturday_day, shift] for shift in rest_like_symbols)
-                    + sum(decision_vars[employee_id, sunday_day, shift] for shift in rest_like_symbols)
-                    >= 1
-                )
+                saturday_work = sum(decision_vars[employee_id, saturday_day, shift] for shift in work_symbols)
+                sunday_work = sum(decision_vars[employee_id, sunday_day, shift] for shift in work_symbols)
+                weekend_violation = model.NewBoolVar(f"weekend_pair_{employee_id}_{saturday_day}")
+                model.Add(weekend_violation >= saturday_work + sunday_work - 1)
+                model.Add(weekend_violation <= saturday_work)
+                model.Add(weekend_violation <= sunday_work)
+                objective_terms.append(weekend_violation * 650)
 
         for day, shift in employee.fixed_assignments.items():
             if 1 <= day <= config.days_in_month:
@@ -1485,6 +1986,24 @@ def build_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpModel, dic
                     sum(decision_vars[employee_id, day, shift] for shift in night_rest_symbols)
                     <= sum(decision_vars[employee_id, day - 1, shift] for shift in night_symbols)
                 )
+
+            prior_chain_count: int | cp_model.IntVar = night_rest_chain_carry_count(tail, config.shift_kinds)
+            for day in range(config.days_in_month):
+                night_rest_today = model.NewBoolVar(f"night_rest_chain_hit_{employee_id}_{day}")
+                model.Add(sum(decision_vars[employee_id, day, shift] for shift in night_rest_symbols) == night_rest_today)
+
+                chain_reset_today = model.NewBoolVar(f"night_rest_chain_reset_{employee_id}_{day}")
+                if non_night_rest_reset_symbols:
+                    model.Add(sum(decision_vars[employee_id, day, shift] for shift in non_night_rest_reset_symbols) == chain_reset_today)
+                else:
+                    model.Add(chain_reset_today == 0)
+
+                chain_count = model.NewIntVar(0, prior_chain_count + config.days_in_month if isinstance(prior_chain_count, int) else config.days_in_month + len(tail), f"night_rest_chain_{employee_id}_{day}")
+                model.Add(chain_count == prior_chain_count + 1).OnlyEnforceIf(night_rest_today)
+                model.Add(chain_count == 0).OnlyEnforceIf(chain_reset_today)
+                model.Add(chain_count == prior_chain_count).OnlyEnforceIf([night_rest_today.Not(), chain_reset_today.Not()])
+                model.Add(chain_count <= 9)
+                prior_chain_count = chain_count
 
         for day in range(config.days_in_month - 1):
             model.Add(
@@ -1516,7 +2035,8 @@ def build_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpModel, dic
         work_flags.extend(sum(decision_vars[employee_id, day, shift] for shift in work_symbols) for day in range(config.days_in_month))
         add_window_constraint(model, work_flags, max_consecutive_work_limit + 1, max_consecutive_work_limit)
 
-        if employee.max_four_day_streak_count is not None and config.days_in_month >= 4:
+        preferred_four_day_streak_count = employee_preferred_four_day_streak_count(employee, config)
+        if (employee.max_four_day_streak_count is not None or preferred_four_day_streak_count is not None) and config.days_in_month >= 4:
             four_day_vars: list[cp_model.IntVar] = []
             for start_day in range(config.days_in_month - 3):
                 window_var = model.NewBoolVar(f"four_day_window_{employee_id}_{start_day}")
@@ -1525,7 +2045,13 @@ def build_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpModel, dic
                     model.Add(window_var <= flag)
                 model.Add(window_var >= sum(window_flags) - 3)
                 four_day_vars.append(window_var)
-            model.Add(sum(four_day_vars) <= employee.max_four_day_streak_count)
+            four_day_window_total = sum(four_day_vars)
+            if employee.max_four_day_streak_count is not None:
+                model.Add(four_day_window_total <= employee.max_four_day_streak_count)
+            if preferred_four_day_streak_count is not None:
+                preferred_four_day_excess = model.NewIntVar(0, config.days_in_month, f"preferred_four_day_excess_{employee_id}")
+                model.Add(four_day_window_total - preferred_four_day_excess <= preferred_four_day_streak_count)
+                objective_terms.append(preferred_four_day_excess * 30)
 
         regular_rest_flags = [1 if shift in regular_rest_limit_symbols else 0 for shift in tail[-config.max_consecutive_rest :]]
         regular_rest_flags.extend(
@@ -1546,6 +2072,15 @@ def build_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpModel, dic
             model.Add(sum(decision_vars[employee_id, day, shift] for day in range(config.days_in_month)) >= minimum)
         for shift, maximum in employee.max_counts.items():
             model.Add(sum(decision_vars[employee_id, day, shift] for day in range(config.days_in_month)) <= maximum)
+        if employee_requires_standard_day(employee, primary_day):
+            model.Add(
+                sum(
+                    decision_vars[employee_id, day, shift]
+                    for day in range(config.days_in_month)
+                    for shift in standard_day_shift_symbols
+                )
+                >= 1
+            )
 
         rest_count = sum(decision_vars[employee_id, day, shift] for day in range(config.days_in_month) for shift in rest_like_symbols)
         if employee.exact_rest_days is not None:
@@ -1556,7 +2091,6 @@ def build_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpModel, dic
             if employee.max_rest_days is not None:
                 model.Add(rest_count <= employee.max_rest_days)
 
-    objective_terms: list[object] = []
     weekend_days = weekend_day_indexes(config.year, config.month, config.days_in_month)
     if weekend_days and config.fairness_weekend_spread is not None:
         weekend_eligible = selected_weekend_fairness_employee_ids(config)
@@ -1587,7 +2121,7 @@ def build_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpModel, dic
         objective_terms.append((max_night - min_night) * 100)
 
     for unit in {employee.unit for employee in config.employees}:
-        unit_employee_ids = [employee.employee_id for employee in config.employees if employee.unit == unit and employee.employment == "full"]
+        unit_employee_ids = selected_unit_shift_balance_employee_ids(config, unit)
         if not unit_employee_ids:
             continue
         for label, symbols in (("early", early_symbols), ("late", late_symbols)):
@@ -1639,6 +2173,7 @@ def build_relaxed_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpMo
     rest_like_symbols = rest_symbols + night_rest_symbols
     work_symbols = [symbol for symbol in shift_order if symbol not in rest_like_symbols]
     weekend_pairs = weekend_pair_day_indexes(config.year, config.month, config.days_in_month)
+    non_night_rest_reset_symbols = tuple(symbol for symbol in rest_like_symbols if symbol not in night_rest_symbols)
     objective_terms: list[object] = []
 
     for employee in config.employees:
@@ -1707,6 +2242,28 @@ def build_relaxed_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpMo
                 model.Add(night_rest_violation <= previous_not_night)
                 objective_terms.append(night_rest_violation * 400)
 
+        if night_rest_symbols:
+            prior_chain_count: int | cp_model.IntVar = night_rest_chain_carry_count(tail, config.shift_kinds)
+            for day in range(config.days_in_month):
+                night_rest_today = model.NewBoolVar(f"relaxed_night_rest_chain_hit_{employee_id}_{day}")
+                model.Add(sum(decision_vars[employee_id, day, shift] for shift in night_rest_symbols) == night_rest_today)
+
+                chain_reset_today = model.NewBoolVar(f"relaxed_night_rest_chain_reset_{employee_id}_{day}")
+                if non_night_rest_reset_symbols:
+                    model.Add(sum(decision_vars[employee_id, day, shift] for shift in non_night_rest_reset_symbols) == chain_reset_today)
+                else:
+                    model.Add(chain_reset_today == 0)
+
+                chain_count = model.NewIntVar(0, prior_chain_count + config.days_in_month if isinstance(prior_chain_count, int) else config.days_in_month + len(tail), f"relaxed_night_rest_chain_{employee_id}_{day}")
+                model.Add(chain_count == prior_chain_count + 1).OnlyEnforceIf(night_rest_today)
+                model.Add(chain_count == 0).OnlyEnforceIf(chain_reset_today)
+                model.Add(chain_count == prior_chain_count).OnlyEnforceIf([night_rest_today.Not(), chain_reset_today.Not()])
+
+                chain_excess = model.NewIntVar(0, config.days_in_month, f"relaxed_night_rest_chain_excess_{employee_id}_{day}")
+                model.Add(chain_count - chain_excess <= 9)
+                objective_terms.append(chain_excess * 500)
+                prior_chain_count = chain_count
+
         if config.require_weekend_pair_rest and employee.require_weekend_pair_rest:
             for saturday_day, sunday_day in weekend_pairs:
                 saturday_work = sum(decision_vars[employee_id, saturday_day, shift] for shift in work_symbols)
@@ -1727,6 +2284,15 @@ def build_relaxed_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpMo
             excess = model.NewIntVar(0, config.days_in_month, f"relaxed_max_{employee_id}_{shift}")
             model.Add(count - excess <= maximum)
             objective_terms.append(excess * 120)
+        if employee_requires_standard_day(employee, primary_day):
+            standard_day_count = sum(
+                decision_vars[employee_id, day, shift]
+                for day in range(config.days_in_month)
+                for shift in standard_day_shift_symbols
+            )
+            standard_day_deficit = model.NewIntVar(0, 1, f"relaxed_standard_day_deficit_{employee_id}")
+            model.Add(standard_day_count + standard_day_deficit >= 1)
+            objective_terms.append(standard_day_deficit * 120)
 
         if employee.required_double_night_min_count is not None:
             pair_vars_for_employee: list[cp_model.IntVar] = []
@@ -1750,7 +2316,8 @@ def build_relaxed_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpMo
                 model.Add(window_sum - excess <= max_consecutive_work_limit)
                 objective_terms.append(excess * 200)
 
-        if employee.max_four_day_streak_count is not None and config.days_in_month >= 4:
+        preferred_four_day_streak_count = employee_preferred_four_day_streak_count(employee, config)
+        if (employee.max_four_day_streak_count is not None or preferred_four_day_streak_count is not None) and config.days_in_month >= 4:
             four_day_window_vars: list[cp_model.IntVar] = []
             for start_day in range(config.days_in_month - 3):
                 window_var = model.NewBoolVar(f"relaxed_four_day_window_{employee_id}_{start_day}")
@@ -1759,9 +2326,15 @@ def build_relaxed_schedule_model(config: SchedulerConfig) -> tuple[cp_model.CpMo
                     model.Add(window_var <= flag)
                 model.Add(window_var >= sum(window_flags) - 3)
                 four_day_window_vars.append(window_var)
-            four_day_excess = model.NewIntVar(0, config.days_in_month, f"relaxed_four_day_excess_{employee_id}")
-            model.Add(sum(four_day_window_vars) - four_day_excess <= employee.max_four_day_streak_count)
-            objective_terms.append(four_day_excess * 120)
+            four_day_window_total = sum(four_day_window_vars)
+            if employee.max_four_day_streak_count is not None:
+                four_day_excess = model.NewIntVar(0, config.days_in_month, f"relaxed_four_day_excess_{employee_id}")
+                model.Add(four_day_window_total - four_day_excess <= employee.max_four_day_streak_count)
+                objective_terms.append(four_day_excess * 120)
+            if preferred_four_day_streak_count is not None:
+                preferred_four_day_excess = model.NewIntVar(0, config.days_in_month, f"relaxed_preferred_four_day_excess_{employee_id}")
+                model.Add(four_day_window_total - preferred_four_day_excess <= preferred_four_day_streak_count)
+                objective_terms.append(preferred_four_day_excess * 40)
 
         rest_count = sum(decision_vars[employee_id, day, shift] for day in range(config.days_in_month) for shift in rest_like_symbols)
         if employee.exact_rest_days is not None:
@@ -1849,36 +2422,54 @@ def solve_schedule(config: SchedulerConfig) -> ScheduleSolveResult:
     )
 
 
-def update_calendar_headers(worksheet, year: int, month: int, days_in_month: int) -> None:
+def update_calendar_headers(
+    worksheet,
+    year: int,
+    month: int,
+    days_in_month: int,
+    layout: dict[str, object] | None = None,
+) -> None:
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
+    day_header_row = workbook_layout_day_header_row_index(resolved_layout) + 1
+    weekday_header_row = workbook_layout_weekday_header_row_index(resolved_layout) + 1
     for day in range(1, 32):
-        column = day + 4
-        worksheet.Cells(4, column).Value = day if day <= days_in_month else ""
-        worksheet.Cells(5, column).Value = JAPANESE_WEEKDAYS[calendar.weekday(year, month, day)] if day <= days_in_month else ""
+        column = workbook_day_column_index(day, resolved_layout) + 1
+        worksheet.Cells(day_header_row, column).Value = day if day <= days_in_month else ""
+        worksheet.Cells(weekday_header_row, column).Value = JAPANESE_WEEKDAYS[calendar.weekday(year, month, day)] if day <= days_in_month else ""
 
 
-def validate_calendar_headers_not_blank(worksheet, target_path: Path, sheet_index: int, days_in_month: int) -> None:
+def validate_calendar_headers_not_blank(
+    worksheet,
+    target_path: Path,
+    sheet_index: int,
+    days_in_month: int,
+    layout: dict[str, object] | None = None,
+) -> None:
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
+    day_header_row = workbook_layout_day_header_row_index(resolved_layout) + 1
+    weekday_header_row = workbook_layout_weekday_header_row_index(resolved_layout) + 1
     for day in range(1, days_in_month + 1):
-        column = day + 4
-        date_text = normalize_cell_text(worksheet.Cells(4, column).Text)
+        column = workbook_day_column_index(day, resolved_layout) + 1
+        date_text = normalize_cell_text(worksheet.Cells(day_header_row, column).Text)
         if not date_text:
             raise ValueError(
                 "日付チェックで空欄を検出しました。"
                 f" 勤怠記入前に {day}日の日付を入力してください。"
                 f"\n対象ファイル: {target_path}"
                 f"\nシート番号: {sheet_index}"
-                f"\nセル位置: {day + 4}列目の4行目"
+                f"\nセル位置: {column}列目の{day_header_row}行目"
             )
 
     for day in range(1, days_in_month + 1):
-        column = day + 4
-        weekday_text = normalize_cell_text(worksheet.Cells(5, column).Text)
+        column = workbook_day_column_index(day, resolved_layout) + 1
+        weekday_text = normalize_cell_text(worksheet.Cells(weekday_header_row, column).Text)
         if not weekday_text:
             raise ValueError(
                 "曜日チェックで空欄を検出しました。"
                 f" 勤怠記入前に {day}日の日付に対応する曜日を入力してください。"
                 f"\n対象ファイル: {target_path}"
                 f"\nシート番号: {sheet_index}"
-                f"\nセル位置: {day + 4}列目の5行目"
+                f"\nセル位置: {column}列目の{weekday_header_row}行目"
             )
 
 
@@ -1893,42 +2484,62 @@ def write_schedule_to_excel(config: SchedulerConfig, schedule: dict[str, list[st
     workbook = open_workbook(excel, config.target_path)
     try:
         worksheet = workbook.Worksheets(config.sheet_index)
-        validate_calendar_headers_not_blank(worksheet, config.target_path, config.sheet_index, config.days_in_month)
-        update_calendar_headers(worksheet, config.year, config.month, config.days_in_month)
+        validate_calendar_headers_not_blank(
+            worksheet,
+            config.target_path,
+            config.sheet_index,
+            config.days_in_month,
+            config.workbook_layout,
+        )
+        update_calendar_headers(worksheet, config.year, config.month, config.days_in_month, config.workbook_layout)
 
         reference_title = None
         try:
-            reference_year, reference_month, _ = detect_template_period(config.manual_source, config.sheet_index)
+            reference_year, reference_month, _ = detect_template_period(config.manual_source, config.sheet_index, config.workbook_layout)
             if reference_year == config.year and reference_month == config.month and config.manual_source.exists():
-                reference_title = read_title_from_workbook(config.manual_source, config.sheet_index)
+                reference_title = read_title_from_workbook(config.manual_source, config.sheet_index, config.workbook_layout)
         except Exception:
             reference_title = None
 
-        count_column_map = {"夜": 36, "早": 37, "遅": 38, "休": 39}
+        count_column_map = {kind: column_index + 1 for kind, column_index in workbook_layout_count_columns(config.workbook_layout).items()}
         night_rest_symbols = set(symbol_names_by_kind(config.shift_kinds, "night_rest"))
+        count_symbols_by_kind: dict[str, set[str]] = {}
+        for label, symbol in config.count_symbols.items():
+            del label
+            kind = config.shift_kinds.get(symbol)
+            if kind in count_column_map:
+                count_symbols_by_kind.setdefault(kind, set()).add(symbol)
+        for kind in count_column_map:
+            if kind not in count_symbols_by_kind:
+                default_symbol = primary_rest_symbol(config.shift_kinds) if kind == "rest" else first_symbol_by_kind(config.shift_kinds, kind)
+                if default_symbol is not None:
+                    count_symbols_by_kind[kind] = {default_symbol}
+        first_day_column = workbook_layout_first_day_column_index(config.workbook_layout) + 1
         for employee in config.employees:
             employee_id = employee.employee_id
             row = employee.row
             for day_offset in range(31):
-                column = day_offset + 5
+                column = first_day_column + day_offset
                 if should_write_employee_row(employee) and day_offset < config.days_in_month:
                     value = schedule[employee_id][day_offset]
                 else:
                     value = ""
                 worksheet.Cells(row, column).Value = value
 
-            for label, symbol in config.count_symbols.items():
+            for kind, column in count_column_map.items():
                 if should_write_employee_row(employee):
-                    counted_symbols = {symbol}
-                    if label == "休":
+                    counted_symbols = set(count_symbols_by_kind.get(kind, set()))
+                    if kind == "rest":
                         counted_symbols.update(night_rest_symbols)
                     count_value = sum(shift in counted_symbols for shift in schedule[employee_id])
                 else:
                     count_value = ""
-                worksheet.Cells(row, count_column_map[label]).Value = count_value
+                worksheet.Cells(row, column).Value = count_value
 
-        worksheet.Cells(1, 1).Value = reference_title if reference_title is not None else f"勤務表　　【R{config.year - 2018}年　{config.month}　月】                             "
-        worksheet.Cells(2, 3).Value = config.unit_name
+        title_row_index, title_column_index = workbook_layout_cell(config.workbook_layout, "title_cell")
+        unit_name_row_index, unit_name_column_index = workbook_layout_cell(config.workbook_layout, "unit_name_cell")
+        worksheet.Cells(title_row_index + 1, title_column_index + 1).Value = reference_title if reference_title is not None else f"勤務表　　【R{config.year - 2018}年　{config.month}　月】                             "
+        worksheet.Cells(unit_name_row_index + 1, unit_name_column_index + 1).Value = config.unit_name
         workbook.Save()
     finally:
         workbook.Close(True)
@@ -1944,7 +2555,12 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
     rest_symbols = set(symbol_names_by_kind(config.shift_kinds, "rest"))
     rest_like_symbols = rest_symbols | night_rest_symbols
     work_symbols = set(symbol for symbol in config.shift_kinds if symbol not in rest_like_symbols)
-    regular_rest_limit_symbols = ({"休"} if "休" in config.shift_kinds else set()) | night_rest_symbols
+    primary_rest = primary_rest_symbol(config.shift_kinds)
+    regular_rest_limit_symbols = ({primary_rest} if primary_rest else set()) | night_rest_symbols
+    regular_rest_label = rest_label_text(config.shift_kinds)
+    all_rest_label = rest_label_text(config.shift_kinds, include_special=True)
+    rest_like_label = rest_like_label_text(config.shift_kinds)
+    night_rest_label = night_rest_label_text(config.shift_kinds)
     weekend_days = weekend_day_indexes(config.year, config.month, config.days_in_month)
     weekend_pairs = weekend_pair_day_indexes(config.year, config.month, config.days_in_month)
     issues: list[str] = []
@@ -1958,14 +2574,16 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
     regular_rest_violations: list[str] = []
     all_rest_violations: list[str] = []
     night_rest_chain_violations: list[str] = []
+    special_rest_shift_symbols = set(special_rest_symbols(config.shift_kinds))
     used_special_leave = sorted(
         employee.display_name
         for employee in config.employees
-        if "特" in schedule[employee.employee_id]
+        if any(shift in special_rest_shift_symbols for shift in schedule[employee.employee_id])
     )
     night_rest_chain_max: dict[str, int] = {}
     double_night_requirement_violations: list[str] = []
     four_day_streak_violations: list[str] = []
+    preferred_four_day_streak_excess: list[str] = []
 
     for day in range(config.days_in_month):
         for unit, requirements in config.required_per_day.items():
@@ -1996,7 +2614,6 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
                 sunday_shift = schedule[employee_id][sunday_day]
                 if saturday_shift not in rest_like_symbols and sunday_shift not in rest_like_symbols:
                     message = f"{employee.display_name}: {saturday_day + 1}日(土)-{sunday_day + 1}日(日) の両方が勤務"
-                    issues.append(message)
                     weekend_pair_rest_violations.append(message)
         for day in range(1, config.days_in_month + 1):
             effective_allowed_shifts = effective_allowed_shifts_for_day(config, employee, day)
@@ -2045,11 +2662,11 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
                 issues.append(message)
                 night_streak_violations.append(message)
             if regular_rest_streak > config.max_consecutive_rest:
-                message = f"{employee.display_name}: 休{config.max_consecutive_rest}連続超過"
+                message = f"{employee.display_name}: {regular_rest_label}{config.max_consecutive_rest}連続超過"
                 issues.append(message)
                 regular_rest_violations.append(message)
             if all_rest_streak > config.max_consecutive_rest_with_special:
-                message = f"{employee.display_name}: 休/特{config.max_consecutive_rest_with_special}連続超過"
+                message = f"{employee.display_name}: {all_rest_label}{config.max_consecutive_rest_with_special}連続超過"
                 issues.append(message)
                 all_rest_violations.append(message)
 
@@ -2060,7 +2677,7 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
                     max_night_rest_chain_streak = max(max_night_rest_chain_streak, night_rest_chain_streak)
                     if night_rest_chain_streak == 10:
                         day_number = index - len(employee.previous_tail) + 1
-                        message = f"{employee.display_name}: 夜勤明け休みが10回以上連続 ({day_number}日目で到達)"
+                        message = f"{employee.display_name}: {night_rest_label}が10回以上連続 ({day_number}日目で到達)"
                         night_rest_chain_violations.append(message)
                 else:
                     night_rest_chain_streak = 0
@@ -2069,16 +2686,22 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
 
         night_rest_chain_max[employee.display_name] = max_night_rest_chain_streak
 
-        if employee.max_four_day_streak_count is not None:
+        preferred_four_day_streak_count = employee_preferred_four_day_streak_count(employee, config)
+        if employee.max_four_day_streak_count is not None or preferred_four_day_streak_count is not None:
             four_day_window_count = count_consecutive_work_windows(schedule[employee_id], work_symbols, 4)
-            if four_day_window_count > employee.max_four_day_streak_count:
+            if employee.max_four_day_streak_count is not None and four_day_window_count > employee.max_four_day_streak_count:
                 message = f"{employee.display_name}: 4連勤窓が {four_day_window_count} 回で、許容 {employee.max_four_day_streak_count} 回を超過"
                 issues.append(message)
                 four_day_streak_violations.append(message)
+            if preferred_four_day_streak_count is not None and four_day_window_count > preferred_four_day_streak_count:
+                preferred_four_day_streak_excess.append(
+                    f"{employee.display_name}: 4連勤窓が {four_day_window_count} 回で、目標 {preferred_four_day_streak_count} 回を超過"
+                )
 
     specified_holiday_night_violations: list[str] = []
     specified_holiday_unchecked: list[str] = []
     specified_holiday_count = sum(len(employee.specified_holidays) for employee in config.employees)
+    primary_day = primary_day_symbol(config.shift_kinds)
     standard_day_shift_symbols = standard_day_symbols(config.shift_kinds)
     rest_day_counts = {
         employee.display_name: sum(shift in rest_like_symbols for shift in schedule[employee.employee_id])
@@ -2095,7 +2718,7 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
             continue
         actual_rest_days = rest_day_counts[employee.display_name]
         if actual_rest_days != employee.exact_rest_days:
-            message = f"{employee.display_name}: 休み総数 {actual_rest_days} 回 (指定 {employee.exact_rest_days} 回)"
+            message = f"{employee.display_name}: {rest_like_label}総数 {actual_rest_days} 回 (指定 {employee.exact_rest_days} 回)"
             issues.append(message)
             exact_rest_day_violations.append(message)
 
@@ -2115,7 +2738,18 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
             if shifts[holiday_day - 2] in night_symbols:
                 specified_holiday_night_violations.append(f"{employee.display_name}: 指定休日 {holiday_day} 日の前日が夜")
 
-    night_eligible = [employee for employee in config.employees if any(config.shift_kinds.get(shift) == "night" for shift in employee.allowed_shifts)]
+    night_fairness_employee_ids = set(selected_night_fairness_employee_ids(config, list(night_symbols)))
+    night_eligible = [
+        employee
+        for employee in config.employees
+        if employee.employee_id in night_fairness_employee_ids
+    ]
+    if not night_eligible:
+        night_eligible = [
+            employee
+            for employee in config.employees
+            if any(config.shift_kinds.get(shift) == "night" for shift in employee.allowed_shifts)
+        ]
     night_counts = {employee.display_name: sum(shift in night_symbols for shift in schedule[employee.employee_id]) for employee in night_eligible}
     day_shift_counts = {employee.display_name: sum(shift in day_symbols for shift in schedule[employee.employee_id]) for employee in config.employees}
     standard_day_shift_counts = {
@@ -2123,14 +2757,14 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
         for employee in config.employees
     }
     standard_day_shift_target_counts = {
-        employee.display_name: standard_day_shift_counts[employee.display_name]
+        employee.display_name: 1
         for employee in config.employees
-        if int(employee.min_counts.get("日", 0)) > 0
+        if employee_requires_standard_day(employee, primary_day)
     }
     standard_day_shift_violations = [
-        f"{employee.display_name}: 通常の日が {standard_day_shift_counts[employee.display_name]} 回で、最低 {employee.min_counts['日']} 回に未達"
+        f"{employee.display_name}: 通常の{display_symbol(primary_day or '日')}が {standard_day_shift_counts[employee.display_name]} 回で、最低 1 回に未達"
         for employee in config.employees
-        if int(employee.min_counts.get("日", 0)) > standard_day_shift_counts[employee.display_name]
+        if employee_requires_standard_day(employee, primary_day) and standard_day_shift_counts[employee.display_name] < 1
     ]
     double_night_counts = {
         employee.display_name: sum(
@@ -2155,7 +2789,7 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
             issues.append(message)
             double_night_requirement_violations.append(message)
 
-    night_fairness_names = [employee.display_name for employee in config.employees if employee.employee_id in selected_night_fairness_employee_ids(config, list(night_symbols))]
+    night_fairness_names = [employee.display_name for employee in config.employees if employee.employee_id in night_fairness_employee_ids]
     night_fairness_counts = {name: night_counts[name] for name in night_fairness_names if name in night_counts}
     weekend_rest_symbols = set(weekend_rest_symbols_for_mode(config.shift_kinds, config.weekend_rest_count_mode))
     weekend_rest = {
@@ -2163,10 +2797,20 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
         for employee in config.employees
         if employee.employee_id in selected_weekend_fairness_employee_ids(config)
     }
-    weekend_four_day_target_counts = {
+    four_day_hard_target_counts = {
         employee.display_name: int(employee.max_four_day_streak_count)
         for employee in config.employees
         if employee.max_four_day_streak_count is not None
+    }
+    preferred_four_day_target_counts = {
+        employee.display_name: int(employee_preferred_four_day_streak_count(employee, config))
+        for employee in config.employees
+        if employee_preferred_four_day_streak_count(employee, config) is not None
+    }
+    four_day_window_counts = {
+        employee.display_name: count_consecutive_work_windows(schedule[employee.employee_id], work_symbols, 4)
+        for employee in config.employees
+        if employee.max_four_day_streak_count is not None or employee_preferred_four_day_streak_count(employee, config) is not None
     }
     return {
         "issues": issues,
@@ -2187,7 +2831,10 @@ def validate_schedule(config: SchedulerConfig, schedule: dict[str, list[str]]) -
         "weekend_rest": weekend_rest,
         "weekend_rest_spread": (0 if not weekend_rest else max(weekend_rest.values()) - min(weekend_rest.values())),
         "weekend_rest_count_mode": config.weekend_rest_count_mode,
-        "weekend_four_day_target_counts": weekend_four_day_target_counts,
+        "four_day_hard_target_counts": four_day_hard_target_counts,
+        "preferred_four_day_target_counts": preferred_four_day_target_counts,
+        "preferred_four_day_streak_excess": preferred_four_day_streak_excess,
+        "four_day_window_counts": four_day_window_counts,
         "used_special_leave": used_special_leave,
         "staffing_issues": staffing_issues,
         "late_to_early_violations": late_to_early_violations,
@@ -2267,12 +2914,15 @@ def collect_assignment_diff_rows(
     sheet_index: int,
     employee_rows: list[int],
     max_days: int = 31,
+    layout: dict[str, object] | None = None,
 ) -> list[dict[str, object]]:
     excel = create_excel_application()
     excel.Visible = False
     excel.DisplayAlerts = False
     source_book = None
     target_book = None
+    resolved_layout = DEFAULT_WORKBOOK_LAYOUT if layout is None else layout
+    name_column = workbook_layout_name_column_index(resolved_layout) + 1
     try:
         source_book = open_workbook(excel, source_path)
         target_book = open_workbook(excel, target_path)
@@ -2282,11 +2932,11 @@ def collect_assignment_diff_rows(
         target_sheet = target_book.Worksheets(sheet_index)
         results: list[dict[str, object]] = []
         for row in employee_rows:
-            source_name = str(source_sheet.Cells(row, 4).Text or "")
-            target_name = str(target_sheet.Cells(row, 4).Text or "")
+            source_name = str(source_sheet.Cells(row, name_column).Text or "")
+            target_name = str(target_sheet.Cells(row, name_column).Text or "")
             diffs: list[dict[str, object]] = []
             for day in range(1, max_days + 1):
-                column = day + 4
+                column = workbook_day_column_index(day, resolved_layout) + 1
                 source_value = str(source_sheet.Cells(row, column).Text or "")
                 target_value = str(target_sheet.Cells(row, column).Text or "")
                 if source_value != target_value:
@@ -2302,7 +2952,7 @@ def collect_assignment_diff_rows(
             )
         return results
     except Exception:
-        return collect_assignment_diff_rows_xlrd(source_path, target_path, sheet_index, employee_rows, max_days)
+        return collect_assignment_diff_rows_xlrd(source_path, target_path, sheet_index, employee_rows, max_days, resolved_layout)
     finally:
         if source_book is not None:
             try:
@@ -2321,10 +2971,28 @@ def collect_assignment_diff_rows(
 
 
 def build_validation_results(config: SchedulerConfig, validation: dict[str, object]) -> list[dict[str, object]]:
-    full_time_employees = [employee.display_name for employee in config.employees if employee.employment == "full"]
     special_leave_names = list(validation.get("used_special_leave", []))
+    primary_day = primary_day_symbol(config.shift_kinds)
+    primary_day_label = display_symbol(primary_day or "日")
+    primary_rest = primary_rest_symbol(config.shift_kinds)
+    regular_rest_label = rest_label_text(config.shift_kinds)
+    all_rest_label = rest_label_text(config.shift_kinds, include_special=True)
+    special_rest_label = special_rest_label_text(config.shift_kinds)
+    night_rest_label = night_rest_label_text(config.shift_kinds)
+    rest_like_label = rest_like_label_text(config.shift_kinds)
+    weekend_rest_mode = validation.get("weekend_rest_count_mode", config.weekend_rest_count_mode)
+    weekend_rest_mode_label = weekend_rest_label_text(config.shift_kinds, weekend_rest_mode)
+    required_shift_kind_labels = {
+        "early": "早番",
+        "late": "遅番",
+        "day": "日勤",
+        "night": "夜勤",
+        "night_rest": "夜勤明け休み",
+        "rest": "通常休み",
+    }
+    has_required_shift_kinds = all(symbol_names_by_kind(config.shift_kinds, kind) for kind in required_shift_kind_labels)
     part_time_entries = [
-        f"{employee.display_name}: {next((shift for shift in employee.allowed_shifts if shift in {'5.5', '6.0'}), '')}"
+        f"{employee.display_name}: {next((shift for shift in employee.allowed_shifts if config.shift_kinds.get(shift) == 'day' and shift not in standard_day_symbols(config.shift_kinds)), next((shift for shift in employee.allowed_shifts if config.shift_kinds.get(shift) == 'day'), ''))}"
         for employee in config.employees
         if employee.employment == "part"
     ]
@@ -2336,7 +3004,7 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
         non_holiday_fixed_assignments = [
             (day, shift)
             for day, shift in sorted(employee.fixed_assignments.items())
-            if not (shift == "休" and day in specified_holiday_days)
+            if not (primary_rest is not None and shift == primary_rest and day in specified_holiday_days)
         ]
         fixed_assignment_count += len(non_holiday_fixed_assignments)
         if non_holiday_fixed_assignments:
@@ -2351,7 +3019,6 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
 
     weekend_days = ", ".join(str(day + 1) for day in weekend_day_indexes(config.year, config.month, config.days_in_month))
     weekend_pair_count = len(weekend_pair_day_indexes(config.year, config.month, config.days_in_month))
-    has_required_symbols = all(symbol in config.shift_kinds for symbol in ["早", "遅", "日", "夜", "休", "特"]) and bool(symbol_names_by_kind(config.shift_kinds, "night_rest"))
     double_night_total = sum(int(count) for count in validation.get("double_night_counts", {}).values())
     exact_rest_day_targets = validation.get("exact_rest_day_targets", {})
     exact_rest_day_violations = validation.get("exact_rest_day_violations", [])
@@ -2363,11 +3030,14 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
     weekday_override_count = sum(len(employee.date_allowed_shift_overrides) for employee in config.employees)
     weekend_pair_target_count = sum(1 for employee in config.employees if employee.require_weekend_pair_rest)
     four_day_streak_violations = validation.get("four_day_streak_violations", [])
-    four_day_target_counts = validation.get("weekend_four_day_target_counts", {})
+    four_day_hard_target_counts = validation.get("four_day_hard_target_counts", validation.get("weekend_four_day_target_counts", {}))
+    preferred_four_day_target_counts = validation.get("preferred_four_day_target_counts", {})
+    preferred_four_day_streak_excess = validation.get("preferred_four_day_streak_excess", [])
+    four_day_window_counts = validation.get("four_day_window_counts", {})
     night_fairness_counts = validation.get("night_fairness_counts", validation.get("night_counts", {}))
     night_fairness_spread = validation.get("night_fairness_spread", validation.get("night_spread", 0))
-    weekend_rest_mode = validation.get("weekend_rest_count_mode", config.weekend_rest_count_mode)
-
+    night_fairness_target_count = len(night_fairness_counts)
+    weekend_fairness_target_count = len(validation.get("weekend_rest", {}))
     results: list[dict[str, object]] = []
     if validation.get("partial_mode"):
         results.append(
@@ -2384,13 +3054,23 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
         {
             "category": "ルール適合性",
             "title": "記号体系",
-            "status": "適合" if has_required_symbols else "不適合",
-            "detail": "ルールで定義された 早・遅・日・夜・夜休・休・特 を設定済みです。" if has_required_symbols else "ルールで定義された勤務記号が不足しています。",
-            "evidence": [f"設定済み記号: {', '.join(display_symbol(symbol) for symbol in config.shift_kinds.keys())}"],
+            "status": "適合" if has_required_shift_kinds else "不適合",
+            "detail": (
+                "早番・遅番・日勤・夜勤・夜勤明け休み・通常休みの勤務種別を設定済みです。"
+                if has_required_shift_kinds
+                else "必要な勤務種別の設定が不足しています。"
+            ),
+            "evidence": [
+                f"設定済み記号: {', '.join(display_symbol(symbol) for symbol in config.shift_kinds.keys())}",
+                "勤務種別: " + ", ".join(
+                    f"{label}={'/'.join(display_symbol(symbol) for symbol in symbol_names_by_kind(config.shift_kinds, kind)) or '未設定'}"
+                    for kind, label in required_shift_kind_labels.items()
+                ),
+            ],
         },
         {
             "category": "ルール適合性",
-            "title": "南北の早番・遅番配置",
+            "title": "ユニット別の早番・遅番配置",
             "status": "適合" if not validation["staffing_issues"] else "不適合",
             "detail": "各ユニットの早番・遅番人数条件を満たしています。" if not validation["staffing_issues"] else "人数条件を満たさない日があります。",
             "evidence": validation["staffing_issues"][:20],
@@ -2415,29 +3095,29 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
         },
         {
             "category": "ルール適合性",
-            "title": "指定勤務日の反映",
+            "title": "指定勤務日（委員会日を含む）の反映",
             "status": "要注意" if fixed_assignment_count == 0 else "適合",
             "detail": (
-                "指定勤務は未設定です。"
+                "指定勤務は未設定です。委員会日は指定勤務日の早番として扱います。"
                 if fixed_assignment_count == 0
-                else f"指定勤務 {fixed_assignment_count} 件を最優先で反映します。元勤務表を読み込み、設定ファイルの指定勤務で必要時だけ上書きします。"
+                else f"指定勤務 {fixed_assignment_count} 件を最優先で反映します。委員会日は早番の指定勤務として扱い、元勤務表を読み込み、設定ファイルの指定勤務で必要時だけ上書きします。"
             ),
             "evidence": fixed_assignment_entries[:20],
         },
         {
-            "category": "ルール適合性",
-            "title": "土日のどちらか休み",
+            "category": "配慮",
+            "title": "土日のどちらかが休系勤務",
             "status": (
                 "要注意"
                 if weekend_pair_target_count == 0
-                else "適合" if not validation["weekend_pair_rest_violations"] else "不適合"
+                else "適合" if not validation["weekend_pair_rest_violations"] else "要注意"
             ),
             "detail": (
                 "対象職員が未設定のため未検証です。"
                 if weekend_pair_target_count == 0
-                else f"対象 {weekend_pair_target_count} 人について、{weekend_pair_count} 組の土日ペアで土曜か日曜のどちらかが休みまたは夜休になる条件を満たしています。"
+                else f"対象 {weekend_pair_target_count} 人について、{weekend_pair_count} 組の土日ペアで土曜か日曜のどちらかが {weekend_rest_mode_label} になる条件を満たしています。"
                 if not validation["weekend_pair_rest_violations"]
-                else "土日ペアの両方が勤務になっている箇所があります。"
+                else "土日ペアの両方が勤務になっている箇所がありますが、例外運用として許容しうる配慮未達です。"
             ),
             "evidence": validation["weekend_pair_rest_violations"][:20],
         },
@@ -2459,32 +3139,59 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
             "category": "ルール適合性",
             "title": "4連勤許容回数",
             "status": (
-                "要注意"
-                if not four_day_target_counts
-                else "適合" if not four_day_streak_violations
-                else "不適合"
+                "不適合"
+                if four_day_streak_violations
+                else "要注意"
+                if preferred_four_day_streak_excess
+                else "適合"
+                if four_day_hard_target_counts or preferred_four_day_target_counts
+                else "要注意"
             ),
             "detail": (
-                "4連勤許容回数は未設定です。"
-                if not four_day_target_counts
-                else f"対象 {len(four_day_target_counts)} 人について、4連勤窓の回数上限を満たしています。"
-                if not four_day_streak_violations
-                else "4連勤窓の回数上限を超える対象者がいます。"
+                "4連勤の目標は未設定です。"
+                if not four_day_hard_target_counts and not preferred_four_day_target_counts
+                else "4連勤の硬い上限と月1回程度の目標を満たしています。"
+                if not four_day_streak_violations and not preferred_four_day_streak_excess
+                else "4連勤の硬い上限違反、または月1回程度の目標超過があります。"
             ),
-            "evidence": four_day_streak_violations[:20],
+            "evidence": [
+                *four_day_streak_violations,
+                *preferred_four_day_streak_excess,
+                *[
+                    f"{name}: 実績{four_day_window_counts.get(name, 0)}回 / 許容{count}回"
+                    for name, count in four_day_hard_target_counts.items()
+                ],
+                *[
+                    f"{name}: 実績{four_day_window_counts.get(name, 0)}回 / 目標{count}回"
+                    for name, count in preferred_four_day_target_counts.items()
+                ],
+            ][:20],
         },
         {
             "category": "ルール適合性",
             "title": "連休上限",
             "status": "適合" if not validation["regular_rest_violations"] and not validation["all_rest_violations"] else "不適合",
-            "detail": "休3連休まで、特を含めて5連休までの条件を満たしています。" if not validation["regular_rest_violations"] and not validation["all_rest_violations"] else "連休上限を超える箇所があります。",
+            "detail": (
+                f"{regular_rest_label}{config.max_consecutive_rest}連休まで、{all_rest_label}{config.max_consecutive_rest_with_special}連休までの条件を満たしています。"
+                if not validation["regular_rest_violations"] and not validation["all_rest_violations"]
+                else "連休上限を超える箇所があります。"
+            ),
             "evidence": [*validation["regular_rest_violations"][:10], *validation["all_rest_violations"][:10]],
         },
         {
             "category": "ルール適合性",
             "title": "夜勤回数の平等化",
-            "status": "適合" if config.fairness_night_spread is None or night_fairness_spread <= config.fairness_night_spread else "不適合",
-            "detail": f"夜勤回数のばらつきは {night_fairness_spread} 回です。",
+            "status": (
+                "要注意"
+                if night_fairness_target_count == 0
+                else "適合" if config.fairness_night_spread is None or night_fairness_spread <= config.fairness_night_spread
+                else "不適合"
+            ),
+            "detail": (
+                "夜勤公平化対象が未設定のため未検証です。"
+                if night_fairness_target_count == 0
+                else f"夜勤回数のばらつきは {night_fairness_spread} 回です。"
+            ),
             "evidence": [f"{name}: {count}回" for name, count in night_fairness_counts.items()],
         },
         {
@@ -2520,7 +3227,7 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
         },
         {
             "category": "ルール適合性",
-            "title": "休回数の個別指定",
+            "title": "休系回数の個別指定",
             "status": (
                 "要注意"
                 if not exact_rest_day_targets
@@ -2530,9 +3237,9 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
             "detail": (
                 "exact_rest_days が未設定のため未検証です。"
                 if not exact_rest_day_targets
-                else f"対象 {len(exact_rest_day_targets)} 人について、休み総数を指定回数に一致させています。"
+                else f"対象 {len(exact_rest_day_targets)} 人について、{rest_like_label}総数を指定回数に一致させています。"
                 if not exact_rest_day_violations
-                else "休み総数が指定回数と一致しない対象者がいます。"
+                else f"{rest_like_label}総数が指定回数と一致しない対象者がいます。"
             ),
             "evidence": [
                 *exact_rest_day_violations,
@@ -2544,14 +3251,23 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
         },
         {
             "category": "ルール適合性",
-            "title": "土日休みの平等化",
-            "status": "適合" if config.fairness_weekend_spread is None or validation["weekend_rest_spread"] <= config.fairness_weekend_spread else "要注意",
-            "detail": f"土日休みのばらつきは {validation['weekend_rest_spread']} 回です。カウント方式は {weekend_rest_mode} です。",
+            "title": "土日休系回数の平等化",
+            "status": (
+                "要注意"
+                if weekend_fairness_target_count == 0
+                else "適合" if config.fairness_weekend_spread is None or validation["weekend_rest_spread"] <= config.fairness_weekend_spread
+                else "要注意"
+            ),
+            "detail": (
+                "土日公平化対象が未設定のため未検証です。"
+                if weekend_fairness_target_count == 0
+                else f"土日の {weekend_rest_mode_label} 回数のばらつきは {validation['weekend_rest_spread']} 回です。"
+            ),
             "evidence": [f"{name}: {count}回" for name, count in validation["weekend_rest"].items()],
         },
         {
             "category": "ルール適合性",
-            "title": "通常の『日』確保",
+            "title": f"通常の『{primary_day_label}』確保",
             "status": (
                 "要注意"
                 if not standard_day_shift_target_counts
@@ -2561,13 +3277,13 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
             "detail": (
                 "対象者が設定されていないため未検証です。"
                 if not standard_day_shift_target_counts
-                else f"対象 {len(standard_day_shift_target_counts)} 人全員に、通常の『日』を月1回以上配置しています。"
+                else f"対象 {len(standard_day_shift_target_counts)} 人全員に、通常の『{primary_day_label}』を月1回以上配置しています。"
                 if not standard_day_shift_violations
-                else "通常の『日』が月1回未満の対象者がいます。"
+                else f"通常の『{primary_day_label}』が月1回未満の対象者がいます。"
             ),
             "evidence": [
                 *standard_day_shift_violations,
-                *[f"{name}: {count}回" for name, count in standard_day_shift_target_counts.items()],
+                *[f"{name}: {validation['standard_day_shift_counts'].get(name, 0)}回" for name in standard_day_shift_target_counts.keys()],
             ][:20],
         },
         {
@@ -2603,9 +3319,9 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
         },
         {
             "category": "ルール適合性",
-            "title": "夜勤明け休み（夜休）が10日以上続かない",
+            "title": "夜勤明け休み連続上限",
             "status": "適合" if not validation["night_rest_chain_violations"] else "不適合",
-            "detail": "夜勤明け休みが10回以上続く並びはありません。" if not validation["night_rest_chain_violations"] else "夜勤明け休みが10回以上続く並びがあります。",
+            "detail": f"{night_rest_label}が10回以上続く並びはありません。" if not validation["night_rest_chain_violations"] else f"{night_rest_label}が10回以上続く並びがあります。",
             "evidence": validation["night_rest_chain_violations"] or [
                 f"{name}: 最大{count}回"
                 for name, count in validation.get("night_rest_chain_max", {}).items()
@@ -2627,16 +3343,20 @@ def build_validation_results(config: SchedulerConfig, validation: dict[str, obje
         },
         {
             "category": "配慮",
-            "title": "土日休みの平等化",
-            "status": "適合",
-            "detail": f"土日休みのばらつきは {validation['weekend_rest_spread']} 回です。",
-            "evidence": [f"{name}: {validation['weekend_rest'][name]}回" for name in full_time_employees if name in validation["weekend_rest"]],
+            "title": "土日休系回数の平等化",
+            "status": "要注意" if weekend_fairness_target_count == 0 else "適合",
+            "detail": (
+                "土日公平化対象が未設定のため未検証です。"
+                if weekend_fairness_target_count == 0
+                else f"土日の {weekend_rest_mode_label} 回数のばらつきは {validation['weekend_rest_spread']} 回です。"
+            ),
+            "evidence": [f"{name}: {count}回" for name, count in validation["weekend_rest"].items()],
         },
         {
             "category": "必須",
-            "title": "特休の使用",
+            "title": f"{special_rest_label}の使用",
             "status": "参考",
-            "detail": "特休が使われています。" if special_leave_names else "特休は使われていません。",
+            "detail": f"{special_rest_label}が使われています。" if special_leave_names else f"{special_rest_label}は使われていません。",
             "evidence": special_leave_names,
         },
         {
@@ -2718,7 +3438,7 @@ def render_validation_report(
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>あかねっこ自動生成検証と差分</title>
+<title>{html.escape(config.unit_name)} 勤務表 自動生成検証と差分</title>
 <style>
 :root {{
   --bg: #f3efe7;
@@ -2798,7 +3518,7 @@ li + li {{ margin-top: 4px; }}
 <main>
 <section class="hero">
 <div class="eyebrow">自動生成レポート</div>
-<h1>【白紙】あかねっこ.xls 自動生成結果と差分</h1>
+<h1>{html.escape(config.target_path.name)} 自動生成結果と差分</h1>
 <p class="subtext">対象ファイル: {html.escape(config.target_path.name)}</p>
 </section>
 {partial_note_html}
@@ -2861,18 +3581,20 @@ def write_validation_report(
         config.target_path,
         config.sheet_index,
         [employee.row for employee in config.employees if should_write_employee_row(employee)],
+        layout=config.workbook_layout,
     )
     report_payload = {
         **validation_summary,
         "results": build_validation_results(config, validation_summary),
     }
     report_text = render_validation_report(config, report_payload, full_diffs, assignment_rows)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(report_text, encoding="utf-8")
     return report_path
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="あかねっこの勤務表を生成・同期・比較します。")
+    parser = argparse.ArgumentParser(description="勤務表を生成・同期・比較します。")
     subparsers = parser.add_subparsers(dest="command")
 
     generate_parser = subparsers.add_parser("generate", help="JSON設定から勤務表を自動作成")
@@ -2908,7 +3630,7 @@ def parse_args() -> argparse.Namespace:
 
 def with_generate_overrides(config: SchedulerConfig, args: argparse.Namespace) -> SchedulerConfig:
     target_path = args.target.resolve() if args.target else config.target_path
-    detected_year, detected_month, detected_days = detect_template_period(target_path, config.sheet_index)
+    detected_year, detected_month, detected_days = detect_template_period(target_path, config.sheet_index, config.workbook_layout)
 
     if detected_year is None and detected_month is None:
         raise ValueError(
@@ -2936,7 +3658,7 @@ def with_generate_overrides(config: SchedulerConfig, args: argparse.Namespace) -
     requested_days = args.days if args.days is not None else detected_days
     days_in_month = normalize_days_in_month(year, month, requested_days, "テンプレートまたは実行引数")
 
-    manual_year, manual_month, _ = detect_template_period(reference_source, config.sheet_index)
+    manual_year, manual_month, _ = detect_template_period(reference_source, config.sheet_index, config.workbook_layout)
     manual_fixed_assignments: dict[str, dict[int, str]] = {}
     if manual_year == year and manual_month == month:
         candidate_manual_fixed_assignments = read_fixed_assignments_from_workbook(
@@ -2945,18 +3667,44 @@ def with_generate_overrides(config: SchedulerConfig, args: argparse.Namespace) -
             config.employees,
             config.shift_kinds,
             days_in_month,
+            config.workbook_layout,
         )
         if not is_completed_schedule_like_fixed_assignments(candidate_manual_fixed_assignments, days_in_month):
             manual_fixed_assignments = candidate_manual_fixed_assignments
 
-    target_specified_holidays = read_specified_holidays_from_workbook(
+    target_specified_holiday_assignments: dict[str, dict[int, str]] = {}
+    candidate_target_fixed_assignments = read_fixed_assignments_from_workbook(
         target_path,
         config.sheet_index,
         config.employees,
+        config.shift_kinds,
         days_in_month,
+        config.workbook_layout,
     )
-    workbook_employee_settings = read_workbook_employee_settings(target_path, config.sheet_index, config.employees)
-    workbook_monthly_settings = read_workbook_monthly_settings(target_path, config.sheet_index)
+    if not is_completed_schedule_like_fixed_assignments(candidate_target_fixed_assignments, days_in_month):
+        target_specified_holiday_assignments = read_specified_holiday_assignments_from_workbook(
+            target_path,
+            config.sheet_index,
+            config.employees,
+            days_in_month,
+            holiday_symbols=tuple(symbol for symbol in symbol_names_by_kind(config.shift_kinds, "rest") if symbol),
+            layout=config.workbook_layout,
+        )
+    workbook_employee_settings = read_workbook_employee_settings(
+        target_path,
+        config.sheet_index,
+        config.employees,
+        config.shift_kinds,
+        days_in_month,
+        config.workbook_layout,
+    )
+    workbook_monthly_settings = read_workbook_monthly_settings(
+        target_path,
+        config.sheet_index,
+        config.shift_kinds,
+        days_in_month,
+        config.workbook_layout,
+    )
 
     previous_tail_length = max(
         config.max_consecutive_work,
@@ -2964,7 +3712,14 @@ def with_generate_overrides(config: SchedulerConfig, args: argparse.Namespace) -
         config.max_consecutive_rest,
         config.max_consecutive_rest_with_special,
     )
-    previous_source = resolve_previous_month_source(config.config_path.parent, target_path, reference_source, year, month)
+    previous_source = resolve_previous_month_source(
+        config.config_path.parent,
+        target_path,
+        reference_source,
+        year,
+        month,
+        config.workbook_layout,
+    )
     previous_tails: dict[str, tuple[str, ...]] = {}
     if previous_source is not None and previous_tail_length > 0:
         previous_tails = read_previous_tail_from_workbook(
@@ -2973,15 +3728,19 @@ def with_generate_overrides(config: SchedulerConfig, args: argparse.Namespace) -
             config.employees,
             config.shift_kinds,
             previous_tail_length,
+            config.workbook_layout,
         )
 
     merged_employees: list[EmployeeConfig] = []
     for employee in config.employees:
+        workbook_settings = workbook_employee_settings.get(employee.employee_id, {})
+        merged_allowed_shifts = tuple(workbook_settings.get("allowed_shifts", employee.allowed_shifts))
         fixed_assignments = dict(manual_fixed_assignments.get(employee.employee_id, {}))
         fixed_assignments.update(employee.fixed_assignments)
-        specified_holidays = tuple(sorted({*employee.specified_holidays, *target_specified_holidays.get(employee.employee_id, ())}))
-        for holiday_day in target_specified_holidays.get(employee.employee_id, ()): 
-            fixed_assignments[holiday_day] = "休"
+        workbook_holiday_assignments = target_specified_holiday_assignments.get(employee.employee_id, {})
+        specified_holidays = tuple(sorted({*employee.specified_holidays, *workbook_holiday_assignments.keys()}))
+        for holiday_day, holiday_symbol in workbook_holiday_assignments.items():
+            fixed_assignments[holiday_day] = holiday_symbol
         previous_tail = previous_tails.get(employee.employee_id, employee.previous_tail)
         fixed_assignments = normalize_night_rest_assignments(
             fixed_assignments,
@@ -2989,6 +3748,19 @@ def with_generate_overrides(config: SchedulerConfig, args: argparse.Namespace) -
             days_in_month,
             previous_shift=(previous_tail[-1] if previous_tail else None),
         )
+        merged_require_standard_day = bool(workbook_settings.get("require_standard_day", employee.require_standard_day))
+        merged_min_counts = dict(employee.min_counts)
+        merged_max_counts = {**employee.max_counts, **workbook_settings.get("max_counts", {})}
+        primary_day = primary_day_symbol(config.shift_kinds)
+        if primary_day is not None and primary_day in merged_allowed_shifts and int(merged_min_counts.get(primary_day, 0)) < 1:
+            merged_min_counts[primary_day] = 1
+        merged_exact_rest_days = workbook_settings.get("exact_rest_days", employee.exact_rest_days)
+        if merged_exact_rest_days is not None:
+            merged_min_rest_days = int(merged_exact_rest_days)
+            merged_max_rest_days = int(merged_exact_rest_days)
+        else:
+            merged_min_rest_days = employee.min_rest_days
+            merged_max_rest_days = employee.max_rest_days
         merged_employees.append(
             EmployeeConfig(
                 employee_id=employee.employee_id,
@@ -2996,27 +3768,39 @@ def with_generate_overrides(config: SchedulerConfig, args: argparse.Namespace) -
                 unit=employee.unit,
                 employment=employee.employment,
                 row=employee.row,
-                allowed_shifts=employee.allowed_shifts,
+                allowed_shifts=merged_allowed_shifts,
                 aliases=employee.aliases,
-                weekday_allowed_shifts=employee.weekday_allowed_shifts,
-                date_allowed_shift_overrides=employee.date_allowed_shift_overrides,
+                weekday_allowed_shifts=workbook_settings.get("weekday_allowed_shifts", employee.weekday_allowed_shifts),
+                date_allowed_shift_overrides=workbook_settings.get("date_allowed_shift_overrides", employee.date_allowed_shift_overrides),
                 require_weekend_pair_rest=employee.require_weekend_pair_rest,
-                night_fairness_target=bool(workbook_employee_settings.get(employee.employee_id, {}).get("night_fairness_target", employee.night_fairness_target)),
-                required_double_night_min_count=(
-                    workbook_employee_settings.get(employee.employee_id, {}).get("required_double_night_min_count", employee.required_double_night_min_count)
-                ),
-                weekend_fairness_target=bool(workbook_employee_settings.get(employee.employee_id, {}).get("weekend_fairness_target", employee.weekend_fairness_target)),
-                min_counts=employee.min_counts,
-                max_counts=employee.max_counts,
-                max_consecutive_work_limit=workbook_employee_settings.get(employee.employee_id, {}).get("max_consecutive_work_limit", employee.max_consecutive_work_limit),
-                max_four_day_streak_count=workbook_employee_settings.get(employee.employee_id, {}).get("max_four_day_streak_count", employee.max_four_day_streak_count),
-                exact_rest_days=employee.exact_rest_days,
-                min_rest_days=employee.min_rest_days,
-                max_rest_days=employee.max_rest_days,
+                night_fairness_target=bool(workbook_settings.get("night_fairness_target", employee.night_fairness_target)),
+                required_double_night_min_count=workbook_settings.get("required_double_night_min_count", employee.required_double_night_min_count),
+                weekend_fairness_target=bool(workbook_settings.get("weekend_fairness_target", employee.weekend_fairness_target)),
+                unit_shift_balance_target=bool(workbook_settings.get("unit_shift_balance_target", employee.unit_shift_balance_target)),
+                preferred_four_day_streak_target=bool(workbook_settings.get("preferred_four_day_streak_target", employee.preferred_four_day_streak_target)),
+                require_standard_day=merged_require_standard_day,
+                min_counts=merged_min_counts,
+                max_counts=merged_max_counts,
+                max_consecutive_work_limit=workbook_settings.get("max_consecutive_work_limit", employee.max_consecutive_work_limit),
+                max_four_day_streak_count=workbook_settings.get("max_four_day_streak_count", employee.max_four_day_streak_count),
+                exact_rest_days=merged_exact_rest_days,
+                min_rest_days=merged_min_rest_days,
+                max_rest_days=merged_max_rest_days,
                 specified_holidays=specified_holidays,
                 fixed_assignments=fixed_assignments,
                 previous_tail=previous_tail,
             )
+        )
+
+    missing_previous_tail_names = missing_previous_tail_for_day1_holidays(merged_employees)
+    if missing_previous_tail_names:
+        previous_source_text = "未検出" if previous_source is None else str(previous_source)
+        joined_names = ", ".join(missing_previous_tail_names)
+        raise ValueError(
+            "1日の指定休日を検証するための前月末勤務情報が不足しています。"
+            f"\n対象者: {joined_names}"
+            f"\n前月ファイル探索結果: {previous_source_text}"
+            "\n前月の勤務表を配置するか、設定ファイルの previous_tail を設定してください。"
         )
 
     return SchedulerConfig(
@@ -3033,16 +3817,18 @@ def with_generate_overrides(config: SchedulerConfig, args: argparse.Namespace) -
         employees=tuple(merged_employees),
         required_per_day=config.required_per_day,
         night_total_per_day=config.night_total_per_day,
-        day_requirements=config.day_requirements,
+        day_requirements=workbook_monthly_settings.get("day_requirements", config.day_requirements),
         max_consecutive_work=config.max_consecutive_work,
         max_consecutive_night=config.max_consecutive_night,
         max_consecutive_rest=config.max_consecutive_rest,
         max_consecutive_rest_with_special=config.max_consecutive_rest_with_special,
+        preferred_four_day_streak_count=config.preferred_four_day_streak_count,
         fairness_night_spread=workbook_monthly_settings.get("fairness_night_spread", config.fairness_night_spread),
         fairness_weekend_spread=workbook_monthly_settings.get("fairness_weekend_spread", config.fairness_weekend_spread),
         weekend_rest_count_mode=str(workbook_monthly_settings.get("weekend_rest_count_mode", config.weekend_rest_count_mode)),
         require_weekend_pair_rest=config.require_weekend_pair_rest,
         prefer_double_night=config.prefer_double_night,
+        workbook_layout=config.workbook_layout,
     )
 
 
@@ -3067,7 +3853,7 @@ def main() -> None:
 
     if args.command == "sync":
         target_path = args.target.resolve() if args.target else config.target_path
-        detected_year, detected_month, _ = detect_template_period(target_path, config.sheet_index)
+        detected_year, detected_month, _ = detect_template_period(target_path, config.sheet_index, config.workbook_layout)
         if detected_year is not None and detected_month is not None:
             config = load_config(args.config, year=detected_year, month=detected_month)
         source_path = args.source.resolve() if args.source else config.manual_source
@@ -3077,7 +3863,7 @@ def main() -> None:
 
     if args.command == "compare":
         target_path = args.target.resolve() if args.target else config.target_path
-        detected_year, detected_month, _ = detect_template_period(target_path, config.sheet_index)
+        detected_year, detected_month, _ = detect_template_period(target_path, config.sheet_index, config.workbook_layout)
         if detected_year is not None and detected_month is not None:
             config = load_config(args.config, year=detected_year, month=detected_month)
         source_path = args.source.resolve() if args.source else config.manual_source

@@ -6,10 +6,13 @@ from PyInstaller.utils.hooks import collect_dynamic_libs
 from PyInstaller.utils.hooks import collect_submodules
 
 datas = [
-    ('.\\akanecco_shift_config.json', '.'),
-    ('.\\3分で使う_GUI版.md', '.'),
+    ('.\\docs\\guides\\3分で使う_GUI版.md', '.'),
 ]
+candidate = Path('.\\shift_config.json')
+if candidate.exists():
+    datas.append((str(candidate), '.'))
 for candidate in [
+    Path('.\\docs\\guides\\3分で使う_GUI版.html'),
     Path('.\\3分で使う_GUI版.html'),
     Path('.\\exe\\generate_akanecco_shift_gui\\3分で使う_GUI版.html'),
     Path('.\\exe\\generate_akanecco_shift_gui\\_internal\\3分で使う_GUI版.html'),
@@ -25,7 +28,7 @@ hiddenimports += collect_submodules('ortools')
 
 
 a = Analysis(
-    ['generate_akanecco_shift_gui.py'],
+    ['generate_shift_gui.py'],
     pathex=[],
     binaries=binaries,
     datas=datas,

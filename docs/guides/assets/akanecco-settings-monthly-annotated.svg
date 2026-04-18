@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420">
+  <defs>
+    <style>
+      .bg { fill: #f7f1e8; }
+      .panel { fill: #fffdf8; stroke: #e5d8c7; stroke-width: 1.5; }
+      .header { fill: #eef3f8; }
+      .sub { fill: #f9fbfe; }
+      .label { fill: #f5f7fa; }
+      .text { font-family: "Yu Gothic UI", "Meiryo", sans-serif; font-size: 16px; fill: #23313d; }
+      .small { font-family: "Yu Gothic UI", "Meiryo", sans-serif; font-size: 13px; fill: #526170; }
+      .title { font-family: "Yu Gothic UI", "Meiryo", sans-serif; font-size: 28px; font-weight: 700; fill: #1f2933; }
+      .accent { font-family: "Yu Gothic UI", "Meiryo", sans-serif; font-size: 18px; font-weight: 700; fill: #9a3412; }
+      .highlight { fill: rgba(220, 38, 38, 0.08); stroke: #dc2626; stroke-width: 4; }
+      .arrow { stroke: #dc2626; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+      .callout { fill: #fff3f3; stroke: #f3b4b4; stroke-width: 1.5; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626" />
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="980" height="420" rx="20" />
+  <text class="title" x="36" y="48">月全体の設定はここを見る</text>
+  <text class="small" x="36" y="78">【統一書式】あかねっこ_設定項目追加.xls の AV から AY の領域</text>
+
+  <rect class="panel" x="34" y="102" width="640" height="214" rx="18" />
+
+  <rect class="label" x="54" y="130" width="58" height="42" />
+  <rect class="header" x="112" y="130" width="126" height="42" />
+  <rect class="header" x="238" y="130" width="126" height="42" />
+  <rect class="header" x="364" y="130" width="126" height="42" />
+  <rect class="header" x="490" y="130" width="164" height="42" />
+
+  <rect class="label" x="54" y="172" width="58" height="42" />
+  <rect class="sub" x="112" y="172" width="126" height="42" />
+  <rect class="sub" x="238" y="172" width="126" height="42" />
+  <rect class="sub" x="364" y="172" width="126" height="42" />
+  <rect class="sub" x="490" y="172" width="164" height="42" />
+
+  <rect class="label" x="54" y="214" width="58" height="42" />
+  <rect class="panel" x="112" y="214" width="126" height="42" />
+  <rect class="panel" x="238" y="214" width="126" height="42" />
+  <rect class="panel" x="364" y="214" width="126" height="42" />
+  <rect class="panel" x="490" y="214" width="164" height="42" />
+
+  <rect class="label" x="54" y="256" width="58" height="42" />
+  <rect class="panel" x="112" y="256" width="126" height="42" />
+  <rect class="panel" x="238" y="256" width="126" height="42" />
+  <rect class="panel" x="364" y="256" width="126" height="42" />
+  <rect class="panel" x="490" y="256" width="164" height="42" />
+
+  <text class="text" x="74" y="156">行/列</text>
+  <text class="text" x="162" y="156">AV</text>
+  <text class="text" x="288" y="156">AW</text>
+  <text class="text" x="414" y="156">AX</text>
+  <text class="text" x="548" y="156">AY</text>
+
+  <text class="text" x="82" y="198">1</text>
+  <text class="text" x="128" y="198">月次設定</text>
+  <text class="text" x="254" y="198">土日休公平化差</text>
+  <text class="text" x="380" y="198">休日数カウント</text>
+  <text class="text" x="506" y="198">指定日人数条件</text>
+
+  <text class="text" x="82" y="240">2</text>
+  <text class="text" x="164" y="240">1</text>
+  <text class="text" x="290" y="240">1</text>
+  <text class="text" x="382" y="240">休+特+夜休</text>
+  <text class="text" x="506" y="240">8=日:2; 21=日:1-2</text>
+
+  <text class="text" x="82" y="282">3</text>
+  <text class="small" x="120" y="282">夜勤公平化許容差</text>
+  <text class="small" x="246" y="282">土日休公平化許容差</text>
+  <text class="small" x="372" y="282">土日休カウント方式</text>
+  <text class="small" x="506" y="282">夜休連鎖定義</text>
+
+  <rect class="highlight" x="112" y="172" width="542" height="42" rx="10" />
+
+  <rect class="callout" x="706" y="138" width="236" height="86" rx="14" />
+  <text class="accent" x="726" y="172">ここが入力欄です</text>
+  <text class="text" x="726" y="200">AV2 から AY2 に、</text>
+  <text class="text" x="726" y="224">その月全体の条件を書きます。</text>
+  <path class="arrow" d="M 706 216 C 670 220, 640 220, 620 194" />
+
+  <rect class="callout" x="706" y="248" width="236" height="96" rx="14" />
+  <text class="accent" x="726" y="282">まず見るのは 4 つ</text>
+  <text class="text" x="726" y="310">AV2: 夜勤の平等さ</text>
+  <text class="text" x="726" y="334">AW2: 土日休みの平等さ</text>
+  <text class="text" x="726" y="358">AX2: 休みの数え方</text>
+  <text class="text" x="726" y="382">AY2: 特定日だけ人数を増やす設定</text>
+</svg>

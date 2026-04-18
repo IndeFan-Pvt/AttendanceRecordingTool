@@ -1,9 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
+from pathlib import Path
+
 from PyInstaller.utils.hooks import collect_data_files
 from PyInstaller.utils.hooks import collect_dynamic_libs
 from PyInstaller.utils.hooks import collect_submodules
 
-datas = [('.\\akanecco_shift_config.json', '.')]
+datas = []
+candidate = Path('.\\shift_config.json')
+if candidate.exists():
+    datas.append((str(candidate), '.'))
 binaries = []
 hiddenimports = ['win32timezone']
 datas += collect_data_files('ortools')
@@ -12,7 +17,7 @@ hiddenimports += collect_submodules('ortools')
 
 
 a = Analysis(
-    ['generate_akanecco_shift.py'],
+    ['generate_shift.py'],
     pathex=[],
     binaries=binaries,
     datas=datas,

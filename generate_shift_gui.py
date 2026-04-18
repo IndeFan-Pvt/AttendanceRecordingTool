@@ -7,11 +7,12 @@ import sys
 import threading
 import traceback
 from argparse import Namespace
+from dataclasses import replace
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-import generate_akanecco_shift as gas
+import generate_shift as gas
 import pythoncom
 
 
@@ -114,7 +115,7 @@ class ShiftGeneratorApp:
 
     def _browse_config(self) -> None:
         if self.is_frozen:
-            messagebox.showinfo("設定固定", "設定 JSON は exe フォルダ内の akanecco_shift_config.json を使用します。")
+            messagebox.showinfo("設定固定", "設定 JSON は実行フォルダ内の shift_config.json を使用します。")
             return
         file_path = filedialog.askopenfilename(
             title="設定 JSON を選択",
@@ -127,14 +128,22 @@ class ShiftGeneratorApp:
         if not self.is_frozen:
             return gas.DEFAULT_CONFIG_PATH
 
-        external_config = self.base_dir / "akanecco_shift_config.json"
-        internal_config = self.base_dir / "_internal" / "akanecco_shift_config.json"
-        if not external_config.exists() and internal_config.exists():
-            try:
-                shutil.copy2(internal_config, external_config)
-            except OSError:
-                return internal_config
-        return external_config if external_config.exists() else internal_config
+        for file_name in gas.DEFAULT_CONFIG_CANDIDATE_FILENAMES:
+            external_config = self.base_dir / file_name
+            if external_config.exists():
+                return external_config
+
+        for file_name in gas.DEFAULT_CONFIG_CANDIDATE_FILENAMES:
+            external_config = self.base_dir / file_name
+            internal_config = self.base_dir / "_internal" / file_name
+            if not external_config.exists() and internal_config.exists():
+                try:
+                    shutil.copy2(internal_config, external_config)
+                    return external_config
+                except OSError:
+                    return internal_config
+
+        return self.base_dir / gas.DEFAULT_CONFIG_CANDIDATE_FILENAMES[0]
 
     def _to_display_path(self, path: Path) -> str:
         try:
@@ -270,53 +279,14 @@ class ShiftGeneratorApp:
                     config.shift_kinds,
                     previous_tail_length,
                 )
-                merged_employees = []
-                for employee in config.employees:
-                    merged_employees.append(
-                        gas.EmployeeConfig(
-                            employee_id=employee.employee_id,
-                            display_name=employee.display_name,
-                            unit=employee.unit,
-                            employment=employee.employment,
-                            row=employee.row,
-                            allowed_shifts=employee.allowed_shifts,
-                            aliases=employee.aliases,
-                            weekday_allowed_shifts=employee.weekday_allowed_shifts,
-                            date_allowed_shift_overrides=employee.date_allowed_shift_overrides,
-                            require_weekend_pair_rest=employee.require_weekend_pair_rest,
-                            min_counts=employee.min_counts,
-                            max_counts=employee.max_counts,
-                            min_rest_days=employee.min_rest_days,
-                            max_rest_days=employee.max_rest_days,
-                            specified_holidays=employee.specified_holidays,
-                            fixed_assignments=employee.fixed_assignments,
-                            previous_tail=previous_tails.get(employee.employee_id, employee.previous_tail),
-                        )
+                merged_employees = [
+                    replace(
+                        employee,
+                        previous_tail=previous_tails.get(employee.employee_id, employee.previous_tail),
                     )
-                config = gas.SchedulerConfig(
-                    config_path=config.config_path,
-                    target_path=config.target_path,
-                    manual_source=config.manual_source,
-                    sheet_index=config.sheet_index,
-                    year=config.year,
-                    month=config.month,
-                    days_in_month=config.days_in_month,
-                    unit_name=config.unit_name,
-                    shift_kinds=config.shift_kinds,
-                    count_symbols=config.count_symbols,
-                    employees=tuple(merged_employees),
-                    required_per_day=config.required_per_day,
-                    night_total_per_day=config.night_total_per_day,
-                    day_requirements=config.day_requirements,
-                    max_consecutive_work=config.max_consecutive_work,
-                    max_consecutive_night=config.max_consecutive_night,
-                    max_consecutive_rest=config.max_consecutive_rest,
-                    max_consecutive_rest_with_special=config.max_consecutive_rest_with_special,
-                    fairness_night_spread=config.fairness_night_spread,
-                    fairness_weekend_spread=config.fairness_weekend_spread,
-                    require_weekend_pair_rest=config.require_weekend_pair_rest,
-                    prefer_double_night=config.prefer_double_night,
-                )
+                    for employee in config.employees
+                ]
+                config = replace(config, employees=tuple(merged_employees))
             self._queue_progress(40, "勤務表を計算しています。しばらくお待ちください。")
             solve_result = gas.solve_schedule(config)
             schedule = solve_result.schedule
@@ -389,6 +359,8 @@ class ShiftGeneratorApp:
         if getattr(sys, "frozen", False):
             base_dir = Path(sys.executable).resolve().parent
             candidates = [
+                base_dir / "docs" / "guides" / "3分で使う_GUI版.html",
+                base_dir / "docs" / "guides" / "3分で使う_GUI版.md",
                 base_dir / "3分で使う_GUI版.html",
                 base_dir / "3分で使う_GUI版.md",
                 base_dir / "_internal" / "3分で使う_GUI版.html",
@@ -397,6 +369,8 @@ class ShiftGeneratorApp:
         else:
             base_dir = Path(__file__).resolve().parent
             candidates = [
+                base_dir / "docs" / "guides" / "3分で使う_GUI版.html",
+                base_dir / "docs" / "guides" / "3分で使う_GUI版.md",
                 base_dir / "exe" / "generate_akanecco_shift_gui" / "3分で使う_GUI版.html",
                 base_dir / "exe" / "generate_akanecco_shift_gui" / "3分で使う_GUI版.md",
                 base_dir / "3分で使う_GUI版.md",

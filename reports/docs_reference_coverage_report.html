@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>docs/reference 対応状況レポート</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --panel: #fffdf8;
+      --line: #d6c7b2;
+      --text: #2f261d;
+      --muted: #6e6255;
+      --ok: #1f6b45;
+      --warn: #9b6a00;
+      --ng: #9d2f2f;
+      --accent: #7a4b2f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Yu Gothic UI", "Hiragino Sans", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, #efe2cd 0, rgba(239, 226, 205, 0) 32%),
+        linear-gradient(180deg, #faf5ec 0%, var(--bg) 100%);
+      line-height: 1.65;
+    }
+
+    main {
+      width: min(1200px, calc(100vw - 32px));
+      margin: 32px auto 56px;
+    }
+
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(77, 55, 29, 0.08);
+    }
+
+    h1, h2 {
+      margin: 0 0 12px;
+      line-height: 1.25;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      letter-spacing: 0.02em;
+    }
+
+    h2 {
+      font-size: 22px;
+      color: var(--accent);
+    }
+
+    p {
+      margin: 0 0 10px;
+    }
+
+    .lede {
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: #fffcf6;
+    }
+
+    .card strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .supported {
+      background: rgba(31, 107, 69, 0.12);
+      color: var(--ok);
+    }
+
+    .partial {
+      background: rgba(155, 106, 0, 0.14);
+      color: var(--warn);
+    }
+
+    .unsupported {
+      background: rgba(157, 47, 47, 0.12);
+      color: var(--ng);
+    }
+
+    .note {
+      background: #f9f3e7;
+      border-left: 4px solid #c38c42;
+      padding: 12px 14px;
+      border-radius: 10px;
+      color: var(--muted);
+    }
+
+    ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+    }
+
+    li + li {
+      margin-top: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+
+    th, td {
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+      padding: 12px 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #f7efe1;
+      font-size: 13px;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      background: #f3eadc;
+      border-radius: 6px;
+      padding: 1px 6px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      table, thead, tbody, tr, th, td {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        margin-bottom: 12px;
+        overflow: hidden;
+      }
+
+      td {
+        border-bottom: 1px solid #efe4d3;
+      }
+
+      td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section>
+      <h1>docs/reference 対応状況レポート</h1>
+      <p class="lede">対象は docs/reference/シフト作成ルール.txt と docs/reference/シフト作成（ルールと配慮）理事長修正.xlsx、評価対象コードは generate_shift.py です。xlsx 側の記載は txt と同系統で、今回の判定に影響する追加ルールは見当たりませんでした。</p>
+      <div class="summary">
+        <div class="card">
+          <strong>9 / 9</strong>
+          <div>必須ルールが実装済み</div>
+        </div>
+        <div class="card">
+          <strong>5 / 5</strong>
+          <div>配慮事項が明確に対応</div>
+        </div>
+        <div class="card">
+          <strong>0 / 5</strong>
+          <div>配慮事項の未完了</div>
+        </div>
+        <div class="card">
+          <strong>4 / 4</strong>
+          <div>追加機能要求が実装済み</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>総括</h2>
+      <p>現行スクリプトは、必須ルール、配慮事項、追加機能要求の全体についてコード上の対応が確認できました。人員配置、夜勤遷移、月跨ぎ引継ぎ、休日数指定、シフト上限、日勤増員指定、解なし時の途中案出力まで、reference の主要要求を通しています。</p>
+      <p>今回の更新で、4連勤の「月1回程度」もソフト制約として目的関数に組み込み、通常の「日」を入れる配慮も専用フラグとして明示化しました。加えて、土日片休条件は厳密解では必須、途中案では緩和対象という段階付きの挙動になっています。</p>
+      <div class="note">このレポートは「現在のスクリプトで実現可能か」を見ています。現在は target 系の配慮条件を自動適用せず、設定で明示した職員だけに適用する実装です。</div>
+    </section>
+
+    <section>
+      <h2>必須ルール ①〜⑨</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>reference 要件</th>
+            <th>判定</th>
+            <th>実装根拠</th>
+            <th>補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="ID">①</td>
+            <td data-label="reference 要件">各ユニットの南北で早番・遅番をそれぞれ 1 人ずつ配置</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1611-1618</code> でユニット別の early / late 必須人数を厳密制約化。</td>
+            <td data-label="補足">reference の人数条件と一致。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">②</td>
+            <td data-label="reference 要件">夜勤を南北合計で 1 人配置</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1619</code> で 1 日あたりの夜勤総数を <code>config.night_total_per_day</code> に固定。</td>
+            <td data-label="補足">検証側でも夜勤人数異常を再チェックしています。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">③</td>
+            <td data-label="reference 要件">遅番翌日の早番禁止。早番・日勤の翌日は広く許容</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1666-1669</code> で 遅→早 を禁止。1 日 1 勤務制約により、それ以外は許容側に寄せた実装。</td>
+            <td data-label="補足">reference の主眼である遅→早禁止は満たしています。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">④</td>
+            <td data-label="reference 要件">夜勤翌日は早・日・遅を不可。夜夜は 2 連続まで</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1670-1673</code> で 夜勤翌日は 夜 または 夜休 のみ許可。<code>generate_shift.py:1710-1714</code> で夜勤連続上限を制約化。</td>
+            <td data-label="補足">原文より少し厳しめで、夜勤後は夜休まで含めて明示制御しています。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑤</td>
+            <td data-label="reference 要件">指定休日の前日に夜勤を入れない</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1651-1656</code> で指定休日の前日夜勤を禁止。<code>generate_shift.py:2333-2343</code> で検証も実施。</td>
+            <td data-label="補足">1 日目の指定休日は前月末データが無いと未検証扱いになります。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑥</td>
+            <td data-label="reference 要件">最長連勤は 5 連勤まで</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1696-1705</code> で連勤窓制約を追加。検証は <code>generate_shift.py:2248-2252</code>。</td>
+            <td data-label="補足">個別により厳しい上限を持たせる拡張にも対応しています。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑦</td>
+            <td data-label="reference 要件">月初勤務は前月末の勤務状況を引き継ぐ</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1644-1651</code> で <code>previous_tail</code> を見て月初制約を追加。読込は <code>generate_shift.py:3255-3279</code>。</td>
+            <td data-label="補足">遅→早禁止や夜勤系列も月跨ぎで継続判定されます。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑧</td>
+            <td data-label="reference 要件">連休は 3 連休まで。特を含めれば 5 連休まで可</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1706-1714</code> で通常休系と特別休込みの 2 系統の連休上限を制約化。検証は <code>generate_shift.py:2260-2277</code>。</td>
+            <td data-label="補足">reference の 2 段階ルールをそのまま持っています。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑨</td>
+            <td data-label="reference 要件">夜勤回数制限のない職員どうしの夜勤回数差を 1 回以内にする</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1747-1758</code> で夜勤公平化対象者の max-min を <code>fairness_night_spread</code> 以内に制約化。</td>
+            <td data-label="補足">report 側でもばらつき回数を明示できます。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>配慮事項 ⑩〜⑭</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>reference 要件</th>
+            <th>判定</th>
+            <th>実装根拠</th>
+            <th>補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="ID">⑩</td>
+            <td data-label="reference 要件">夜夜の 2 連続夜勤を最低 1 回は入れたい</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1674-1694</code> で夜夜ペア変数を定義し、<code>generate_shift.py:1784</code> 付近で目的関数に反映。個別最低回数も設定可能。</td>
+            <td data-label="補足">「配慮」としての誘導だけでなく、対象者ごとの必須回数にもできます。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑪</td>
+            <td data-label="reference 要件">4 連勤までが望ましい。4 連勤は月 1 回程度が望ましい</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py</code> で 4 連勤窓の個別上限に加え、未指定者には月 1 回程度のソフト目標を目的関数へ追加。検証でも目標超過を集計。</td>
+            <td data-label="補足">硬い上限と望ましさの両方を分けて扱っています。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑫</td>
+            <td data-label="reference 要件">土日の休み回数をなるべく平等にする</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1730-1741</code> で土日休系回数の max-min を制御。report 化は <code>generate_shift.py:2807-2810</code>。</td>
+            <td data-label="補足">休のみ / 休+夜休 / 休+特+夜休 の数え方も切替可能です。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑬</td>
+            <td data-label="reference 要件">勤務体制に関係ない通常の「日」をどこかに 1 日入れる</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py</code> で <code>require_standard_day</code> を導入し、対象者に通常日勤 1 回を明示的に付与。検証も専用集計に切替。</td>
+            <td data-label="補足">現在は require_standard_day を明示した対象者だけに適用します。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑭</td>
+            <td data-label="reference 要件">夜休入りの休みが 10 日以上続くのは禁止</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:2240-2290</code> で夜休連鎖を検証し、10 回到達で違反化。report 反映は <code>generate_shift.py:2867-2869</code>。</td>
+            <td data-label="補足">これは検証系で明確に見える化されています。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>組み込みたい機能 ⑮〜⑱</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>reference 要件</th>
+            <th>判定</th>
+            <th>実装根拠</th>
+            <th>補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="ID">⑮</td>
+            <td data-label="reference 要件">休回数を個別指定できるようにする</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:279-319</code> で exact / min / max の休数設定を正規化。制約は <code>generate_shift.py:1720-1726</code>、検証は <code>generate_shift.py:2321-2325</code>。</td>
+            <td data-label="補足">月ごとの差分も設定データで吸収できます。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑯</td>
+            <td data-label="reference 要件">早・日・遅・夜の MAX 回数を個別指定できるようにする</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1716-1719</code> で <code>employee.max_counts</code> を勤務種別ごとに上限制約化。</td>
+            <td data-label="補足">最小回数 <code>min_counts</code> も併せて扱えます。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑰</td>
+            <td data-label="reference 要件">指定日は日勤を必ず 1〜2 人配置したい</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1621-1627</code> で日別の min / max 要件を適用。report では日勤増員条件として検証対象に含まれます。</td>
+            <td data-label="補足">日勤以外にも同じ仕組みで日別増減条件を持てます。</td>
+          </tr>
+          <tr>
+            <td data-label="ID">⑱</td>
+            <td data-label="reference 要件">完全作成できない場合でも途中経過のシフトを出したい</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:2002-2020</code> で厳密解が無理なら緩和モデルへ切替。summary 化は <code>generate_shift.py:1988-2000</code>。</td>
+            <td data-label="補足">違反件数つきの暫定案を返す実装です。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>出勤制限のある職員パターン</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>pattern</th>
+            <th>判定</th>
+            <th>実装根拠</th>
+            <th>補足</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="pattern">早番メイン。日勤可。夜勤・遅番不可</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1448-1454</code> の <code>allowed_shifts</code> と、日別制限の <code>weekday_allowed_shifts</code> / <code>date_allowed_shift_overrides</code> で表現可能。</td>
+            <td data-label="補足">固定パターンではなく設定値で作る形です。</td>
+          </tr>
+          <tr>
+            <td data-label="pattern">早番と遅番固定。夜勤なし</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:1448-1454</code> の許可勤務種別制御で表現可能。</td>
+            <td data-label="補足">回数未定でも問題ありません。</td>
+          </tr>
+          <tr>
+            <td data-label="pattern">遅番は金土日のみ。土日のどちらかを休みにしたい。難しい時は例外運用あり</td>
+            <td data-label="判定"><span class="tag supported">対応済み</span></td>
+            <td data-label="実装根拠"><code>generate_shift.py:823-829</code> と <code>generate_shift.py:1466-1484</code> で曜日制限を設定可能。<code>generate_shift.py:1638-1643</code> で土日片休条件を付与し、緩和モデルで例外許容も扱います。</td>
+            <td data-label="補足">厳密解で守れない場合だけ途中案側で違反量を最小化する構成です。</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>次に手を入れるなら</h2>
+      <ul>
+        <li>必要なら勤務表の 勤務可能一覧・日勤候補対象・曜日別勤務制限 を埋めて、月ごとの運用差分を workbook 側へ寄せる。</li>
+        <li>必要なら preferred_four_day_streak_count を月や施設ごとに変えて、4連勤の出方を調整する。</li>
+        <li>必要なら JSON 側は職員一覧、行番号、ユニットなどの構造定義に絞り、運用条件の更新箇所を workbook に寄せる。</li>
+      </ul>
+      <p class="small">判定基準は「現在のスクリプトで実現可能か」です。構造定義は JSON に残りますが、docs/reference 相当の運用条件は workbook 側へ寄せられる前提で整理しています。</p>
+    </section>
+  </main>
+</body>
+</html>

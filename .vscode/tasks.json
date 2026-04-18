@@ -8,7 +8,7 @@
 			"args": [
 				"-m",
 				"PyInstaller",
-				"generate_akanecco_shift.spec"
+				"generate_shift.spec"
 			],
 			"isBackground": false,
 			"group": "build"
@@ -20,7 +20,7 @@
 			"args": [
 				"-m",
 				"PyInstaller",
-				"generate_akanecco_shift_gui.spec"
+				"generate_shift_gui.spec"
 			],
 			"isBackground": false,
 			"group": "build"
@@ -33,7 +33,7 @@
 				"-m",
 				"PyInstaller",
 				"-y",
-				"generate_akanecco_shift_gui.spec"
+				"generate_shift_gui.spec"
 			],
 			"isBackground": false,
 			"group": "build"

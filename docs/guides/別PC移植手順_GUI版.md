@@ -1,4 +1,4 @@
-# あかねっこ勤怠生成 GUI版 別PC移植手順
+# 勤怠生成 GUI版 別PC移植手順
 
 ## 1. 前提
 
@@ -25,7 +25,6 @@
 
 - generate_akanecco_shift_gui.exe
 - akanecco_shift_config.json
-- run_generate_akanecco_shift_gui.bat
 - _internal
 
 ### 2-2. 勤怠表データ
@@ -48,7 +47,6 @@
   generate_akanecco_shift_gui/
     generate_akanecco_shift_gui.exe
     akanecco_shift_config.json
-    run_generate_akanecco_shift_gui.bat
     _internal/
   勤怠データ/
     【統一書式】あかねっこ2月_temp.xls
@@ -66,9 +64,8 @@
 
 ### 4-1. GUI の起動
 
-以下のどちらかで起動します。
+以下で起動します。
 
-- generate_akanecco_shift_gui/run_generate_akanecco_shift_gui.bat
 - generate_akanecco_shift_gui/generate_akanecco_shift_gui.exe
 
 ### 4-2. GUI で指定する項目
@@ -78,7 +75,7 @@ GUI が開いたら以下を指定します。
 1. 記載したい勤怠表 (.xls / .xlsx)
    - 例: 【統一書式】あかねっこ2月_temp.xls
 2. 設定 JSON
-   - 例: generate_akanecco_shift_gui/akanecco_shift_config.json
+  - 例: generate_akanecco_shift_gui/akanecco_shift_config.json
 3. 前月勤務表 (任意)
    - 月初の勤務引継ぎを確実に反映したい場合に指定
    - 例: 【統一書式】あかねっこ1月.xls
@@ -133,6 +130,36 @@ GUI が開いたら以下を指定します。
 - 日本語ファイル名を変更すると、運用手順が分かりにくくなることがある
 - 設定 JSON の中身を変更する場合は、コピー後のファイルを編集する
 
+### 7-1. 設定 JSON の職員フラグについて
+
+現在のスクリプトは、職員向けの配慮条件を自動では付けません。必要な職員にだけ、設定 JSON で明示します。
+
+- night_fairness_target: 夜勤回数の平等化対象
+- weekend_fairness_target: 土日休系回数の平等化対象
+- unit_shift_balance_target: ユニット内の早番・遅番回数平準化対象
+- preferred_four_day_streak_target: 4連勤を月1回程度に抑える配慮対象
+- require_standard_day: 通常の「日」を月1回以上入れる対象
+
+別PCへ配布するときに設定 JSON を編集するなら、このフラグも一緒に確認します。
+
+勤務表側に見出し列を追加している運用なら、夜勤公平化対象、土日休公平化対象、4連勤許容回数、日勤候補対象、休系回数指定、各勤務の MAX 回数、勤務可能一覧、曜日別勤務制限、日付別勤務制限、指定日の日勤増員などは勤務表から直接変更できます。
+
+勤務可能一覧は、1 セルに「早/遅/日/夜/休」のように書きます。夜勤を含めた場合の夜休は自動補完されます。
+
+曜日別勤務制限と日付別勤務制限は、1 セルに「金=早/遅/日/夜/休; 土=早/遅/日/夜/休」「5=休; 17=休」のように書きます。
+
+指定日の日勤増員は、月次設定セルに「5=日:1-2; 17=日:2」のように書きます。
+
+### 7-2. period_overrides を使うときの注意
+
+月ごとに設定を変える場合は、period_overrides を使います。
+
+- キーは YYYY-MM 形式で書く
+- rules や target_path などは、その月だけ変えたい項目だけを書く
+- employees を書いた月は、通常設定の employees に追記されるのではなく、その月の employees 配列全体で置き換わる
+
+そのため、別PC用に設定 JSON を配布して月別設定も使う場合は、対象月の employees を必要人数ぶんまとめて入れておきます。
+
 ## 8. 最低限の配布チェックリスト
 
 - generate_akanecco_shift_gui フォルダを丸ごとコピーした
@@ -148,7 +175,7 @@ GUI が開いたら以下を指定します。
 
 1. generate_akanecco_shift_gui フォルダを別 PC にコピーする
 2. 勤怠データを別 PC にコピーする
-3. bat または exe を起動する
+3. exe を起動する
 4. GUI で対象 xls、設定 JSON、必要なら前月勤務表を選ぶ
 5. 生成実行する
 6. 必要なら生成後に Excel とレポートを確認する
