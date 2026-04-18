@@ -274,13 +274,11 @@ class ShiftGeneratorApp:
                 for employee in config.employees:
                     merged_employees.append(
                         gas.EmployeeConfig(
-                            employee_id=employee.employee_id,
-                            display_name=employee.display_name,
+                            name=employee.name,
                             unit=employee.unit,
                             employment=employee.employment,
                             row=employee.row,
                             allowed_shifts=employee.allowed_shifts,
-                            aliases=employee.aliases,
                             weekday_allowed_shifts=employee.weekday_allowed_shifts,
                             date_allowed_shift_overrides=employee.date_allowed_shift_overrides,
                             require_weekend_pair_rest=employee.require_weekend_pair_rest,
@@ -290,7 +288,7 @@ class ShiftGeneratorApp:
                             max_rest_days=employee.max_rest_days,
                             specified_holidays=employee.specified_holidays,
                             fixed_assignments=employee.fixed_assignments,
-                            previous_tail=previous_tails.get(employee.employee_id, employee.previous_tail),
+                            previous_tail=previous_tails.get(employee.name, employee.previous_tail),
                         )
                     )
                 config = gas.SchedulerConfig(
